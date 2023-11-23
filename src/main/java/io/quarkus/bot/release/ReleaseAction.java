@@ -10,9 +10,7 @@ import org.jboss.logging.Logger;
 import org.kohsuke.github.GHEventPayload;
 import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHIssueComment;
-import org.kohsuke.github.GHOrganization;
-import org.kohsuke.github.GHTeam;
-import org.kohsuke.github.GHUser;
+import org.kohsuke.github.GHPermissionType;
 import org.kohsuke.github.Reactable;
 import org.kohsuke.github.ReactionContent;
 
@@ -31,7 +29,6 @@ import io.quarkus.bot.release.step.StepStatus;
 import io.quarkus.bot.release.util.Command;
 import io.quarkus.bot.release.util.Issues;
 import io.quarkus.bot.release.util.Processes;
-import io.quarkus.bot.release.util.Teams;
 
 public class ReleaseAction {
 
@@ -51,7 +48,7 @@ public class ReleaseAction {
             throw new IllegalStateException("No RELEASE_GITHUB_TOKEN around");
         }
 
-        if (!hasReleaserPermission(issuePayload.getOrganization(), issuePayload.getSender())) {
+        if (!issuePayload.getRepository().hasPermission(issuePayload.getSender(), GHPermissionType.WRITE)) {
             react(commands, issue, ReactionContent.MINUS_ONE);
             issue.comment(":rotating_light: You don't have the permission to start a release.");
             issue.close();
@@ -71,6 +68,8 @@ public class ReleaseAction {
             throw e;
         }
 
+        react(commands, issue, ReactionContent.PLUS_ONE);
+
         handleSteps(context, commands, issuePayload.getIssue(), null, releaseInformation, new ReleaseStatus(Status.STARTED, Step.PREREQUISITES, StepStatus.STARTED, context.getGitHubRunId()));
     }
 
@@ -84,7 +83,7 @@ public class ReleaseAction {
             return;
         }
 
-        if (!hasReleaserPermission(issueCommentPayload.getOrganization(), issueCommentPayload.getSender())) {
+        if (!issueCommentPayload.getRepository().hasPermission(issueCommentPayload.getSender(), GHPermissionType.WRITE)) {
             react(commands, issueComment, ReactionContent.MINUS_ONE);
             return;
         }
@@ -162,6 +161,8 @@ public class ReleaseAction {
                 continue;
             }
 
+            commands.notice("Running step " + currentStep.getDescription());
+
             try {
                 StepHandler stepHandler = getStepHandler(currentStep);
 
@@ -201,16 +202,6 @@ public class ReleaseAction {
             issue.close();
         } catch (IOException e) {
             throw new IllegalStateException("Unable to mark the release as successful", e);
-        }
-    }
-
-    private static boolean hasReleaserPermission(GHOrganization organization, GHUser user) {
-        try {
-            GHTeam releasersTeam = organization.getTeamBySlug(Teams.RELEASERS);
-            return releasersTeam.hasMember(user);
-        } catch (IOException e) {
-            LOG.error("Unable to verify permissions", e);
-            return false;
         }
     }
 
