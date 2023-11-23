@@ -6,9 +6,11 @@ import jakarta.inject.Singleton;
 
 import org.kohsuke.github.GHIssue;
 
+import io.quarkus.arc.Unremovable;
 import io.quarkus.bot.release.ReleaseInformation;
 
 @Singleton
+@Unremovable
 public class CoreReleasePrepare implements StepHandler {
 
     @Override

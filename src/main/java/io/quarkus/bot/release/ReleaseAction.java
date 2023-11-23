@@ -23,9 +23,6 @@ import io.quarkus.arc.Arc;
 import io.quarkus.arc.InstanceHandle;
 import io.quarkus.bot.release.error.StatusUpdateException;
 import io.quarkus.bot.release.error.StepExecutionException;
-import io.quarkus.bot.release.step.ApproveCoreRelease;
-import io.quarkus.bot.release.step.CoreReleasePrepare;
-import io.quarkus.bot.release.step.Prerequisites;
 import io.quarkus.bot.release.step.Step;
 import io.quarkus.bot.release.step.StepHandler;
 import io.quarkus.bot.release.step.StepStatus;
@@ -42,14 +39,6 @@ public class ReleaseAction {
 
     @Inject
     Processes processes;
-
-    // ugly workaround...
-    @Inject
-    Prerequisites prerequisites;
-    @Inject
-    ApproveCoreRelease approveCoreRelease;
-    @Inject
-    CoreReleasePrepare coreReleasePrepare;
 
     @Action
     void startRelease(Context context, Commands commands, @Issue.Opened GHEventPayload.Issue issuePayload) throws Exception {
@@ -160,7 +149,7 @@ public class ReleaseAction {
         }
 
         progressInformation(context, commands, releaseInformation, currentReleaseStatus, issue,
-                "Proceeding to step " + Step.values()[initialStepOrdinal]);
+                "Proceeding to step " + Step.values()[initialStepOrdinal].getDescription());
 
         for (Step currentStep : Step.values()) {
             if (currentStep.ordinal() < initialStepOrdinal) {
@@ -261,10 +250,11 @@ public class ReleaseAction {
 
     private void progressError(Context context, Commands commands, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, String error) {
         try {
-            issue.setBody(issues.appendReleaseStatus(issue.getBody(), releaseStatus.progress(StepStatus.FAILED)));
+            ReleaseStatus currentReleaseStatus = releaseStatus.progress(StepStatus.FAILED);
+            issue.setBody(issues.appendReleaseStatus(issue.getBody(), currentReleaseStatus));
             issue.comment(":rotating_light: " + error + "\n\nYou can find more information about the failure [here](" + getWorkflowRunUrl(context) + ").\n\n"
                     + "This is not a fatal error, you can retry by adding a `retry` comment."
-                    + youAreHere(releaseInformation, releaseStatus));
+                    + youAreHere(releaseInformation, currentReleaseStatus));
         } catch (IOException e) {
             throw new RuntimeException("Unable to add progress error comment or close the comment: " + error, e);
         }
@@ -272,10 +262,11 @@ public class ReleaseAction {
 
     private void fatalError(Context context, Commands commands, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, String error) {
         try {
-            issue.setBody(issues.appendReleaseStatus(issue.getBody(), releaseStatus.progress(Status.FAILED, StepStatus.FAILED)));
+            ReleaseStatus currentReleaseStatus = releaseStatus.progress(Status.FAILED, StepStatus.FAILED);
+            issue.setBody(issues.appendReleaseStatus(issue.getBody(), currentReleaseStatus));
             issue.comment(":rotating_light: " + error + "\n\nYou can find more information about the failure [here](" + getWorkflowRunUrl(context) + ").\n\n"
                     + "This is a fatal error, the issue will be closed."
-                    + youAreHere(releaseInformation, releaseStatus));
+                    + youAreHere(releaseInformation, currentReleaseStatus));
             issue.close();
         } catch (IOException e) {
             throw new RuntimeException("Unable to add fatal error comment or close the comment: " + error, e);
@@ -287,7 +278,7 @@ public class ReleaseAction {
     }
 
     private static String youAreHere(ReleaseInformation releaseInformation, ReleaseStatus releaseStatus) {
-        return "\n\n<details><summary>You are here</summary>\n\n- " +
+        return "\n\n<details><summary>You are here</summary>\n\n" +
                 Arrays.stream(Step.values())
                     .filter(s -> releaseInformation.isFinal() || !s.isForFinalReleasesOnly())
                     .map(s -> {
@@ -299,14 +290,15 @@ public class ReleaseAction {
                         } else {
                             sb.append(" ");
                         }
-                        sb.append("] ").append(s.name());
-                        if (releaseStatus.getCurrentStepStatus() == StepStatus.STARTED) {
-                            sb.append(" :gear:");
-                        }
-                        if (releaseStatus.getCurrentStepStatus() == StepStatus.FAILED) {
-                            sb.append(" :rotating_light:");
-                        }
+                        sb.append("] ").append(s.getDescription());
+
                         if (releaseStatus.getCurrentStep() == s) {
+                            if (releaseStatus.getCurrentStepStatus() == StepStatus.STARTED) {
+                                sb.append(" :gear:");
+                            }
+                            if (releaseStatus.getCurrentStepStatus() == StepStatus.FAILED) {
+                                sb.append(" :rotating_light:");
+                            }
                             sb.append(" ☚ You are here");
                         }
                         return sb.toString();
