@@ -6,8 +6,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 import org.kohsuke.github.GHIssue;
 
@@ -15,7 +15,7 @@ import io.quarkus.bot.release.ReleaseInformation;
 import io.quarkus.bot.release.util.Issues;
 import io.quarkus.bot.release.util.Processes;
 
-@Dependent
+@Singleton
 public class Prerequisites implements StepHandler {
 
     @Inject

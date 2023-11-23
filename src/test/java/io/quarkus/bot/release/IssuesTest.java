@@ -7,6 +7,8 @@ import jakarta.inject.Inject;
 
 import org.junit.jupiter.api.Test;
 
+import io.quarkus.arc.Arc;
+import io.quarkus.bot.release.step.Prerequisites;
 import io.quarkus.bot.release.step.Step;
 import io.quarkus.bot.release.step.StepStatus;
 import io.quarkus.bot.release.util.Issues;

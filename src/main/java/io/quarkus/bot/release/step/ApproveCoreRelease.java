@@ -2,6 +2,8 @@ package io.quarkus.bot.release.step;
 
 import java.io.IOException;
 
+import jakarta.inject.Singleton;
+
 import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHIssueComment;
 
@@ -9,6 +11,7 @@ import io.quarkus.bot.release.ReleaseInformation;
 import io.quarkus.bot.release.ReleaseStatus;
 import io.quarkus.bot.release.util.Command;
 
+@Singleton
 public class ApproveCoreRelease implements StepHandler {
 
     @Override
