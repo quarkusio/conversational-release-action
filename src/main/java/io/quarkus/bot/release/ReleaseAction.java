@@ -23,6 +23,9 @@ import io.quarkus.arc.Arc;
 import io.quarkus.arc.InstanceHandle;
 import io.quarkus.bot.release.error.StatusUpdateException;
 import io.quarkus.bot.release.error.StepExecutionException;
+import io.quarkus.bot.release.step.ApproveCoreRelease;
+import io.quarkus.bot.release.step.CoreReleasePrepare;
+import io.quarkus.bot.release.step.Prerequisites;
 import io.quarkus.bot.release.step.Step;
 import io.quarkus.bot.release.step.StepHandler;
 import io.quarkus.bot.release.step.StepStatus;
@@ -39,6 +42,14 @@ public class ReleaseAction {
 
     @Inject
     Processes processes;
+
+    // ugly workaround...
+    @Inject
+    Prerequisites prerequisites;
+    @Inject
+    ApproveCoreRelease approveCoreRelease;
+    @Inject
+    CoreReleasePrepare coreReleasePrepare;
 
     @Action
     void startRelease(Context context, Commands commands, @Issue.Opened GHEventPayload.Issue issuePayload) throws Exception {
