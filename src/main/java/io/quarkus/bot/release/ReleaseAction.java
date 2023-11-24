@@ -150,6 +150,8 @@ public class ReleaseAction {
                 if (stepHandler.shouldContinue(releaseInformation, currentReleaseStatus, issueComment)) {
                     react(commands, issueComment, ReactionContent.PLUS_ONE);
                     currentReleaseStatus = currentReleaseStatus.progress(StepStatus.COMPLETED);
+                    updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
+                    initialStepOrdinal++;
                 } else {
                     react(commands, issueComment, ReactionContent.CONFUSED);
                     return;
