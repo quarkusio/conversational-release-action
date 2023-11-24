@@ -19,6 +19,7 @@ import io.quarkus.bot.release.util.Command;
 import io.quarkus.bot.release.util.Issues;
 import io.quarkus.bot.release.util.Outputs;
 import io.quarkus.bot.release.util.Processes;
+import io.quarkus.bot.release.util.UpdatedIssueBody;
 
 @Singleton
 @Unremovable
@@ -31,7 +32,8 @@ public class Prerequisites implements StepHandler {
     Processes processes;
 
     @Override
-    public int run(Context context, Commands commands, ReleaseInformation releaseInformation, GHIssue issue) throws IOException, InterruptedException {
+    public int run(Context context, Commands commands, ReleaseInformation releaseInformation, GHIssue issue,
+            UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
         List<String> command = new ArrayList<String>();
         command.add("./prerequisites.java");
         command.add("--branch=" + releaseInformation.getBranch());
@@ -48,7 +50,7 @@ public class Prerequisites implements StepHandler {
         }
 
         releaseInformation.setVersion(Files.readString(Path.of("work", "newVersion")).trim());
-        issues.appendReleaseInformation(issue.getBody(), releaseInformation);
+        issues.appendReleaseInformation(updatedIssueBody, releaseInformation);
 
         StringBuilder comment = new StringBuilder();
         comment.append("We are going to release the following release:\n\n");
@@ -57,7 +59,7 @@ public class Prerequisites implements StepHandler {
             comment.append("- This is a `maintenance` release.\n");
         }
         if (Files.exists(Path.of("work", "preview"))) {
-            comment.append("- This is a preview release (e.g.`Alpha`, `Beta`, `CR`).\n");
+            comment.append("- This is a preview release (e.g. `Alpha`, `Beta`, `CR`).\n");
         }
         comment.append(
                 "\nPlease add a `" + Command.YES.getFullCommand() + "` comment if you want to pursue with the release.\n");

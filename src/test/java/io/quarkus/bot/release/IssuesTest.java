@@ -7,11 +7,10 @@ import jakarta.inject.Inject;
 
 import org.junit.jupiter.api.Test;
 
-import io.quarkus.arc.Arc;
-import io.quarkus.bot.release.step.Prerequisites;
 import io.quarkus.bot.release.step.Step;
 import io.quarkus.bot.release.step.StepStatus;
 import io.quarkus.bot.release.util.Issues;
+import io.quarkus.bot.release.util.UpdatedIssueBody;
 import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
@@ -59,7 +58,7 @@ public class IssuesTest {
 
     @Test
     void testAppendReleaseInformation() {
-        assertThat(issues.appendReleaseInformation("", new ReleaseInformation(null, "3.6", null, false))).isEqualTo("""
+        assertThat(issues.appendReleaseInformation(new UpdatedIssueBody(""), new ReleaseInformation(null, "3.6", null, false))).isEqualTo("""
 
 
                 <!-- quarkus-release/release-information:
@@ -70,7 +69,7 @@ public class IssuesTest {
                 major: false
                 -->""");
 
-        assertThat(issues.appendReleaseInformation("""
+        assertThat(issues.appendReleaseInformation(new UpdatedIssueBody("""
                 This is a comment.
 
                 <!-- quarkus-release/release-information:
@@ -78,7 +77,7 @@ public class IssuesTest {
                 branch: "3.6"
                 qualifier: null
                 major: false
-                -->""", new ReleaseInformation("3.7.1", "3.7", "CR1", true))).isEqualTo("""
+                -->"""), new ReleaseInformation("3.7.1", "3.7", "CR1", true))).isEqualTo("""
                         This is a comment.
 
                         <!-- quarkus-release/release-information:
@@ -92,7 +91,7 @@ public class IssuesTest {
 
     @Test
     void testExtractReleaseInformation() {
-        assertThat(issues.extractReleaseInformation("""
+        assertThat(issues.extractReleaseInformation(new UpdatedIssueBody("""
                 This is a comment.
 
                 <!-- quarkus-release/release-information:
@@ -108,9 +107,9 @@ public class IssuesTest {
                 currentStep: "APPROVE_RELEASE"
                 currentStepStatus: "STARTED"
                 workflowRunId: 123
-                -->""")).isEqualTo(new ReleaseInformation(null, "4.0", "CR1", true));
+                -->"""))).isEqualTo(new ReleaseInformation(null, "4.0", "CR1", true));
 
-        assertThat(issues.extractReleaseInformation("""
+        assertThat(issues.extractReleaseInformation(new UpdatedIssueBody("""
                 This is a comment.
 
                 <!-- quarkus-release/release-information:
@@ -126,12 +125,12 @@ public class IssuesTest {
                 currentStep: "APPROVE_RELEASE"
                 currentStepStatus: "STARTED"
                 workflowRunId: 123
-                -->""")).isEqualTo(new ReleaseInformation("4.0.0.CR1", "4.0", "CR1", true));
+                -->"""))).isEqualTo(new ReleaseInformation("4.0.0.CR1", "4.0", "CR1", true));
     }
 
     @Test
     void testAppendReleaseStatus() {
-        assertThat(issues.appendReleaseStatus("", new ReleaseStatus(Status.STARTED, Step.APPROVE_CORE_RELEASE, StepStatus.STARTED, 123L))).isEqualTo("""
+        assertThat(issues.appendReleaseStatus(new UpdatedIssueBody(""), new ReleaseStatus(Status.STARTED, Step.APPROVE_CORE_RELEASE, StepStatus.STARTED, 123L))).isEqualTo("""
 
 
                 <!-- quarkus-release/release-status:
@@ -142,7 +141,7 @@ public class IssuesTest {
                 workflowRunId: 123
                 -->""");
 
-        assertThat(issues.appendReleaseStatus("""
+        assertThat(issues.appendReleaseStatus(new UpdatedIssueBody("""
                 This is a comment.
 
                 <!-- quarkus-release/release-information:
@@ -158,7 +157,7 @@ public class IssuesTest {
                 currentStep: "APPROVE_CORE_RELEASE"
                 currentStepStatus: "STARTED"
                 workflowRunId: 123
-                -->""", new ReleaseStatus(Status.COMPLETED, Step.CORE_RELEASE_PREPARE, StepStatus.COMPLETED, 145L))).isEqualTo("""
+                -->"""), new ReleaseStatus(Status.COMPLETED, Step.CORE_RELEASE_PREPARE, StepStatus.COMPLETED, 145L))).isEqualTo("""
                         This is a comment.
 
                         <!-- quarkus-release/release-information:
@@ -179,7 +178,7 @@ public class IssuesTest {
 
     @Test
     void testExtractReleaseStatus() {
-        assertThat(issues.extractReleaseStatus("""
+        assertThat(issues.extractReleaseStatus(new UpdatedIssueBody("""
                 This is a comment.
 
                 <!-- quarkus-release/release-information:
@@ -195,6 +194,6 @@ public class IssuesTest {
                 currentStep: "APPROVE_CORE_RELEASE"
                 currentStepStatus: "STARTED"
                 workflowRunId: 123
-                -->""")).isEqualTo(new ReleaseStatus(Status.STARTED, Step.APPROVE_CORE_RELEASE, StepStatus.STARTED, 123L));
+                -->"""))).isEqualTo(new ReleaseStatus(Status.STARTED, Step.APPROVE_CORE_RELEASE, StepStatus.STARTED, 123L));
     }
 }

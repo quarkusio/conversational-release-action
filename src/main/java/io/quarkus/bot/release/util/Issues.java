@@ -82,14 +82,14 @@ public final class Issues {
         return new ReleaseInformation(null, branch, qualifier, major);
     }
 
-    public ReleaseInformation extractReleaseInformation(String body) {
-        if (body == null || body.isBlank()) {
+    public ReleaseInformation extractReleaseInformation(UpdatedIssueBody updatedIssueBody) {
+        if (updatedIssueBody.isBlank()) {
             throw new IllegalStateException("Unable to extract release information as body is empty");
         }
 
-        Matcher releaseInformationMatcher = RELEASE_INFORMATION_PATTERN.matcher(body);
+        Matcher releaseInformationMatcher = RELEASE_INFORMATION_PATTERN.matcher(updatedIssueBody.getBody());
         if (!releaseInformationMatcher.find()) {
-            throw new IllegalStateException("Invalid release information in body:\n" + body);
+            throw new IllegalStateException("Invalid release information in body:\n" + updatedIssueBody);
         }
 
         try {
@@ -99,28 +99,28 @@ public final class Issues {
         }
     }
 
-    public String appendReleaseInformation(String body, ReleaseInformation releaseInformation) {
+    public String appendReleaseInformation(UpdatedIssueBody updatedIssueBody, ReleaseInformation releaseInformation) {
         try {
             String descriptor = RELEASE_INFORMATION_MARKER + "\n" + objectMapper.writeValueAsString(releaseInformation) + END_OF_MARKER;
 
-            if (body == null || !body.contains(RELEASE_INFORMATION_MARKER)) {
-                return (body != null ? body + "\n\n" : "") + descriptor;
+            if (!updatedIssueBody.contains(RELEASE_INFORMATION_MARKER)) {
+                return updatedIssueBody.append(descriptor);
             }
 
-            return RELEASE_INFORMATION_PATTERN.matcher(body).replaceFirst(descriptor);
+            return updatedIssueBody.replace(RELEASE_INFORMATION_PATTERN, descriptor);
         } catch (Exception e) {
             throw new IllegalStateException("Unable to update the release information descriptor", e);
         }
     }
 
-    public ReleaseStatus extractReleaseStatus(String body) {
-        if (body == null || body.isBlank()) {
-            throw new IllegalStateException("Invalid release status in body:\n" + body);
+    public ReleaseStatus extractReleaseStatus(UpdatedIssueBody updatedIssueBody) {
+        if (updatedIssueBody.isBlank()) {
+            throw new IllegalStateException("Unable to extract release status as body is empty");
         }
 
-        Matcher releaseStatusMatcher = RELEASE_STATUS_PATTERN.matcher(body);
+        Matcher releaseStatusMatcher = RELEASE_STATUS_PATTERN.matcher(updatedIssueBody.getBody());
         if (!releaseStatusMatcher.find()) {
-            throw new IllegalStateException("Invalid release status in body:\n" + body);
+            throw new IllegalStateException("Invalid release status in body:\n" + updatedIssueBody);
         }
 
         try {
@@ -130,15 +130,15 @@ public final class Issues {
         }
     }
 
-    public String appendReleaseStatus(String body, ReleaseStatus releaseStatus) {
+    public String appendReleaseStatus(UpdatedIssueBody updatedIssueBody, ReleaseStatus releaseStatus) {
         try {
             String descriptor = RELEASE_STATUS_MARKER + "\n" + objectMapper.writeValueAsString(releaseStatus) + END_OF_MARKER;
 
-            if (body == null || !body.contains(RELEASE_STATUS_MARKER)) {
-                return (body != null ? body + "\n\n" : "") + descriptor;
+            if (!updatedIssueBody.contains(RELEASE_STATUS_MARKER)) {
+                return updatedIssueBody.append(descriptor);
             }
 
-            return RELEASE_STATUS_PATTERN.matcher(body).replaceFirst(descriptor);
+            return updatedIssueBody.replace(RELEASE_STATUS_PATTERN, descriptor);
         } catch (Exception e) {
             throw new IllegalStateException("Unable to update the release status descriptor", e);
         }
