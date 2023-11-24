@@ -11,9 +11,13 @@ import jakarta.inject.Singleton;
 
 import org.kohsuke.github.GHIssue;
 
+import io.quarkiverse.githubaction.Commands;
+import io.quarkiverse.githubaction.Context;
 import io.quarkus.arc.Unremovable;
 import io.quarkus.bot.release.ReleaseInformation;
+import io.quarkus.bot.release.util.Command;
 import io.quarkus.bot.release.util.Issues;
+import io.quarkus.bot.release.util.Outputs;
 import io.quarkus.bot.release.util.Processes;
 
 @Singleton
@@ -27,7 +31,7 @@ public class Prerequisites implements StepHandler {
     Processes processes;
 
     @Override
-    public int run(ReleaseInformation releaseInformation, GHIssue issue) throws IOException, InterruptedException {
+    public int run(Context context, Commands commands, ReleaseInformation releaseInformation, GHIssue issue) throws IOException, InterruptedException {
         List<String> command = new ArrayList<String>();
         command.add("./prerequisites.java");
         command.add("--branch=" + releaseInformation.getBranch());
@@ -55,9 +59,10 @@ public class Prerequisites implements StepHandler {
         if (Files.exists(Path.of("work", "preview"))) {
             comment.append("- This is a preview release (e.g.`Alpha`, `Beta`, `CR`).\n");
         }
-        comment.append("\nPlease add a `yes` comment if you want to pursue with the release.\n");
+        comment.append(
+                "\nPlease add a `" + Command.YES.getFullCommand() + "` comment if you want to pursue with the release.\n");
         comment.append("\nIf not, simply close this issue.");
-        issue.comment(comment.toString());
+        commands.setOutput(Outputs.INTERACTION_COMMENT, comment.toString());
 
         return exitCode;
     }

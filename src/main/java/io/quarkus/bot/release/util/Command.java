@@ -16,11 +16,15 @@ public enum Command {
 
     public boolean matches(String body) {
         for (String command : commands) {
-            if (body.toLowerCase(Locale.ENGLISH).startsWith(command)) {
+            if (body.toLowerCase(Locale.ENGLISH).startsWith("@" + Users.QUARKUS_BOT + " " + command)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    public String getFullCommand() {
+        return "@" + Users.QUARKUS_BOT + " " + commands[0];
     }
 }
