@@ -150,6 +150,8 @@ public class ReleaseAction {
                 if (stepHandler.shouldContinue(releaseInformation, currentReleaseStatus, issueComment)) {
                     react(commands, issueComment, ReactionContent.PLUS_ONE);
                     currentReleaseStatus = currentReleaseStatus.progress(StepStatus.COMPLETED);
+                    updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
+                    initialStepOrdinal++;
                 } else {
                     react(commands, issueComment, ReactionContent.CONFUSED);
                     return;
@@ -311,11 +313,18 @@ public class ReleaseAction {
                             sb.append("] ").append(s.getDescription());
 
                             if (releaseStatus.getCurrentStep() == s) {
-                                if (releaseStatus.getCurrentStepStatus() == StepStatus.STARTED) {
-                                    sb.append(" :gear:");
-                                }
-                                if (releaseStatus.getCurrentStepStatus() == StepStatus.FAILED) {
-                                    sb.append(" :rotating_light:");
+                                switch (releaseStatus.getCurrentStepStatus()) {
+                                    case STARTED:
+                                        sb.append(" :gear:");
+                                        break;
+                                    case FAILED:
+                                        sb.append(" :rotating_light:");
+                                        break;
+                                    case PAUSED:
+                                        sb.append(" :pause_button:");
+                                        break;
+                                    default:
+                                        break;
                                 }
                                 sb.append(" ☚ You are here");
                             }
