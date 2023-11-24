@@ -313,11 +313,18 @@ public class ReleaseAction {
                             sb.append("] ").append(s.getDescription());
 
                             if (releaseStatus.getCurrentStep() == s) {
-                                if (releaseStatus.getCurrentStepStatus() == StepStatus.STARTED) {
-                                    sb.append(" :gear:");
-                                }
-                                if (releaseStatus.getCurrentStepStatus() == StepStatus.FAILED) {
-                                    sb.append(" :rotating_light:");
+                                switch (releaseStatus.getCurrentStepStatus()) {
+                                    case STARTED:
+                                        sb.append(" :gear:");
+                                        break;
+                                    case FAILED:
+                                        sb.append(" :rotating_light:");
+                                        break;
+                                    case PAUSED:
+                                        sb.append(" :pause_button:");
+                                        break;
+                                    default:
+                                        break;
                                 }
                                 sb.append(" ☚ You are here");
                             }
