@@ -50,4 +50,16 @@ public enum Step {
     public boolean isForFinalReleasesOnly() {
         return forFinalReleasesOnly;
     }
+
+    public boolean isLast() {
+        return this.ordinal() == values().length -1;
+    }
+
+    public Step next() {
+        if (isLast()) {
+            throw new IllegalStateException("Called next() on the last step");
+        }
+
+        return Step.values()[this.ordinal() + 1];
+    }
 }

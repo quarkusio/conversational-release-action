@@ -112,20 +112,17 @@ public class ReleaseAction {
 
     private void handleSteps(Context context, Commands commands, GHIssue issue, UpdatedIssueBody updatedIssueBody,
             GHIssueComment issueComment, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus) throws Exception {
-        int initialStepOrdinal = releaseStatus.getCurrentStep().ordinal();
-        if (releaseStatus.getCurrentStepStatus() == StepStatus.COMPLETED) {
-            initialStepOrdinal++;
-        }
-        if (initialStepOrdinal >= Step.values().length) {
-            return;
-        }
-
         ReleaseStatus currentReleaseStatus = releaseStatus;
 
         if (issueComment != null) {
-            // Handle retries
+            if (currentReleaseStatus.getCurrentStepStatus() == StepStatus.COMPLETED) {
+                commands.error("Current step status is completed, ignoring comment");
+                react(commands, issueComment, ReactionContent.MINUS_ONE);
+                return;
+            }
             if (currentReleaseStatus.getCurrentStepStatus() == StepStatus.FAILED ||
                     currentReleaseStatus.getCurrentStepStatus() == StepStatus.STARTED) {
+                // Handle retries
                 if (currentReleaseStatus.getCurrentStep().isRecoverable()) {
                     if (Command.RETRY.matches(issueComment.getBody())) {
                         react(commands, issueComment, ReactionContent.PLUS_ONE);
@@ -141,17 +138,14 @@ public class ReleaseAction {
                             "A previous step failed with unrecoverable error");
                     return;
                 }
-            }
-
-            // Handle paused, we will continue the process with the next step
-            if (currentReleaseStatus.getCurrentStepStatus() == StepStatus.PAUSED) {
+            } else if (currentReleaseStatus.getCurrentStepStatus() == StepStatus.PAUSED) {
+                // Handle paused, we will continue the process with the next step
                 StepHandler stepHandler = getStepHandler(currentReleaseStatus.getCurrentStep());
 
                 if (stepHandler.shouldContinue(releaseInformation, currentReleaseStatus, issueComment)) {
                     react(commands, issueComment, ReactionContent.PLUS_ONE);
                     currentReleaseStatus = currentReleaseStatus.progress(StepStatus.COMPLETED);
                     updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
-                    initialStepOrdinal++;
                 } else {
                     react(commands, issueComment, ReactionContent.CONFUSED);
                     return;
@@ -159,11 +153,21 @@ public class ReleaseAction {
             }
         }
 
+        if (currentReleaseStatus.getCurrentStepStatus() == StepStatus.COMPLETED) {
+            if (currentReleaseStatus.getCurrentStep().isLast()) {
+                markAsReleased(issue, updatedIssueBody, releaseInformation, currentReleaseStatus);
+                return;
+            } else {
+                currentReleaseStatus = currentReleaseStatus.progress(currentReleaseStatus.getCurrentStep().next());
+                updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
+            }
+        }
+
         progressInformation(context, commands, releaseInformation, currentReleaseStatus, issue,
-                "Proceeding to step " + Step.values()[initialStepOrdinal].getDescription());
+                "Proceeding to step " + currentReleaseStatus.getCurrentStep().getDescription());
 
         for (Step currentStep : Step.values()) {
-            if (currentStep.ordinal() < initialStepOrdinal) {
+            if (currentStep.ordinal() < currentReleaseStatus.getCurrentStep().ordinal()) {
                 // we already handled this step, skipping to next one
                 continue;
             }
@@ -208,6 +212,11 @@ public class ReleaseAction {
             }
         }
 
+        markAsReleased(issue, updatedIssueBody, releaseInformation, currentReleaseStatus);
+    }
+
+    private void markAsReleased(GHIssue issue, UpdatedIssueBody updatedIssueBody, ReleaseInformation releaseInformation,
+            ReleaseStatus currentReleaseStatus) {
         currentReleaseStatus = currentReleaseStatus.progress(Status.COMPLETED);
         updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
 
