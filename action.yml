@@ -7,9 +7,14 @@ inputs:
   action:
     description: 'Name of the action (if named)'
     required: false
+  interaction-comment:
+    description: 'Optional interaction comment'
+    required: false
 outputs:
   workflow-run-id:
     value: ${{ steps.action.outputs.workflow-run-id }}
+  interaction-comment:
+    value: ${{ steps.action.outputs.interaction-comment }}
 runs:
   using: "composite"
   steps:

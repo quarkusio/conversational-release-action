@@ -28,7 +28,9 @@ import io.quarkus.bot.release.step.StepHandler;
 import io.quarkus.bot.release.step.StepStatus;
 import io.quarkus.bot.release.util.Command;
 import io.quarkus.bot.release.util.Issues;
+import io.quarkus.bot.release.util.Outputs;
 import io.quarkus.bot.release.util.Processes;
+import io.quarkus.bot.release.util.Users;
 
 public class ReleaseAction {
 
@@ -78,8 +80,7 @@ public class ReleaseAction {
         GHIssueComment issueComment = issueCommentPayload.getComment();
         GHIssue issue = issueCommentPayload.getIssue();
 
-        if (issueCommentPayload.getSender().getLogin().endsWith("-bot")
-                || issueCommentPayload.getSender().getLogin().endsWith("[bot]")) {
+        if (Users.isBot(issueCommentPayload.getSender().getLogin())) {
             return;
         }
 
@@ -175,7 +176,7 @@ public class ReleaseAction {
                     return;
                 }
 
-                int exitCode = stepHandler.run(releaseInformation, issue);
+                int exitCode = stepHandler.run(context, commands, releaseInformation, issue);
                 handleExitCode(exitCode, currentStep);
 
                 currentReleaseStatus = currentReleaseStatus.progress(StepStatus.COMPLETED);
@@ -252,8 +253,9 @@ public class ReleaseAction {
         try {
             ReleaseStatus currentReleaseStatus = releaseStatus.progress(StepStatus.FAILED);
             issue.setBody(issues.appendReleaseStatus(issue.getBody(), currentReleaseStatus));
-            issue.comment(":rotating_light: " + error + "\n\nYou can find more information about the failure [here](" + getWorkflowRunUrl(context) + ").\n\n"
-                    + "This is not a fatal error, you can retry by adding a `retry` comment."
+            commands.setOutput(Outputs.INTERACTION_COMMENT, ":rotating_light: " + error
+                    + "\n\nYou can find more information about the failure [here](" + getWorkflowRunUrl(context) + ").\n\n"
+                    + "This is not a fatal error, you can retry by adding a `" + Command.RETRY.getFullCommand() + "` comment."
                     + youAreHere(releaseInformation, currentReleaseStatus));
         } catch (IOException e) {
             throw new RuntimeException("Unable to add progress error comment or close the comment: " + error, e);
