@@ -30,6 +30,7 @@ import io.quarkus.bot.release.util.Command;
 import io.quarkus.bot.release.util.Issues;
 import io.quarkus.bot.release.util.Outputs;
 import io.quarkus.bot.release.util.Processes;
+import io.quarkus.bot.release.util.UpdatedIssueBody;
 import io.quarkus.bot.release.util.Users;
 
 public class ReleaseAction {
@@ -45,6 +46,7 @@ public class ReleaseAction {
     @Action
     void startRelease(Context context, Commands commands, @Issue.Opened GHEventPayload.Issue issuePayload) throws Exception {
         GHIssue issue = issuePayload.getIssue();
+        UpdatedIssueBody updatedIssueBody = new UpdatedIssueBody(issue.getBody());
 
         if (System.getenv("RELEASE_GITHUB_TOKEN") == null || System.getenv("RELEASE_GITHUB_TOKEN").isBlank()) {
             throw new IllegalStateException("No RELEASE_GITHUB_TOKEN around");
@@ -60,25 +62,29 @@ public class ReleaseAction {
         ReleaseInformation releaseInformation;
 
         try {
-            releaseInformation= issues
-                    .extractReleaseInformationFromForm(issuePayload.getIssue().getBody());
+            releaseInformation = issues.extractReleaseInformationFromForm(updatedIssueBody.getBody());
+            issue.setBody(issues.appendReleaseInformation(updatedIssueBody, releaseInformation));
         } catch (Exception e) {
             LOG.error("Unable to extract release information from the body of the issue for issue: #"
                     + issue.getNumber() + " " + issue.getTitle());
-            issue.comment(":rotating_light: Unable to extract release information from the issue description.\nWe can't release\nClosing the issue.");
+            issue.comment(
+                    ":rotating_light: Unable to extract release information from the issue description.\nWe can't release\nClosing the issue.");
             issue.close();
             throw e;
         }
 
         react(commands, issue, ReactionContent.PLUS_ONE);
 
-        handleSteps(context, commands, issuePayload.getIssue(), null, releaseInformation, new ReleaseStatus(Status.STARTED, Step.PREREQUISITES, StepStatus.STARTED, context.getGitHubRunId()));
+        handleSteps(context, commands, issuePayload.getIssue(), updatedIssueBody, null, releaseInformation,
+                new ReleaseStatus(Status.STARTED, Step.PREREQUISITES, StepStatus.STARTED, context.getGitHubRunId()));
     }
 
     @Action
-    void onComment(Context context, Commands commands, @IssueComment.Created GHEventPayload.IssueComment issueCommentPayload) throws Exception {
+    void onComment(Context context, Commands commands, @IssueComment.Created GHEventPayload.IssueComment issueCommentPayload)
+            throws Exception {
         GHIssueComment issueComment = issueCommentPayload.getComment();
         GHIssue issue = issueCommentPayload.getIssue();
+        UpdatedIssueBody updatedIssueBody = new UpdatedIssueBody(issue.getBody());
 
         if (Users.isBot(issueCommentPayload.getSender().getLogin())) {
             return;
@@ -92,18 +98,20 @@ public class ReleaseAction {
         ReleaseInformation releaseInformation;
         ReleaseStatus releaseStatus;
         try {
-            releaseInformation = issues.extractReleaseInformation(issue.getBody());
-            releaseStatus = issues.extractReleaseStatus(issue.getBody());
+            releaseInformation = issues.extractReleaseInformation(updatedIssueBody);
+            releaseStatus = issues.extractReleaseStatus(updatedIssueBody);
         } catch (Exception e) {
-            issue.comment(":rotating_light: Unable to extract release information and/or release status from the issue description.\nWe can't release\nClosing the issue.");
+            issue.comment(
+                    ":rotating_light: Unable to extract release information and/or release status from the issue description.\nWe can't release\nClosing the issue.");
             issue.close();
             throw e;
         }
 
-        handleSteps(context, commands, issue, issueComment, releaseInformation, releaseStatus);
+        handleSteps(context, commands, issue, updatedIssueBody, issueComment, releaseInformation, releaseStatus);
     }
 
-    private void handleSteps(Context context, Commands commands, GHIssue issue, GHIssueComment issueComment, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus) throws Exception {
+    private void handleSteps(Context context, Commands commands, GHIssue issue, UpdatedIssueBody updatedIssueBody,
+            GHIssueComment issueComment, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus) throws Exception {
         int initialStepOrdinal = releaseStatus.getCurrentStep().ordinal();
         if (releaseStatus.getCurrentStepStatus() == StepStatus.COMPLETED) {
             initialStepOrdinal++;
@@ -122,14 +130,14 @@ public class ReleaseAction {
                     if (Command.RETRY.matches(issueComment.getBody())) {
                         react(commands, issueComment, ReactionContent.PLUS_ONE);
                         currentReleaseStatus = currentReleaseStatus.progress(StepStatus.STARTED);
-                        updateReleaseStatus(issue, currentReleaseStatus);
+                        updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
                     } else {
                         react(commands, issueComment, ReactionContent.CONFUSED);
                         return;
                     }
                 } else {
                     react(commands, issueComment, ReactionContent.CONFUSED);
-                    fatalError(context, commands, releaseInformation, currentReleaseStatus, issue,
+                    fatalError(context, commands, releaseInformation, currentReleaseStatus, issue, updatedIssueBody,
                             "A previous step failed with unrecoverable error");
                     return;
                 }
@@ -168,38 +176,42 @@ public class ReleaseAction {
                 StepHandler stepHandler = getStepHandler(currentStep);
 
                 currentReleaseStatus = currentReleaseStatus.progress(currentStep);
-                updateReleaseStatus(issue, currentReleaseStatus);
+                updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
 
                 if (stepHandler.shouldPause(releaseInformation, releaseStatus)) {
                     currentReleaseStatus = currentReleaseStatus.progress(StepStatus.PAUSED);
-                    updateReleaseStatus(issue, currentReleaseStatus);
+                    updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
                     return;
                 }
 
-                int exitCode = stepHandler.run(context, commands, releaseInformation, issue);
+                int exitCode = stepHandler.run(context, commands, releaseInformation, issue, updatedIssueBody);
                 handleExitCode(exitCode, currentStep);
 
                 currentReleaseStatus = currentReleaseStatus.progress(StepStatus.COMPLETED);
-                updateReleaseStatus(issue, currentReleaseStatus);
+                updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
             } catch (StatusUpdateException e) {
-                fatalError(context, commands, releaseInformation, currentReleaseStatus, issue, e.getMessage());
+                fatalError(context, commands, releaseInformation, currentReleaseStatus, issue, updatedIssueBody,
+                        e.getMessage());
                 throw e;
             } catch (Exception e) {
                 if (currentStep.isRecoverable()) {
-                    progressError(context, commands, releaseInformation, currentReleaseStatus, issue, e.getMessage());
+                    progressError(context, commands, releaseInformation, currentReleaseStatus, issue, updatedIssueBody,
+                            e.getMessage());
                     throw e;
                 } else {
-                    fatalError(context, commands, releaseInformation, currentReleaseStatus, issue, e.getMessage());
+                    fatalError(context, commands, releaseInformation, currentReleaseStatus, issue, updatedIssueBody,
+                            e.getMessage());
                     throw e;
                 }
             }
         }
 
         currentReleaseStatus = currentReleaseStatus.progress(Status.COMPLETED);
-        updateReleaseStatus(issue, currentReleaseStatus);
+        updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
 
         try {
-            issue.comment(":white_check_mark: " + releaseInformation.getVersion() + " was successfully released.\n\nTime to write the announcement.");
+            issue.comment(":white_check_mark: " + releaseInformation.getVersion()
+                    + " was successfully released.\n\nTime to write the announcement.");
             issue.close();
         } catch (IOException e) {
             throw new IllegalStateException("Unable to mark the release as successful", e);
@@ -216,16 +228,15 @@ public class ReleaseAction {
         return instanceHandle.get();
     }
 
-
     private static void handleExitCode(int exitCode, Step step) {
         if (exitCode != 0) {
             throw new StepExecutionException("An error occurred while executing step `" + step.getDescription() + "`.");
         }
     }
 
-    private void updateReleaseStatus(GHIssue issue, ReleaseStatus updatedReleaseStatus) {
+    private void updateReleaseStatus(GHIssue issue, UpdatedIssueBody updatedIssueBody, ReleaseStatus updatedReleaseStatus) {
         try {
-            issue.setBody(issues.appendReleaseStatus(issue.getBody(), updatedReleaseStatus));
+            issue.setBody(issues.appendReleaseStatus(updatedIssueBody, updatedReleaseStatus));
         } catch (Exception e) {
             throw new StatusUpdateException("Unable to update the release status to: " + updatedReleaseStatus, e);
         }
@@ -242,17 +253,19 @@ public class ReleaseAction {
     private static void progressInformation(Context context, Commands commands, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, String progress) {
         try {
-            issue.comment(":gear: " + progress + "\n\nYou can follow the progress of the workflow [here](" + getWorkflowRunUrl(context)
+            issue.comment(":gear: " + progress + "\n\nYou can follow the progress of the workflow [here]("
+                    + getWorkflowRunUrl(context)
                     + ")." + youAreHere(releaseInformation, releaseStatus));
         } catch (IOException e) {
             commands.warning("Unable to add progress comment: " + progress);
         }
     }
 
-    private void progressError(Context context, Commands commands, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, String error) {
+    private void progressError(Context context, Commands commands, ReleaseInformation releaseInformation,
+            ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody, String error) {
         try {
             ReleaseStatus currentReleaseStatus = releaseStatus.progress(StepStatus.FAILED);
-            issue.setBody(issues.appendReleaseStatus(issue.getBody(), currentReleaseStatus));
+            issue.setBody(issues.appendReleaseStatus(updatedIssueBody, currentReleaseStatus));
             commands.setOutput(Outputs.INTERACTION_COMMENT, ":rotating_light: " + error
                     + "\n\nYou can find more information about the failure [here](" + getWorkflowRunUrl(context) + ").\n\n"
                     + "This is not a fatal error, you can retry by adding a `" + Command.RETRY.getFullCommand() + "` comment."
@@ -262,11 +275,13 @@ public class ReleaseAction {
         }
     }
 
-    private void fatalError(Context context, Commands commands, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, String error) {
+    private void fatalError(Context context, Commands commands, ReleaseInformation releaseInformation,
+            ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody, String error) {
         try {
             ReleaseStatus currentReleaseStatus = releaseStatus.progress(Status.FAILED, StepStatus.FAILED);
-            issue.setBody(issues.appendReleaseStatus(issue.getBody(), currentReleaseStatus));
-            issue.comment(":rotating_light: " + error + "\n\nYou can find more information about the failure [here](" + getWorkflowRunUrl(context) + ").\n\n"
+            issue.setBody(issues.appendReleaseStatus(updatedIssueBody, currentReleaseStatus));
+            issue.comment(":rotating_light: " + error + "\n\nYou can find more information about the failure [here]("
+                    + getWorkflowRunUrl(context) + ").\n\n"
                     + "This is a fatal error, the issue will be closed."
                     + youAreHere(releaseInformation, currentReleaseStatus));
             issue.close();
@@ -282,28 +297,30 @@ public class ReleaseAction {
     private static String youAreHere(ReleaseInformation releaseInformation, ReleaseStatus releaseStatus) {
         return "\n\n<details><summary>You are here</summary>\n\n" +
                 Arrays.stream(Step.values())
-                    .filter(s -> releaseInformation.isFinal() || !s.isForFinalReleasesOnly())
-                    .map(s -> {
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("[");
-                        if (releaseStatus.getCurrentStep().ordinal() > s.ordinal() ||
-                                (releaseStatus.getCurrentStep() == s && releaseStatus.getCurrentStepStatus() == StepStatus.COMPLETED)) {
-                            sb.append("X");
-                        } else {
-                            sb.append(" ");
-                        }
-                        sb.append("] ").append(s.getDescription());
+                        .filter(s -> releaseInformation.isFinal() || !s.isForFinalReleasesOnly())
+                        .map(s -> {
+                            StringBuilder sb = new StringBuilder();
+                            sb.append("[");
+                            if (releaseStatus.getCurrentStep().ordinal() > s.ordinal() ||
+                                    (releaseStatus.getCurrentStep() == s
+                                            && releaseStatus.getCurrentStepStatus() == StepStatus.COMPLETED)) {
+                                sb.append("X");
+                            } else {
+                                sb.append(" ");
+                            }
+                            sb.append("] ").append(s.getDescription());
 
-                        if (releaseStatus.getCurrentStep() == s) {
-                            if (releaseStatus.getCurrentStepStatus() == StepStatus.STARTED) {
-                                sb.append(" :gear:");
+                            if (releaseStatus.getCurrentStep() == s) {
+                                if (releaseStatus.getCurrentStepStatus() == StepStatus.STARTED) {
+                                    sb.append(" :gear:");
+                                }
+                                if (releaseStatus.getCurrentStepStatus() == StepStatus.FAILED) {
+                                    sb.append(" :rotating_light:");
+                                }
+                                sb.append(" ☚ You are here");
                             }
-                            if (releaseStatus.getCurrentStepStatus() == StepStatus.FAILED) {
-                                sb.append(" :rotating_light:");
-                            }
-                            sb.append(" ☚ You are here");
-                        }
-                        return sb.toString();
-                    }).collect(Collectors.joining("\n- ", "- ", "")) + "</details>";
+                            return sb.toString();
+                        }).collect(Collectors.joining("\n- ", "- ", ""))
+                + "</details>";
     }
 }

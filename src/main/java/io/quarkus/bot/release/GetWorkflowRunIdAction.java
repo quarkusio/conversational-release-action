@@ -9,6 +9,7 @@ import io.quarkiverse.githubaction.Commands;
 import io.quarkiverse.githubapp.event.IssueComment;
 import io.quarkus.bot.release.util.Issues;
 import io.quarkus.bot.release.util.Outputs;
+import io.quarkus.bot.release.util.UpdatedIssueBody;
 
 public class GetWorkflowRunIdAction {
 
@@ -17,7 +18,9 @@ public class GetWorkflowRunIdAction {
 
     @Action("get-workflow-run-id")
     void getWorkflowRunId(Commands commands, @IssueComment.Created GHEventPayload.IssueComment issueCommentPayload) {
+        UpdatedIssueBody updatedIssueBody = new UpdatedIssueBody(issueCommentPayload.getIssue().getBody());
+
         commands.setOutput(Outputs.WORKFLOW_RUN_ID,
-                issues.extractReleaseStatus(issueCommentPayload.getIssue().getBody()).getWorkflowRunId().toString());
+                issues.extractReleaseStatus(updatedIssueBody).getWorkflowRunId().toString());
     }
 }
