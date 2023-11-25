@@ -75,8 +75,14 @@ public class ReleaseAction {
 
         react(commands, issue, ReactionContent.PLUS_ONE);
 
-        handleSteps(context, commands, issuePayload.getIssue(), updatedIssueBody, null, releaseInformation,
-                new ReleaseStatus(Status.STARTED, Step.PREREQUISITES, StepStatus.STARTED, context.getGitHubRunId()));
+        try {
+            handleSteps(context, commands, issuePayload.getIssue(), updatedIssueBody, null, releaseInformation,
+                    new ReleaseStatus(Status.STARTED, Step.PREREQUISITES, StepStatus.STARTED, context.getGitHubRunId()));
+        } finally {
+            if (releaseInformation.getVersion() != null) {
+                commands.setOutput(Outputs.VERSION, releaseInformation.getVersion());
+            }
+        }
     }
 
     @Action
@@ -107,7 +113,13 @@ public class ReleaseAction {
             throw e;
         }
 
-        handleSteps(context, commands, issue, updatedIssueBody, issueComment, releaseInformation, releaseStatus);
+        try {
+            handleSteps(context, commands, issue, updatedIssueBody, issueComment, releaseInformation, releaseStatus);
+        } finally {
+            if (releaseInformation.getVersion() != null) {
+                commands.setOutput(Outputs.VERSION, releaseInformation.getVersion());
+            }
+        }
     }
 
     private void handleSteps(Context context, Commands commands, GHIssue issue, UpdatedIssueBody updatedIssueBody,
