@@ -11,12 +11,24 @@ inputs:
     description: 'Optional interaction comment'
     required: false
 outputs:
+  branch:
+    value: ${{ steps.action.outputs.branch }}
+  qualifier:
+    value: ${{ steps.action.outputs.qualifier }}
+  major:
+    value: ${{ steps.action.outputs.major }}
+  version:
+    value: ${{ steps.action.outputs.version }}
+  status:
+    value: ${{ steps.action.outputs.status }}
+  current-step:
+    value: ${{ steps.action.outputs.current-step }}
+  current-step-status:
+    value: ${{ steps.action.outputs.current-step-status }}
   workflow-run-id:
     value: ${{ steps.action.outputs.workflow-run-id }}
   interaction-comment:
     value: ${{ steps.action.outputs.interaction-comment }}
-  version:
-    value: ${{ steps.action.outputs.version }}
 runs:
   using: "composite"
   steps:
