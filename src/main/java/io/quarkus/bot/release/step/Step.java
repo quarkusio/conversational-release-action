@@ -4,8 +4,8 @@ public enum Step {
 
     PREREQUISITES("Prerequisites", Prerequisites.class, false, false),
     APPROVE_CORE_RELEASE("Approve the core release", ApproveCoreRelease.class, true, false),
-    CORE_RELEASE_PREPARE("Prepare the core release", CoreReleasePrepare.class, true, false);
-//    CORE_RELEASE_PERFORM("Perform the core release", true, false),
+    CORE_RELEASE_PREPARE("Prepare the core release", CoreReleasePrepare.class, true, false),
+    CORE_RELEASE_PERFORM("Perform the core release", CoreReleasePrepare.class, true, false);
 //    SYNC_CORE_RELEASE_TO_MAVEN_CENTRAL("Sync core release to Maven Central", true, false),
 //    RELEASE_GRADLE_PLUGIN("Release Gradle plugin", true, false),
 //    POST_CORE_RELEASE("Execute post-core-release operations", true, false),
