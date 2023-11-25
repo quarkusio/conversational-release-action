@@ -16,7 +16,9 @@ import jakarta.inject.Singleton;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 
 @Singleton
@@ -28,6 +30,8 @@ public class UtilsProducer {
     public ObjectMapper yamlObjectMapper() {
         ObjectMapper yamlObjectMapper = new ObjectMapper(new YAMLFactory());
         yamlObjectMapper.registerModule(new ParameterNamesModule());
+        yamlObjectMapper.registerModule(new JavaTimeModule());
+        yamlObjectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         yamlObjectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         return yamlObjectMapper;
     }

@@ -130,7 +130,7 @@ public class IssuesTest {
 
     @Test
     void testAppendReleaseStatus() {
-        assertThat(issues.appendReleaseStatus(new UpdatedIssueBody(""), new ReleaseStatus(Status.STARTED, Step.APPROVE_CORE_RELEASE, StepStatus.STARTED, 123L))).isEqualTo("""
+        assertThat(issues.appendReleaseStatus(new UpdatedIssueBody(""), new ReleaseStatus(Status.STARTED, Step.APPROVE_CORE_RELEASE, StepStatus.STARTED, 123L))).matches("""
 
 
                 <!-- quarkus-release/release-status:
@@ -139,6 +139,7 @@ public class IssuesTest {
                 currentStep: "APPROVE_CORE_RELEASE"
                 currentStepStatus: "STARTED"
                 workflowRunId: 123
+                date: ".*"
                 -->""");
 
         assertThat(issues.appendReleaseStatus(new UpdatedIssueBody("""
@@ -157,7 +158,7 @@ public class IssuesTest {
                 currentStep: "APPROVE_CORE_RELEASE"
                 currentStepStatus: "STARTED"
                 workflowRunId: 123
-                -->"""), new ReleaseStatus(Status.COMPLETED, Step.CORE_RELEASE_PREPARE, StepStatus.COMPLETED, 145L))).isEqualTo("""
+                -->"""), new ReleaseStatus(Status.COMPLETED, Step.CORE_RELEASE_PREPARE, StepStatus.COMPLETED, 145L))).matches("""
                         This is a comment.
 
                         <!-- quarkus-release/release-information:
@@ -173,6 +174,7 @@ public class IssuesTest {
                         currentStep: "CORE_RELEASE_PREPARE"
                         currentStepStatus: "COMPLETED"
                         workflowRunId: 145
+                        date: ".*"
                         -->""");
     }
 

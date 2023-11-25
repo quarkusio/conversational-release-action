@@ -1,5 +1,6 @@
 package io.quarkus.bot.release;
 
+import java.time.Instant;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -14,6 +15,7 @@ public class ReleaseStatus {
     private final Step currentStep;
     private final StepStatus currentStepStatus;
     private final Long workflowRunId;
+    private final Instant date;
 
     @JsonCreator
     public ReleaseStatus(Status status, Step currentStep, StepStatus currentStepStatus, Long workflowRunId) {
@@ -21,6 +23,7 @@ public class ReleaseStatus {
         this.currentStep = currentStep;
         this.currentStepStatus = currentStepStatus;
         this.workflowRunId = workflowRunId;
+        this.date = Instant.now();
     }
 
     public Status getStatus() {
@@ -37,6 +40,10 @@ public class ReleaseStatus {
 
     public Long getWorkflowRunId() {
         return workflowRunId;
+    }
+
+    public Instant getDate() {
+        return date;
     }
 
     @JsonIgnore
