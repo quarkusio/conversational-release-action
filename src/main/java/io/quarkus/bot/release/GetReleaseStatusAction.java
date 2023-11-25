@@ -18,6 +18,8 @@ public class GetReleaseStatusAction {
 
     @Action("get-release-status")
     void getReleaseStatus(Commands commands, @IssueComment.Created GHEventPayload.IssueComment issueCommentPayload) {
+        commands.notice("Extracting release status information...");
+
         UpdatedIssueBody updatedIssueBody = new UpdatedIssueBody(issueCommentPayload.getIssue().getBody());
 
         ReleaseStatus releaseStatus = issues.extractReleaseStatus(updatedIssueBody);
