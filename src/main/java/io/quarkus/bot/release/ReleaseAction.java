@@ -45,6 +45,8 @@ public class ReleaseAction {
 
     @Action
     void startRelease(Context context, Commands commands, @Issue.Opened GHEventPayload.Issue issuePayload) throws Exception {
+        commands.notice("Starting release...");
+
         GHIssue issue = issuePayload.getIssue();
         UpdatedIssueBody updatedIssueBody = new UpdatedIssueBody(issue.getBody());
 
@@ -88,6 +90,8 @@ public class ReleaseAction {
     @Action
     void onComment(Context context, Commands commands, @IssueComment.Created GHEventPayload.IssueComment issueCommentPayload)
             throws Exception {
+        commands.notice("Continuing release...");
+
         GHIssueComment issueComment = issueCommentPayload.getComment();
         GHIssue issue = issueCommentPayload.getIssue();
         UpdatedIssueBody updatedIssueBody = new UpdatedIssueBody(issue.getBody());

@@ -29,6 +29,8 @@ public class PostInteractionCommentAction {
     }
 
     private void postInteractionComment(Commands commands, Inputs inputs, GHIssue issue) throws IOException {
+        commands.notice("Posting interaction comment");
+
         Optional<String> interactionCommentInput = inputs.get(Outputs.INTERACTION_COMMENT);
         if (interactionCommentInput.isEmpty() || interactionCommentInput.get().isBlank()) {
             commands.warning("No " + Outputs.INTERACTION_COMMENT + " input, not posting interaction comment");
