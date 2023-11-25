@@ -3,7 +3,6 @@ package io.quarkus.bot.release;
 import jakarta.inject.Inject;
 
 import org.kohsuke.github.GHEventPayload;
-import org.kohsuke.github.GHIssue;
 
 import io.quarkiverse.githubaction.Action;
 import io.quarkiverse.githubaction.Commands;
@@ -20,26 +19,23 @@ public class GetReleaseInformationAction {
 
     @Action("get-release-information")
     void getReleaseInformation(Commands commands, @Issue.Opened GHEventPayload.Issue issuePayload) {
-        extractReleaseInformation(commands, issuePayload.getIssue());
+        commands.notice("Extracting release information...");
+
+        ReleaseInformation releaseInformation = issues.extractReleaseInformationFromForm(issuePayload.getIssue().getBody());
+        outputReleaseInformation(commands, releaseInformation);
     }
 
     @Action("get-release-information")
     void getReleaseInformation(Commands commands, @IssueComment.Created GHEventPayload.IssueComment issueCommentPayload) {
-        extractReleaseInformation(commands, issueCommentPayload.getIssue());
-    }
-
-    private void extractReleaseInformation(Commands commands, GHIssue issue) {
         commands.notice("Extracting release information...");
 
-        ReleaseInformation releaseInformation;
+        UpdatedIssueBody updatedIssueBody = new UpdatedIssueBody(issueCommentPayload.getIssue().getBody());
+        ReleaseInformation releaseInformation = issues.extractReleaseInformation(updatedIssueBody);
 
-        try {
-            UpdatedIssueBody updatedIssueBody = new UpdatedIssueBody(issue.getBody());
-            releaseInformation = issues.extractReleaseInformation(updatedIssueBody);
-        } catch (Exception e) {
-            releaseInformation = issues.extractReleaseInformationFromForm(issue.getBody());
-        }
+        outputReleaseInformation(commands, releaseInformation);
+    }
 
+    private void outputReleaseInformation(Commands commands, ReleaseInformation releaseInformation) {
         commands.setOutput(Outputs.BRANCH, releaseInformation.getBranch());
         if (releaseInformation.getQualifier() != null) {
             commands.setOutput(Outputs.QUALIFIER, releaseInformation.getQualifier());
