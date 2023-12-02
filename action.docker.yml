@@ -1,9 +1,0 @@
-name: 'Conversational release action'
-description: 'Release Quarkus by conversing with a GitHub Action'
-inputs:
-  github-token:
-    description: 'GitHub token'
-    required: false
-runs:
-  using: 'docker'
-  image: 'docker://ghcr.io/quarkusio/conversational-release-action:main'

@@ -14,7 +14,9 @@ public class StepInjectionTest {
     @Test
     void testStepInjection() {
         for (Step step : Step.values()) {
-            assertThat(Arc.container().instance(step.getStepHandler()).get()).isNotNull();
+            assertThat(Arc.container().instance(step.getStepHandler()).get())
+                    .as("Step handler for %s does not exist or is not an unremovable CDI bean", step.name())
+                    .isNotNull();
         }
     }
 }
