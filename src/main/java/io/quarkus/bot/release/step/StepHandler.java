@@ -16,12 +16,17 @@ public interface StepHandler {
     int run(Context context, Commands commands, ReleaseInformation releaseInformation, GHIssue issue,
             UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException;
 
-    default boolean shouldPause(ReleaseInformation releaseInformation, ReleaseStatus releaseStatus) {
+    default boolean shouldPause(Context context, Commands commands, ReleaseInformation releaseInformation,
+            ReleaseStatus releaseStatus) {
         return false;
     }
 
-    default boolean shouldContinue(ReleaseInformation releaseInformation, ReleaseStatus releaseStatus,
-            GHIssueComment issueComment) {
+    default boolean shouldContinue(Context context, Commands commands,
+            ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssueComment issueComment) {
         return false;
+    }
+
+    default String getErrorHelp() {
+        return null;
     }
 }

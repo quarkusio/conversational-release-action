@@ -158,7 +158,7 @@ public class ReleaseAction {
                 // Handle paused, we will continue the process with the next step
                 StepHandler stepHandler = getStepHandler(currentReleaseStatus.getCurrentStep());
 
-                if (stepHandler.shouldContinue(releaseInformation, currentReleaseStatus, issueComment)) {
+                if (stepHandler.shouldContinue(context, commands, releaseInformation, currentReleaseStatus, issueComment)) {
                     react(commands, issueComment, ReactionContent.PLUS_ONE);
                     currentReleaseStatus = currentReleaseStatus.progress(StepStatus.COMPLETED);
                     updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
@@ -182,6 +182,8 @@ public class ReleaseAction {
         progressInformation(context, commands, releaseInformation, currentReleaseStatus, issue,
                 "Proceeding to step " + currentReleaseStatus.getCurrentStep().getDescription());
 
+        StepHandler currentStepHandler;
+
         for (Step currentStep : Step.values()) {
             if (currentStep.ordinal() < currentReleaseStatus.getCurrentStep().ordinal()) {
                 // we already handled this step, skipping to next one
@@ -194,19 +196,20 @@ public class ReleaseAction {
 
             commands.notice("Running step " + currentStep.getDescription());
 
+            currentStepHandler = getStepHandler(currentStep);
+
             try {
-                StepHandler stepHandler = getStepHandler(currentStep);
 
                 currentReleaseStatus = currentReleaseStatus.progress(currentStep);
                 updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
 
-                if (stepHandler.shouldPause(releaseInformation, releaseStatus)) {
+                if (currentStepHandler.shouldPause(context, commands, releaseInformation, releaseStatus)) {
                     currentReleaseStatus = currentReleaseStatus.progress(StepStatus.PAUSED);
                     updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
                     return;
                 }
 
-                int exitCode = stepHandler.run(context, commands, releaseInformation, issue, updatedIssueBody);
+                int exitCode = currentStepHandler.run(context, commands, releaseInformation, issue, updatedIssueBody);
                 handleExitCode(exitCode, currentStep);
 
                 currentReleaseStatus = currentReleaseStatus.progress(StepStatus.COMPLETED);
@@ -218,11 +221,11 @@ public class ReleaseAction {
             } catch (Exception e) {
                 if (currentStep.isRecoverable()) {
                     progressError(context, commands, releaseInformation, currentReleaseStatus, issue, updatedIssueBody,
-                            e.getMessage());
+                            e.getMessage(), currentStepHandler.getErrorHelp());
                     throw e;
                 } else {
                     fatalError(context, commands, releaseInformation, currentReleaseStatus, issue, updatedIssueBody,
-                            e.getMessage());
+                            e.getMessage(), currentStepHandler.getErrorHelp());
                     throw e;
                 }
             }
@@ -289,11 +292,13 @@ public class ReleaseAction {
     }
 
     private void progressError(Context context, Commands commands, ReleaseInformation releaseInformation,
-            ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody, String error) {
+            ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody, String error,
+            String errorHelp) {
         try {
             ReleaseStatus currentReleaseStatus = releaseStatus.progress(StepStatus.FAILED);
             issue.setBody(issues.appendReleaseStatus(updatedIssueBody, currentReleaseStatus));
             commands.setOutput(Outputs.INTERACTION_COMMENT, ":rotating_light: " + error
+                    + (errorHelp != null && !errorHelp.isBlank() ? "\n\n" + errorHelp : "")
                     + "\n\nYou can find more information about the failure [here](" + getWorkflowRunUrl(context) + ").\n\n"
                     + "This is not a fatal error, you can retry by adding a `" + Command.RETRY.getFullCommand() + "` comment."
                     + youAreHere(releaseInformation, currentReleaseStatus));
@@ -304,10 +309,17 @@ public class ReleaseAction {
 
     private void fatalError(Context context, Commands commands, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody, String error) {
+        fatalError(context, commands, releaseInformation, releaseStatus, issue, updatedIssueBody, error, null);
+    }
+
+    private void fatalError(Context context, Commands commands, ReleaseInformation releaseInformation,
+            ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody, String error, String errorHelp) {
         try {
             ReleaseStatus currentReleaseStatus = releaseStatus.progress(Status.FAILED, StepStatus.FAILED);
             issue.setBody(issues.appendReleaseStatus(updatedIssueBody, currentReleaseStatus));
-            issue.comment(":rotating_light: " + error + "\n\nYou can find more information about the failure [here]("
+            issue.comment(":rotating_light: " + error
+                    + (errorHelp != null && !errorHelp.isBlank() ? "\n\n" + errorHelp : "")
+                    + "\n\nYou can find more information about the failure [here]("
                     + getWorkflowRunUrl(context) + ").\n\n"
                     + "This is a fatal error, the issue will be closed."
                     + youAreHere(releaseInformation, currentReleaseStatus));
@@ -322,7 +334,7 @@ public class ReleaseAction {
     }
 
     private static String youAreHere(ReleaseInformation releaseInformation, ReleaseStatus releaseStatus) {
-        return "\n\n<details><summary>You are here</summary>\n\n" +
+        return "\n\n<details><summary>Where am I?</summary>\n\n" +
                 Arrays.stream(Step.values())
                         .filter(s -> releaseInformation.isFinal() || !s.isForFinalReleasesOnly())
                         .map(s -> {
