@@ -36,7 +36,8 @@ public class ReleasePlatform implements StepHandler {
         comment.append("```\n\n");
         comment.append("* Check the diff with `git diff`\n\n");
         comment.append("```\n");
-        comment.append("git commit -a -m 'Upgrade to Quarkus " + releaseInformation.getVersion() + "'\n");
+        comment.append("git add .\n");
+        comment.append("git commit -m 'Upgrade to Quarkus " + releaseInformation.getVersion() + "'\n");
         comment.append("git push origin quarkus-" + releaseInformation.getVersion() + "\n");
         comment.append("```\n\n");
         comment.append("* Create a pull request\n");
@@ -49,7 +50,7 @@ public class ReleasePlatform implements StepHandler {
         comment.append("* Then actually release the branch with the following line:\n\n");
         comment.append("> TAG=" + releaseInformation.getVersion() + " && ./check-version.sh $TAG && ./mvnw release:prepare release:perform -DdevelopmentVersion=999-SNAPSHOT -DreleaseVersion=$TAG -Dtag=$TAG -DperformRelease -Prelease,releaseNexus -DskipTests -Darguments=-DskipTests\n\n");
         comment.append(
-                ":warning: You need to wait for them to be synced to Maven Central before pursuing with the release:\n\n");
+                "**IMPORTANT** You need to wait for them to be synced to Maven Central before pursuing with the release:\n\n");
         comment.append("* Wait for 40 minutes\n");
         comment.append("* Check that https://repo1.maven.org/maven2/io/quarkus/platform/quarkus-bom/" + releaseInformation.getVersion() + "/"
                 + " does not return a 404\n\n");

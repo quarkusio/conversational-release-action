@@ -24,7 +24,7 @@ public class SyncCoreRelease implements StepHandler {
     public boolean shouldPause(Context context, Commands commands, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus) {
         StringBuilder comment = new StringBuilder();
-        comment.append("The core artifacts have been pushed to s01.oss.sonatype.org.\n\n");
+        comment.append("The core artifacts have been pushed to `s01.oss.sonatype.org`.\n\n");
         comment.append(
                 "**IMPORTANT** You need to wait for them to be synced to Maven Central before pursuing with the release:\n\n");
         comment.append("* Wait for one hour\n");
