@@ -26,7 +26,7 @@ public class SyncCoreRelease implements StepHandler {
         StringBuilder comment = new StringBuilder();
         comment.append("The core artifacts have been pushed to s01.oss.sonatype.org.\n\n");
         comment.append(
-                ":warning: You need to wait for them to be synced to Maven Central before pursuing with the release:\n\n");
+                "**IMPORTANT** You need to wait for them to be synced to Maven Central before pursuing with the release:\n\n");
         comment.append("* Wait for one hour\n");
         comment.append("* Check that https://repo1.maven.org/maven2/io/quarkus/quarkus-core/" + releaseInformation.getVersion() + "/"
                 + " does not return a 404\n\n");
