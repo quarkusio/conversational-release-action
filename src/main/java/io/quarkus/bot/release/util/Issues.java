@@ -26,8 +26,8 @@ public final class Issues {
     private static final String RELEASE_STATUS_MARKER = "<!-- quarkus-release/release-status:";
     private static final String END_OF_MARKER = "-->";
 
-    private static final Pattern RELEASE_INFORMATION_PATTERN = Pattern.compile(RELEASE_INFORMATION_MARKER + "\\H(.*?)\\H" + END_OF_MARKER, Pattern.DOTALL);
-    private static final Pattern RELEASE_STATUS_PATTERN = Pattern.compile(RELEASE_STATUS_MARKER + "\\H(.*?)\\H" + END_OF_MARKER, Pattern.DOTALL);
+    private static final Pattern RELEASE_INFORMATION_PATTERN = Pattern.compile(RELEASE_INFORMATION_MARKER + "(.*?)" + END_OF_MARKER, Pattern.DOTALL);
+    private static final Pattern RELEASE_STATUS_PATTERN = Pattern.compile(RELEASE_STATUS_MARKER + "(.*?)" + END_OF_MARKER, Pattern.DOTALL);
 
     @Inject
     @Yaml
