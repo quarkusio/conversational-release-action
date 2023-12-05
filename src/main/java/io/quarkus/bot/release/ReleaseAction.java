@@ -118,6 +118,8 @@ public class ReleaseAction {
         }
 
         try {
+            releaseStatus = releaseStatus.progress(context.getGitHubRunId());
+            updateReleaseStatus(issue, updatedIssueBody, releaseStatus);
             handleSteps(context, commands, issue, updatedIssueBody, issueComment, releaseInformation, releaseStatus);
         } finally {
             if (releaseInformation.getVersion() != null) {
