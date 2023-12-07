@@ -1,5 +1,5 @@
 
-# Conversational release action
+# Conversational Release Action
 
 > Release Quarkus by conversing with a GitHub Action
 
