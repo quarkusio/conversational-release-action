@@ -16,7 +16,8 @@ public enum Step {
     UPDATE_JBANG_CATALOG("Update JBang catalog", UpdateJBangCatalog.class, true, true),
     PUBLISH_CLI("Publish CLI", PublishCLI.class, true, true),
     UPDATE_QUICKSTARTS("Update quickstarts", UpdateQuickstarts.class, true, true),
-    UPDATE_DOCUMENTATION("Update documentation", UpdateDocumentation.class, true, true);
+    UPDATE_DOCUMENTATION("Update documentation", UpdateDocumentation.class, true, true),
+    ANNOUNCE_RELEASE("Announce release", AnnounceRelease.class, true, false);
 
     private final String description;
 

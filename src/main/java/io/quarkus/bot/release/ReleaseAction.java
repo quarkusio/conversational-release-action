@@ -2,6 +2,7 @@ package io.quarkus.bot.release;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import jakarta.inject.Inject;
@@ -10,7 +11,9 @@ import org.jboss.logging.Logger;
 import org.kohsuke.github.GHEventPayload;
 import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHIssueComment;
+import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHPermissionType;
+import org.kohsuke.github.GHReaction;
 import org.kohsuke.github.Reactable;
 import org.kohsuke.github.ReactionContent;
 
@@ -100,7 +103,8 @@ public class ReleaseAction {
             return;
         }
 
-        if (!issueCommentPayload.getRepository().hasPermission(issueCommentPayload.getSender(), GHPermissionType.WRITE)) {
+        if (!issueCommentPayload.getRepository().hasPermission(issueCommentPayload.getSender(), GHPermissionType.WRITE)
+                || issue.getState() == GHIssueState.CLOSED) {
             react(commands, issueComment, ReactionContent.MINUS_ONE);
             return;
         }
@@ -240,14 +244,6 @@ public class ReleaseAction {
             ReleaseStatus currentReleaseStatus) {
         currentReleaseStatus = currentReleaseStatus.progress(Status.COMPLETED);
         updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
-
-        try {
-            issue.comment(":white_check_mark: " + releaseInformation.getVersion()
-                    + " was successfully released.\n\nTime to write the announcement.");
-            issue.close();
-        } catch (IOException e) {
-            throw new IllegalStateException("Unable to mark the release as successful", e);
-        }
     }
 
     private static StepHandler getStepHandler(Step step) {
@@ -274,8 +270,19 @@ public class ReleaseAction {
         }
     }
 
-    private static void react(Commands commands, Reactable reactable, ReactionContent reactionContent) {
+    private static void react(Commands commands, final Reactable reactable, ReactionContent reactionContent) {
         try {
+            reactable.listReactions().toList().stream()
+                    .filter(r -> Users.isBot(r.getUser().getLogin()))
+                    .filter(r -> r.getContent() == ReactionContent.EYES)
+                    .forEach(r -> {
+                        try {
+                            reactable.deleteReaction(r);
+                        } catch (Exception e) {
+                            // ignore
+                        }
+                    });
+
             reactable.createReaction(reactionContent);
         } catch (IOException e) {
             commands.error("Unable to react with: " + reactionContent);
