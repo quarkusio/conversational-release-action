@@ -19,6 +19,8 @@ outputs:
     value: ${{ steps.action.outputs.major }}
   version:
     value: ${{ steps.action.outputs.version }}
+  jdk:
+    value: ${{ steps.action.outputs.jdk }}
   status:
     value: ${{ steps.action.outputs.status }}
   current-step:

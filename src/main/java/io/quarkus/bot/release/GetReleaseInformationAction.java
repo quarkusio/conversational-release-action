@@ -9,6 +9,7 @@ import io.quarkiverse.githubaction.Commands;
 import io.quarkiverse.githubapp.event.Issue;
 import io.quarkiverse.githubapp.event.IssueComment;
 import io.quarkus.bot.release.util.Issues;
+import io.quarkus.bot.release.util.Jdks;
 import io.quarkus.bot.release.util.Outputs;
 import io.quarkus.bot.release.util.UpdatedIssueBody;
 
@@ -16,6 +17,9 @@ public class GetReleaseInformationAction {
 
     @Inject
     Issues issues;
+
+    @Inject
+    Jdks jdks;
 
     @Action("get-release-information")
     void getReleaseInformation(Commands commands, @Issue.Opened GHEventPayload.Issue issuePayload) {
@@ -44,5 +48,7 @@ public class GetReleaseInformationAction {
         if (releaseInformation.getVersion() != null) {
             commands.setOutput(Outputs.VERSION, releaseInformation.getVersion());
         }
+
+        commands.setOutput(Outputs.JDK, jdks.getJdkVersion(releaseInformation.getBranch()));
     }
 }

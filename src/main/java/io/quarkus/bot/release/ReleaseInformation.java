@@ -42,6 +42,15 @@ public class ReleaseInformation {
         return qualifier == null || qualifier.isBlank() || qualifier.equals("Final");
     }
 
+    @JsonIgnore
+    public boolean isFirstFinal() {
+        if (version == null) {
+            throw new IllegalStateException("Unable to know if the version is the first final at this stage");
+        }
+
+        return version.endsWith(".0") || version.endsWith(".0.Final");
+    }
+
     public boolean isMajor() {
         return major;
     }
