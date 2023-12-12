@@ -2,7 +2,6 @@ package io.quarkus.bot.release;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import jakarta.inject.Inject;
@@ -13,7 +12,6 @@ import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHIssueComment;
 import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHPermissionType;
-import org.kohsuke.github.GHReaction;
 import org.kohsuke.github.Reactable;
 import org.kohsuke.github.ReactionContent;
 
