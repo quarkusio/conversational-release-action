@@ -39,7 +39,7 @@ public class ReleasePlatform implements StepHandler {
         } else {
             comment.append("Now is time to release the Quarkus Platform. This is a manual process:\n\n");
         }
-        comment.append("* Make sure you have merged all the pull requests that should be included in this version of the Platform\n");
+        comment.append("* Make sure you have merged [all the pull requests](https://github.com/quarkusio/quarkus-platform/pulls) that should be included in this version of the Platform\n");
         comment.append("* Then follow (roughly) this process:\n\n");
         comment.append("```\n");
         comment.append("cd <your quarkus-platform clone>\n");
