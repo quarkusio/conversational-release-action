@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 import org.kohsuke.github.GHIssue;
@@ -15,6 +16,7 @@ import io.quarkus.arc.Unremovable;
 import io.quarkus.bot.release.ReleaseInformation;
 import io.quarkus.bot.release.ReleaseStatus;
 import io.quarkus.bot.release.util.Command;
+import io.quarkus.bot.release.util.Jdks;
 import io.quarkus.bot.release.util.Outputs;
 import io.quarkus.bot.release.util.UpdatedIssueBody;
 
@@ -22,16 +24,20 @@ import io.quarkus.bot.release.util.UpdatedIssueBody;
 @Unremovable
 public class ApproveCoreRelease implements StepHandler {
 
+    @Inject
+    Jdks jdks;
+
     @Override
     public boolean shouldPause(Context context, Commands commands, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus) {
         StringBuilder comment = new StringBuilder();
         comment.append("We are going to release the following release:\n\n");
-        comment.append("- `").append(releaseInformation.getVersion()).append("`\n");
+        comment.append("- Quarkus `").append(releaseInformation.getVersion()).append("`\n");
+        comment.append("- with Java `").append(jdks.getJdkVersion(releaseInformation.getBranch())).append("`\n");
         if (Files.exists(Path.of("work", "maintenance"))) {
             comment.append("- This is a `maintenance` release.\n");
         }
         if (Files.exists(Path.of("work", "preview"))) {
-            comment.append("- This is a preview release (e.g. `Alpha`, `Beta`, `CR`).\n");
+            comment.append("- This is a `preview` release (e.g. `Alpha`, `Beta`, `CR`).\n");
         }
         comment.append(
                 "\nPlease approve with a `" + Command.YES.getFullCommand() + "` comment if you want to continue with the release.\n");
