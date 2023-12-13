@@ -42,7 +42,7 @@ public class AnnounceRelease implements StepHandler {
             if (releaseInformation.isFirstFinal()) {
                 comment.append("  * If a Mandrel/GraalVM upgrade is necessary, make sure it is prominent in the announcement");
             }
-            comment.append("* Push it and wait for it to be live on [quarkus.io](https://quarkus.io/blog/)\n");
+            comment.append("* Push it and wait for it to be live on [quarkus.io](https://quarkus.io/blog/) - you can follow the progress of the deployment on [GitHub Actions](https://github.com/quarkusio/quarkusio.github.io/actions)\n");
             comment.append("* Send the announcement to [quarkus-dev@googlegroups.com](mailto:quarkus-dev@googlegroups.com)\n");
             comment.append("* Send the announcement to various social networks using https://buffer.com/\n");
 
