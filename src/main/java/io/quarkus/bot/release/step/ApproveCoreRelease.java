@@ -28,7 +28,7 @@ public class ApproveCoreRelease implements StepHandler {
     Jdks jdks;
 
     @Override
-    public boolean shouldPause(Context context, Commands commands, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus) {
+    public boolean shouldPause(Context context, Commands commands, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         StringBuilder comment = new StringBuilder();
         comment.append("We are going to release the following release:\n\n");
         comment.append("- Quarkus `").append(releaseInformation.getVersion()).append("`\n");
@@ -48,7 +48,7 @@ public class ApproveCoreRelease implements StepHandler {
 
     @Override
     public boolean shouldContinue(Context context, Commands commands,
-            ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssueComment issueComment) {
+            ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         return Command.YES.matches(issueComment.getBody());
     }
 

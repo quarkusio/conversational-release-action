@@ -15,7 +15,7 @@ public final class Versions {
     }
 
     public static ComparableVersion getVersion(String version) {
-        if ("main".equals(version)) {
+        if (Branches.MAIN.equals(version)) {
             return MAIN;
         }
 
