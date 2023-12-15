@@ -55,7 +55,8 @@ public class ReleaseAction {
             throw new IllegalStateException("No RELEASE_GITHUB_TOKEN around");
         }
 
-        if (!issuePayload.getRepository().hasPermission(issuePayload.getSender(), GHPermissionType.WRITE)) {
+        if (!issuePayload.getRepository().hasPermission(issuePayload.getSender(), GHPermissionType.WRITE)
+                || Users.isIgnored(issuePayload.getSender().getLogin())) {
             react(commands, issue, ReactionContent.MINUS_ONE);
             issue.comment(":rotating_light: You don't have the permission to start a release.");
             issue.close();
