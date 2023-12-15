@@ -10,10 +10,10 @@ public class UsersTest {
 
     @Test
     void testIsBot() {
-        assertThat(Users.isBot("gsmet")).isFalse();
-        assertThat(Users.isBot(null)).isTrue();
-        assertThat(Users.isBot("quarkusbot")).isTrue();
-        assertThat(Users.isBot("quarkus-bot")).isTrue();
-        assertThat(Users.isBot("github actions [bot]")).isTrue();
+        assertThat(Users.isIgnored("gsmet")).isFalse();
+        assertThat(Users.isIgnored(null)).isTrue();
+        assertThat(Users.isIgnored("quarkusbot")).isFalse();
+        assertThat(Users.isIgnored("quarkus-bot")).isTrue();
+        assertThat(Users.isIgnored("github actions [bot]")).isTrue();
     }
 }

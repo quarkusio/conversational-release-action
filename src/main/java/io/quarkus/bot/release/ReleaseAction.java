@@ -55,7 +55,8 @@ public class ReleaseAction {
             throw new IllegalStateException("No RELEASE_GITHUB_TOKEN around");
         }
 
-        if (!issuePayload.getRepository().hasPermission(issuePayload.getSender(), GHPermissionType.WRITE)) {
+        if (!issuePayload.getRepository().hasPermission(issuePayload.getSender(), GHPermissionType.WRITE)
+                || Users.isIgnored(issuePayload.getSender().getLogin())) {
             react(commands, issue, ReactionContent.MINUS_ONE);
             issue.comment(":rotating_light: You don't have the permission to start a release.");
             issue.close();
@@ -97,7 +98,7 @@ public class ReleaseAction {
         GHIssue issue = issueCommentPayload.getIssue();
         UpdatedIssueBody updatedIssueBody = new UpdatedIssueBody(issue.getBody());
 
-        if (Users.isBot(issueCommentPayload.getSender().getLogin())) {
+        if (Users.isIgnored(issueCommentPayload.getSender().getLogin())) {
             return;
         }
 
@@ -162,7 +163,7 @@ public class ReleaseAction {
                 // Handle paused, we will continue the process with the next step
                 StepHandler stepHandler = getStepHandler(currentReleaseStatus.getCurrentStep());
 
-                if (stepHandler.shouldContinue(context, commands, releaseInformation, currentReleaseStatus, issueComment)) {
+                if (stepHandler.shouldContinue(context, commands, releaseInformation, currentReleaseStatus, issue, issueComment)) {
                     react(commands, issueComment, ReactionContent.PLUS_ONE);
                     currentReleaseStatus = currentReleaseStatus.progress(StepStatus.COMPLETED);
                     updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
@@ -207,7 +208,7 @@ public class ReleaseAction {
                 currentReleaseStatus = currentReleaseStatus.progress(currentStep);
                 updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
 
-                if (currentStepHandler.shouldPause(context, commands, releaseInformation, releaseStatus)) {
+                if (currentStepHandler.shouldPause(context, commands, releaseInformation, releaseStatus, issue, issueComment)) {
                     currentReleaseStatus = currentReleaseStatus.progress(StepStatus.PAUSED);
                     updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
                     return;
@@ -271,7 +272,7 @@ public class ReleaseAction {
     private static void react(Commands commands, final Reactable reactable, ReactionContent reactionContent) {
         try {
             reactable.listReactions().toList().stream()
-                    .filter(r -> Users.isBot(r.getUser().getLogin()))
+                    .filter(r -> Users.isIgnored(r.getUser().getLogin()))
                     .filter(r -> r.getContent() == ReactionContent.EYES)
                     .forEach(r -> {
                         try {

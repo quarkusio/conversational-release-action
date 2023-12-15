@@ -17,12 +17,12 @@ public interface StepHandler {
             UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException;
 
     default boolean shouldPause(Context context, Commands commands, ReleaseInformation releaseInformation,
-            ReleaseStatus releaseStatus) {
+            ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         return false;
     }
 
     default boolean shouldContinue(Context context, Commands commands,
-            ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssueComment issueComment) {
+            ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         return false;
     }
 
