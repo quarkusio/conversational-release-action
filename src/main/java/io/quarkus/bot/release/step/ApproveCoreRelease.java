@@ -32,7 +32,8 @@ public class ApproveCoreRelease implements StepHandler {
         StringBuilder comment = new StringBuilder();
         comment.append("We are going to release the following release:\n\n");
         comment.append("- Quarkus `").append(releaseInformation.getVersion()).append("`\n");
-        comment.append("- with Java `").append(jdks.getJdkVersion(releaseInformation.getBranch())).append("`\n");
+        comment.append("- On branch `").append(releaseInformation.getBranch()).append("`\n");
+        comment.append("- With Java `").append(jdks.getJdkVersion(releaseInformation.getBranch())).append("`\n");
         if (Files.exists(Path.of("work", "maintenance"))) {
             comment.append("- This is a `maintenance` release.\n");
         }
