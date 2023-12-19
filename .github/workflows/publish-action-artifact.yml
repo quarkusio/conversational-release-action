@@ -3,8 +3,8 @@ name: Publish action artifact to GitHub project's Maven repository
 on:
   workflow_dispatch:
   push:
-    branches-ignore:
-      - 'dependabot/**'
+    branches:
+      - 'main'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
