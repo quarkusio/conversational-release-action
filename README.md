@@ -3,6 +3,8 @@
 
 > Release Quarkus by conversing with a GitHub Action
 
+<p align="center"><img src="https://design.jboss.org/quarkus/bot/final/images/quarkusbot_full.svg" width="128" height="128" /></p>
+
 This GitHub Action is used to release [Quarkus](https://github.com/quarkusio/quarkus) and the [Quarkus Platform](https://github.com/quarkusio/quarkus-platform/).
 It is developed in Quarkus using the [Quarkus GitHub Action](https://github.com/quarkiverse/quarkus-github-action/) extension.
 
