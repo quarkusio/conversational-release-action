@@ -53,7 +53,7 @@ public class PreparePlatform implements StepHandler {
         comment.append("git commit -m 'Upgrade to Quarkus " + releaseInformation.getVersion() + "'\n");
         comment.append("git push origin quarkus-" + releaseInformation.getVersion() + "\n");
         comment.append("```\n\n");
-        comment.append("* [Create a pull request](https://github.com/quarkusio/quarkus-platform/pulls) for branch `" + platformPreparationBranch + "`\n");
+        comment.append("* [Create a pull request](https://github.com/quarkusio/quarkus-platform/pulls) targeting branch `" + platformPreparationBranch + "`\n");
         comment.append("* Wait for CI to go green\n");
         comment.append("* Merge the pull request\n");
         if (releaseInformation.isFirstFinal()) {
