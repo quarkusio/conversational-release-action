@@ -51,13 +51,12 @@ public class ReleaseAction {
         GHIssue issue = issuePayload.getIssue();
         UpdatedIssueBody updatedIssueBody = new UpdatedIssueBody(issue.getBody());
 
-        if (System.getenv("RELEASE_GITHUB_TOKEN") == null || System.getenv("RELEASE_GITHUB_TOKEN").isBlank()) {
-            throw new IllegalStateException("No RELEASE_GITHUB_TOKEN around");
-        }
+        checkReleaseGitHubTokenIsPresent();
 
         if (!issuePayload.getRepository().hasPermission(issuePayload.getSender(), GHPermissionType.WRITE)
                 || Users.isIgnored(issuePayload.getSender().getLogin())) {
             react(commands, issue, ReactionContent.MINUS_ONE);
+            commands.error("User " + issuePayload.getSender() + " doesn't have the appropriate permission");
             issue.comment(":rotating_light: You don't have the permission to start a release.");
             issue.close();
             return;
@@ -90,7 +89,7 @@ public class ReleaseAction {
     }
 
     @Action
-    void onComment(Context context, Commands commands, @IssueComment.Created GHEventPayload.IssueComment issueCommentPayload)
+    void continueRelease(Context context, Commands commands, @IssueComment.Created GHEventPayload.IssueComment issueCommentPayload)
             throws Exception {
         commands.notice("Continuing release...");
 
@@ -98,12 +97,20 @@ public class ReleaseAction {
         GHIssue issue = issueCommentPayload.getIssue();
         UpdatedIssueBody updatedIssueBody = new UpdatedIssueBody(issue.getBody());
 
+        checkReleaseGitHubTokenIsPresent();
+
         if (Users.isIgnored(issueCommentPayload.getSender().getLogin())) {
             return;
         }
 
-        if (!issueCommentPayload.getRepository().hasPermission(issueCommentPayload.getSender(), GHPermissionType.WRITE)
-                || issue.getState() == GHIssueState.CLOSED) {
+        if (issue.getState() == GHIssueState.CLOSED) {
+            commands.error("The issue is closed. No further action is allowed.");
+            react(commands, issueComment, ReactionContent.MINUS_ONE);
+            return;
+        }
+
+        if (!issueCommentPayload.getRepository().hasPermission(issueCommentPayload.getSender(), GHPermissionType.WRITE)) {
+            commands.error("User " + issueCommentPayload.getSender() + " doesn't have the appropriate permission");
             react(commands, issueComment, ReactionContent.MINUS_ONE);
             return;
         }
@@ -128,6 +135,12 @@ public class ReleaseAction {
             if (releaseInformation.getVersion() != null) {
                 commands.setOutput(Outputs.VERSION, releaseInformation.getVersion());
             }
+        }
+    }
+
+    private static void checkReleaseGitHubTokenIsPresent() {
+        if (System.getenv("RELEASE_GITHUB_TOKEN") == null || System.getenv("RELEASE_GITHUB_TOKEN").isBlank()) {
+            throw new IllegalStateException("No RELEASE_GITHUB_TOKEN around");
         }
     }
 

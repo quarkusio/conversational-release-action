@@ -67,7 +67,7 @@ public class SyncCoreRelease implements StepHandler {
 
             comment.append("---\n\n");
             comment.append("If things go south, you can monitor the situation manually:\n\n");
-            comment.append("* Wait for 40 minutes (starting from the time of this comment)\n");
+            comment.append("* Wait for 1 hour (starting from the time of this comment)\n");
             comment.append("* Check that https://repo1.maven.org/maven2/io/quarkus/quarkus-bom/"
                     + releaseInformation.getVersion() + "/"
                     + " does not return a 404\n\n");
