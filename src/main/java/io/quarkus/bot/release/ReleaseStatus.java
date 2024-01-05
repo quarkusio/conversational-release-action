@@ -53,7 +53,7 @@ public class ReleaseStatus {
 
     @JsonIgnore
     public ReleaseStatus progress(Step updatedStep) {
-        return new ReleaseStatus(this.status, updatedStep, StepStatus.STARTED, this.workflowRunId);
+        return new ReleaseStatus(this.status, updatedStep, StepStatus.INIT, this.workflowRunId);
     }
 
     @JsonIgnore

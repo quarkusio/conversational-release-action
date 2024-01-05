@@ -13,15 +13,25 @@ import io.quarkus.bot.release.util.UpdatedIssueBody;
 
 public interface StepHandler {
 
-    int run(Context context, Commands commands, ReleaseInformation releaseInformation, GHIssue issue,
-            UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException;
+    int run(Context context, Commands commands, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus,
+            GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException;
 
     default boolean shouldPause(Context context, Commands commands, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         return false;
     }
 
-    default boolean shouldContinue(Context context, Commands commands,
+    default boolean shouldContinueAfterPause(Context context, Commands commands,
+            ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
+        return false;
+    }
+
+    default boolean shouldSkipAfterPause(Context context, Commands commands,
+            ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
+        return false;
+    }
+
+    default boolean shouldSkip(Context context, Commands commands,
             ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         return false;
     }

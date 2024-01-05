@@ -15,6 +15,7 @@ import io.quarkus.bot.release.ReleaseStatus;
 import io.quarkus.bot.release.util.Branches;
 import io.quarkus.bot.release.util.Command;
 import io.quarkus.bot.release.util.Outputs;
+import io.quarkus.bot.release.util.Progress;
 import io.quarkus.bot.release.util.UpdatedIssueBody;
 
 @Singleton
@@ -86,20 +87,22 @@ public class PreparePlatform implements StepHandler {
         comment.append(
                 "Once everything has been merged to branch `" + platformReleaseBranch + "`, you can continue with the release by adding a `"
                         + Command.CONTINUE.getFullCommand() + "` comment.");
+        comment.append(Progress.youAreHere(releaseInformation, releaseStatus));
+
         commands.setOutput(Outputs.INTERACTION_COMMENT, comment.toString());
 
         return true;
     }
 
     @Override
-    public boolean shouldContinue(Context context, Commands commands,
+    public boolean shouldContinueAfterPause(Context context, Commands commands,
             ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         return Command.CONTINUE.matches(issueComment.getBody());
     }
 
     @Override
-    public int run(Context context, Commands commands, ReleaseInformation releaseInformation, GHIssue issue,
-            UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
+    public int run(Context context, Commands commands, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus,
+            GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
         issue.comment(":white_check_mark: The Platform branch `" + Branches.getPlatformPreparationBranch(releaseInformation)
                 + "` is ready to be released, continuing...");
         return 0;

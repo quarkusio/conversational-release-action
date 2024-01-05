@@ -51,6 +51,11 @@ public class ReleaseInformation {
         return version.endsWith(".0") || version.endsWith(".0.Final");
     }
 
+    @JsonIgnore
+    public boolean isFirstCR() {
+        return "CR1".equalsIgnoreCase(qualifier);
+    }
+
     public boolean isMajor() {
         return major;
     }
