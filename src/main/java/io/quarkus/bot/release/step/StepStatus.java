@@ -2,8 +2,11 @@ package io.quarkus.bot.release.step;
 
 public enum StepStatus {
 
-    STARTED,
+    INIT,
     PAUSED,
+    STARTED,
     COMPLETED,
-    FAILED
+    SKIPPED,
+    FAILED,
+    INIT_FAILED
 }

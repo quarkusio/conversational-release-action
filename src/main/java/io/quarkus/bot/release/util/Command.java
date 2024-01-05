@@ -5,6 +5,8 @@ import java.util.Locale;
 public enum Command {
 
     YES("yes"),
+    AUTO("auto"),
+    MANUAL("manual"),
     CONTINUE("continue"),
     RETRY("retry");
 

@@ -18,6 +18,7 @@ import io.quarkus.bot.release.util.Branches;
 import io.quarkus.bot.release.util.Command;
 import io.quarkus.bot.release.util.MonitorArtifactPublicationInputKeys;
 import io.quarkus.bot.release.util.Outputs;
+import io.quarkus.bot.release.util.Progress;
 import io.quarkus.bot.release.util.UpdatedIssueBody;
 import io.quarkus.bot.release.util.Versions;
 
@@ -85,19 +86,21 @@ public class SyncCoreRelease implements StepHandler {
                             + Command.CONTINUE.getFullCommand() + "` comment.");
         }
 
+        comment.append(Progress.youAreHere(releaseInformation, releaseStatus));
+
         commands.setOutput(Outputs.INTERACTION_COMMENT, comment.toString());
         return true;
     }
 
     @Override
-    public boolean shouldContinue(Context context, Commands commands,
+    public boolean shouldContinueAfterPause(Context context, Commands commands,
             ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         return Command.CONTINUE.matches(issueComment.getBody());
     }
 
     @Override
-    public int run(Context context, Commands commands, ReleaseInformation releaseInformation, GHIssue issue,
-            UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
+    public int run(Context context, Commands commands, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus,
+            GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
         issue.comment(":white_check_mark: Core artifacts have been synced to Maven Central, continuing...");
         return 0;
     }
