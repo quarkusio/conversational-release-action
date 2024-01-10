@@ -93,6 +93,7 @@ public class ApproveCoreRelease implements StepHandler {
     @Override
     public int run(Context context, Commands commands, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus,
             GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
+        issue.comment(":white_check_mark: Core release is approved, proceeding...");
         return 0;
     }
 
