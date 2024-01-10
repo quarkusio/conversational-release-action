@@ -149,7 +149,7 @@ public class ReleaseAction {
 
         if (issueComment != null) {
             if (currentReleaseStatus.getCurrentStepStatus() == StepStatus.INIT ||
-                    currentReleaseStatus.getCurrentStepStatus() != StepStatus.STARTED) {
+                    currentReleaseStatus.getCurrentStepStatus() == StepStatus.STARTED) {
                 commands.error("Current step is running, ignoring comment");
                 react(commands, issueComment, ReactionContent.MINUS_ONE);
                 return;
