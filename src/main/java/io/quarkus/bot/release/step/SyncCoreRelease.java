@@ -86,7 +86,7 @@ public class SyncCoreRelease implements StepHandler {
                             + Command.CONTINUE.getFullCommand() + "` comment.");
         }
 
-        comment.append(Progress.youAreHere(releaseInformation, releaseStatus));
+        comment.append("\n\n" + Progress.youAreHere(releaseInformation, releaseStatus));
 
         commands.setOutput(Outputs.INTERACTION_COMMENT, comment.toString());
         return true;

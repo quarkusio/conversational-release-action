@@ -78,7 +78,7 @@ public class ApproveCoreRelease implements StepHandler {
 
         comment.append(
                 "\nPlease approve with a `" + Command.YES.getFullCommand() + "` comment if you want to continue with the release.\n");
-        comment.append("\nIf not, simply close this issue.");
+        comment.append("\nIf not, simply close this issue.\n\n");
         comment.append(Progress.youAreHere(releaseInformation, releaseStatus));
         commands.setOutput(Outputs.INTERACTION_COMMENT, comment.toString());
         return true;

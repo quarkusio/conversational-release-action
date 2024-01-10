@@ -86,7 +86,7 @@ public class PreparePlatform implements StepHandler {
 
         comment.append(
                 "Once everything has been merged to branch `" + platformReleaseBranch + "`, you can continue with the release by adding a `"
-                        + Command.CONTINUE.getFullCommand() + "` comment.");
+                        + Command.CONTINUE.getFullCommand() + "` comment.\n\n");
         comment.append(Progress.youAreHere(releaseInformation, releaseStatus));
 
         commands.setOutput(Outputs.INTERACTION_COMMENT, comment.toString());
