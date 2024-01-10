@@ -34,13 +34,13 @@ public class PreparePlatform implements StepHandler {
             comment.append("Now is time to update Quarkus in the Quarkus Platform. This is a manual process.\n\n");
             comment.append(":warning: **This is the `.0` release so we update the Platform first then wait one week for the Platform members to contribute their updates then we release. Make sure you follow the instructions closely.**\n\n");
         } else {
-            comment.append("Now is time to update Quarkus in the Quarkus Platform. This is a manual process:\n\n");
+            comment.append("Now is time to update Quarkus in the Quarkus Platform. This is a manual process.\n\n");
         }
 
         if (!releaseInformation.isFinal()) {
-            comment.append("* In the case of `preview releases` (e.g. `Alpha1`, `CR1`...), the release will be built from the main branch\n");
+            comment.append("* In the case of `preview releases` (e.g. `Alpha1`, `CR1`...), the release will be built from the `main` branch\n");
         }
-        comment.append("* Then follow (roughly) this process:\n\n");
+        comment.append("* Follow (roughly) these steps:\n\n");
         comment.append("```\n");
         comment.append("cd <your quarkus-platform clone>\n");
         comment.append("git checkout " + platformPreparationBranch + "\n");
