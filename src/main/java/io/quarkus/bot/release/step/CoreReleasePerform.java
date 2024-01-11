@@ -31,7 +31,7 @@ public class CoreReleasePerform implements StepHandler {
     }
 
     @Override
-    public String getErrorHelp() {
+    public String getErrorHelp(ReleaseInformation releaseInformation) {
         return "Please check the workflow run logs but there is a good chance "
                 + "that the issue was due to a problem with accessing `s01.oss.sonatype.org` "
                 + "either when authenticating or when uploading the artifacts.\n"

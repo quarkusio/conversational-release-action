@@ -272,11 +272,11 @@ public class ReleaseAction {
             } catch (Exception e) {
                 if (currentStep.isRecoverable()) {
                     progressError(context, commands, releaseInformation, currentReleaseStatus, issue, updatedIssueBody,
-                            e.getMessage(), currentStepHandler.getErrorHelp());
+                            e.getMessage(), currentStepHandler.getErrorHelp(releaseInformation));
                     throw e;
                 } else {
                     fatalError(context, commands, releaseInformation, currentReleaseStatus, issue, updatedIssueBody,
-                            e.getMessage(), currentStepHandler.getErrorHelp());
+                            e.getMessage(), currentStepHandler.getErrorHelp(releaseInformation));
                     throw e;
                 }
             }
