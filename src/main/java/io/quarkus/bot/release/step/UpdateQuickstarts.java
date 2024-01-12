@@ -29,4 +29,16 @@ public class UpdateQuickstarts implements StepHandler {
         return processes.execute(List.of("./update-quickstarts.sh"));
     }
 
+    @Override
+    public String getErrorHelp(ReleaseInformation releaseInformation) {
+        if (releaseInformation.isFirstFinal()) {
+            return "It might be due to the build failing with the current " + releaseInformation.getBranch()
+                    + " branch of Quarkus.\n\n"
+                    + "You need to check the content of the `development` branch of https://github.com/quarkusio/quarkus-quickstarts/.\n\n"
+                    + "If you fix the issue there, you can safely retry.";
+        } else {
+            return "For minor versions, we shouldn't have code updates in the Quickstarts.\n\n"
+                    + "So, if you got the build failing, either something got wrongly merged in the `main` branch of https://github.com/quarkusio/quarkus-quickstarts/ or something in Quarkus broke the quickstarts.";
+        }
+    }
 }
