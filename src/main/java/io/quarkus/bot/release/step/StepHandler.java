@@ -36,7 +36,7 @@ public interface StepHandler {
         return false;
     }
 
-    default String getErrorHelp() {
+    default String getErrorHelp(ReleaseInformation releaseInformation) {
         return null;
     }
 }

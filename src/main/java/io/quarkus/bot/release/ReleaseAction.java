@@ -272,11 +272,11 @@ public class ReleaseAction {
             } catch (Exception e) {
                 if (currentStep.isRecoverable()) {
                     progressError(context, commands, releaseInformation, currentReleaseStatus, issue, updatedIssueBody,
-                            e.getMessage(), currentStepHandler.getErrorHelp());
+                            e.getMessage(), currentStepHandler.getErrorHelp(releaseInformation));
                     throw e;
                 } else {
                     fatalError(context, commands, releaseInformation, currentReleaseStatus, issue, updatedIssueBody,
-                            e.getMessage(), currentStepHandler.getErrorHelp());
+                            e.getMessage(), currentStepHandler.getErrorHelp(releaseInformation));
                     throw e;
                 }
             }
@@ -311,7 +311,8 @@ public class ReleaseAction {
         try {
             issue.setBody(issues.appendReleaseStatus(updatedIssueBody, updatedReleaseStatus));
         } catch (Exception e) {
-            throw new StatusUpdateException("Unable to update the release status to: " + updatedReleaseStatus, e);
+            throw new StatusUpdateException(
+                    "Unable to update the release status to " + updatedReleaseStatus + ": " + e.getMessage(), e);
         }
     }
 
@@ -348,26 +349,32 @@ public class ReleaseAction {
     private void progressError(Context context, Commands commands, ReleaseInformation releaseInformation,
             final ReleaseStatus currentReleaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody, String error,
             String errorHelp) {
+        ReleaseStatus updatedReleaseStatus;
+        switch(currentReleaseStatus.getCurrentStepStatus()) {
+            case INIT:
+                updatedReleaseStatus = currentReleaseStatus.progress(StepStatus.INIT_FAILED);
+                break;
+            case SKIPPED:
+                updatedReleaseStatus = currentReleaseStatus.progress(StepStatus.SKIPPED);
+                break;
+            default:
+                updatedReleaseStatus = currentReleaseStatus.progress(StepStatus.FAILED);
+                break;
+        }
+
         try {
-            ReleaseStatus updatedReleaseStatus;
-            switch(currentReleaseStatus.getCurrentStepStatus()) {
-                case INIT:
-                    updatedReleaseStatus = currentReleaseStatus.progress(StepStatus.INIT_FAILED);
-                    break;
-                case SKIPPED:
-                    updatedReleaseStatus = currentReleaseStatus.progress(StepStatus.SKIPPED);
-                    break;
-                default:
-                    updatedReleaseStatus = currentReleaseStatus.progress(StepStatus.FAILED);
-                    break;
-            }
-            issue.setBody(issues.appendReleaseStatus(updatedIssueBody, updatedReleaseStatus));
+            retry(3, () -> issue.setBody(issues.appendReleaseStatus(updatedIssueBody, updatedReleaseStatus)));
+
             commands.setOutput(Outputs.INTERACTION_COMMENT, ":rotating_light: " + error
                     + (errorHelp != null && !errorHelp.isBlank() ? "\n\n" + errorHelp : "")
                     + "\n\nYou can find more information about the failure [here](" + getWorkflowRunUrl(context) + ").\n\n"
                     + "This is not a fatal error, you can retry by adding a `" + Command.RETRY.getFullCommand() + "` comment.\n\n"
                     + Progress.youAreHere(releaseInformation, currentReleaseStatus));
-        } catch (IOException e) {
+        } catch (Exception e) {
+            commands.setOutput(Outputs.INTERACTION_COMMENT, ":rotating_light: We were unable to report the error to the issue status.\n\n"
+                    + "The issue is in an inconsistent state, better ping @gsmet to figure out how to continue with the process.\n\n"
+                    + Progress.youAreHere(releaseInformation, updatedReleaseStatus));
+
             throw new IllegalStateException("Unable to update the status or add progress error comment: " + error, e);
         }
     }
@@ -379,22 +386,60 @@ public class ReleaseAction {
 
     private void fatalError(Context context, Commands commands, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody, String error, String errorHelp) {
+        final ReleaseStatus updatedReleaseStatus = releaseStatus.progress(Status.FAILED, StepStatus.FAILED);
+
         try {
-            ReleaseStatus currentReleaseStatus = releaseStatus.progress(Status.FAILED, StepStatus.FAILED);
-            issue.setBody(issues.appendReleaseStatus(updatedIssueBody, currentReleaseStatus));
-            issue.comment(":rotating_light: " + error
+            retry(3, () -> issue.setBody(issues.appendReleaseStatus(updatedIssueBody, updatedReleaseStatus)));
+            retry(3, () -> issue.comment(":rotating_light: " + error
                     + (errorHelp != null && !errorHelp.isBlank() ? "\n\n" + errorHelp : "")
                     + "\n\nYou can find more information about the failure [here]("
                     + getWorkflowRunUrl(context) + ").\n\n"
                     + "This is a fatal error, the issue will be closed.\n\n"
-                    + Progress.youAreHere(releaseInformation, currentReleaseStatus));
-            issue.close();
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to add fatal error comment or close the issue: " + error, e);
+                    + Progress.youAreHere(releaseInformation, releaseStatus)));
+            retry(3, () -> issue.close());
+        } catch (Exception e) {
+            commands.setOutput(Outputs.INTERACTION_COMMENT,
+                    ":rotating_light: We were unable to report the fatal error to the issue status.\n\n"
+                            + "The issue should be closed and no further interaction should be made with this issue.\n\n"
+                            + Progress.youAreHere(releaseInformation, updatedReleaseStatus));
+
+            throw new RuntimeException(
+                    "Unable to add fatal error comment or close the issue: " + error + " (because of " + e.getMessage() + ")",
+                    e);
         }
     }
 
     private static String getWorkflowRunUrl(Context context) {
         return context.getGitHubServerUrl() + "/" + context.getGitHubRepository() + "/actions/runs/" + context.getGitHubRunId();
+    }
+
+    /**
+     * This should be used with a lot of precautions, only to make sure critical API calls are successful.
+     */
+    private static void retry(int iterations, ThrowingRunnable runnable) throws Exception {
+        Exception originalException = null;
+        for (int i = 1; i <= iterations; i++) {
+            try {
+                runnable.run();
+            } catch (Exception e) {
+                if (originalException == null) {
+                    originalException = e;
+                } else {
+                    originalException.addSuppressed(e);
+                }
+                if (i == iterations) {
+                    throw originalException;
+                } else {
+                    // otherwise wait a bit and iterate
+                    Thread.sleep(i * 3000);
+                }
+            }
+        }
+    }
+
+    @FunctionalInterface
+    public interface ThrowingRunnable {
+
+        void run() throws Exception;
     }
 }

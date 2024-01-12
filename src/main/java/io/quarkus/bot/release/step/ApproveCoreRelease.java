@@ -98,7 +98,7 @@ public class ApproveCoreRelease implements StepHandler {
     }
 
     @Override
-    public String getErrorHelp() {
+    public String getErrorHelp(ReleaseInformation releaseInformation) {
         return "Failure at this stage usually means that something is wrong with this version.\n"
                 + "It might be a code issue or a javadoc issue.\n\n"
                 + "If so, you don't have much choice as close this release, adjust the code and start a whole new release.";
