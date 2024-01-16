@@ -34,8 +34,14 @@ public class AnnounceRelease implements StepHandler {
 
         comment.append(":white_check_mark: " + releaseInformation.getVersion() + " was successfully released.\n\n");
 
+        comment.append("Connected to the Red Hat VPN, in a clone of https://github.com/quarkusio/quarkus-release, run:\n");
+        comment.append("```\n");
+        comment.append("./trigger-performance-testing.sh " + releaseInformation.getVersion() + "\n");
+        comment.append("```\n");
+        comment.append("to trigger the performance evaluation testing for this release.\n\n");
+
         if (releaseInformation.isFinal()) {
-            comment.append("Time to write the announcement:\n\n");
+            comment.append("Then it is time to write the announcement:\n\n");
             if (!releaseInformation.isMaintenance()) {
                 comment.append("* Update the versions in `_data/versions.yaml`\n");
             }
@@ -75,7 +81,7 @@ public class AnnounceRelease implements StepHandler {
                 }
             }
         } else {
-            comment.append("Time to send an email to [quarkus-dev@googlegroups.com](mailto:quarkus-dev@googlegroups.com):\n\n");
+            comment.append("Then it is time to send an email to [quarkus-dev@googlegroups.com](mailto:quarkus-dev@googlegroups.com):\n\n");
             comment.append("Subject: `Quarkus " + releaseInformation.getVersion() + " released`\n\n");
             comment.append("> Hi,\n"
                     + "> \n"
