@@ -36,7 +36,9 @@ public class AnnounceRelease implements StepHandler {
 
         if (releaseInformation.isFinal()) {
             comment.append("Time to write the announcement:\n\n");
-            comment.append("* Update the versions in `_data/versions.yaml`\n");
+            if (!releaseInformation.isMaintenance()) {
+                comment.append("* Update the versions in `_data/versions.yaml`\n");
+            }
             comment.append("* Write a blog post for [the website](https://github.com/quarkusio/quarkusio.github.io)\n");
             comment.append(
                     "  * Use a previous announcement as a template (be aware, annoucements are very different for the first final of a major/minor and the follow-up micros)\n");

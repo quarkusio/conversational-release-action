@@ -49,6 +49,7 @@ public class Prerequisites implements StepHandler {
         }
 
         releaseInformation.setVersion(Files.readString(Path.of("work", "newVersion")).trim());
+        releaseInformation.setMaintenance(Files.exists(Path.of("work", "maintenance")));
         issues.appendReleaseInformation(updatedIssueBody, releaseInformation);
 
         return exitCode;
