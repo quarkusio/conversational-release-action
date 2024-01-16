@@ -1,8 +1,6 @@
 package io.quarkus.bot.release.step;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -35,10 +33,10 @@ public class ApproveCoreRelease implements StepHandler {
         comment.append("- Quarkus `").append(releaseInformation.getVersion()).append("`\n");
         comment.append("- On branch `").append(releaseInformation.getBranch()).append("`\n");
         comment.append("- With Java `").append(jdks.getJdkVersion(releaseInformation.getBranch())).append("`\n");
-        if (Files.exists(Path.of("work", "maintenance"))) {
+        if (releaseInformation.isMaintenance()) {
             comment.append("- This is a `maintenance` release.\n");
         }
-        if (Files.exists(Path.of("work", "preview"))) {
+        if (!releaseInformation.isFinal()) {
             comment.append("- This is a `preview` release (e.g. `Alpha`, `Beta`, `CR`).\n");
         }
 

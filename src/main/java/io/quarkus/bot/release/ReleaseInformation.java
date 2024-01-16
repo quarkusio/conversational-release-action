@@ -12,13 +12,15 @@ public class ReleaseInformation {
     private final boolean major;
 
     private String version;
+    private boolean maintenance;
 
     @JsonCreator
-    public ReleaseInformation(String version, String branch, String qualifier, boolean major) {
+    public ReleaseInformation(String version, String branch, String qualifier, boolean major, boolean maintenance) {
         this.version = version;
         this.branch = branch;
         this.qualifier = qualifier;
         this.major = major;
+        this.maintenance = maintenance;
     }
 
     public String getVersion() {
@@ -33,8 +35,16 @@ public class ReleaseInformation {
         return qualifier;
     }
 
+    public boolean isMaintenance() {
+        return maintenance;
+    }
+
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public void setMaintenance(boolean maintenance) {
+        this.maintenance = maintenance;
     }
 
     @JsonIgnore
@@ -80,7 +90,7 @@ public class ReleaseInformation {
 
     @Override
     public String toString() {
-        return "ReleaseInformation [version=" + version + ", branch=" + branch + ", qualifier=" + qualifier + ", major=" + major
+        return "ReleaseInformation [version=" + version + ", branch=" + branch + ", qualifier=" + qualifier + ", major=" + major + ",maintenance=" + maintenance
                 + "]";
     }
 }

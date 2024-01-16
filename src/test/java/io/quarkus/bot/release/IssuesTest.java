@@ -35,7 +35,7 @@ public class IssuesTest {
             - [ ] This release is a major version.
             """;
 
-        assertThat(issues.extractReleaseInformationFromForm(description)).isEqualTo(new ReleaseInformation(null, "3.6", null, false));
+        assertThat(issues.extractReleaseInformationFromForm(description)).isEqualTo(new ReleaseInformation(null, "3.6", null, false, false));
 
         description = """
                 ### Branch
@@ -51,14 +51,14 @@ public class IssuesTest {
                 - [X] This release is a major version.
                 """;
 
-        assertThat(issues.extractReleaseInformationFromForm(description)).isEqualTo(new ReleaseInformation(null, "main", "CR1", true));
+        assertThat(issues.extractReleaseInformationFromForm(description)).isEqualTo(new ReleaseInformation(null, "main", "CR1", true, false));
 
         assertThrows(IllegalStateException.class, () -> issues.extractReleaseInformationFromForm("foobar"));
     }
 
     @Test
     void testAppendReleaseInformation() {
-        assertThat(issues.appendReleaseInformation(new UpdatedIssueBody(""), new ReleaseInformation(null, "3.6", null, false))).isEqualTo("""
+        assertThat(issues.appendReleaseInformation(new UpdatedIssueBody(""), new ReleaseInformation(null, "3.6", null, false, false))).isEqualTo("""
 
 
                 <!-- quarkus-release/release-information:
@@ -67,6 +67,7 @@ public class IssuesTest {
                 branch: "3.6"
                 qualifier: null
                 major: false
+                maintenance: false
                 -->""");
 
         assertThat(issues.appendReleaseInformation(new UpdatedIssueBody("""
@@ -77,7 +78,8 @@ public class IssuesTest {
                 branch: "3.6"
                 qualifier: null
                 major: false
-                -->"""), new ReleaseInformation("3.7.1", "3.7", "CR1", true))).isEqualTo("""
+                maintenance: false
+                -->"""), new ReleaseInformation("3.7.1", "3.7", "CR1", true, false))).isEqualTo("""
                         This is a comment.
 
                         <!-- quarkus-release/release-information:
@@ -86,6 +88,7 @@ public class IssuesTest {
                         branch: "3.7"
                         qualifier: "CR1"
                         major: true
+                        maintenance: false
                         -->""");
     }
 
@@ -100,6 +103,7 @@ public class IssuesTest {
                 branch: "4.0"
                 qualifier: CR1
                 major: true
+                maintenance: true
                 -->
 
                 <!-- quarkus-release/release-status:
@@ -107,7 +111,7 @@ public class IssuesTest {
                 currentStep: "APPROVE_RELEASE"
                 currentStepStatus: "STARTED"
                 workflowRunId: 123
-                -->"""))).isEqualTo(new ReleaseInformation(null, "4.0", "CR1", true));
+                -->"""))).isEqualTo(new ReleaseInformation(null, "4.0", "CR1", true, true));
 
         assertThat(issues.extractReleaseInformation(new UpdatedIssueBody("""
                 This is a comment.
@@ -118,6 +122,7 @@ public class IssuesTest {
                 branch: "4.0"
                 qualifier: CR1
                 major: true
+                maintenance: false
                 -->
 
                 <!-- quarkus-release/release-status:
@@ -125,7 +130,7 @@ public class IssuesTest {
                 currentStep: "APPROVE_RELEASE"
                 currentStepStatus: "STARTED"
                 workflowRunId: 123
-                -->"""))).isEqualTo(new ReleaseInformation("4.0.0.CR1", "4.0", "CR1", true));
+                -->"""))).isEqualTo(new ReleaseInformation("4.0.0.CR1", "4.0", "CR1", true, false));
     }
 
     @Test
