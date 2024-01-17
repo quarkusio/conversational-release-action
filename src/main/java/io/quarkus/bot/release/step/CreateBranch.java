@@ -109,15 +109,20 @@ public class CreateBranch implements StepHandler {
 
     @Override
     public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
-            ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
+            ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody) throws InterruptedException, IOException {
         GHRepository repository = Repositories.getQuarkusRepository(quarkusBotGitHub);
 
         try {
             repository.getBranch(releaseInformation.getBranch());
         } catch (Exception e) {
             // the branch does not exist, let's create it
-            String sha = repository.getBranch(Branches.MAIN).getSHA1();
-            repository.createRef("refs/heads/" + releaseInformation.getBranch(), sha);
+            try {
+                String sha = repository.getBranch(Branches.MAIN).getSHA1();
+                repository.createRef("refs/heads/" + releaseInformation.getBranch(), sha);
+            } catch (Exception e2) {
+                throw new IllegalStateException(
+                        "Unable to create branch " + releaseInformation.getBranch() + ": " + e2.getMessage(), e2);
+            }
         }
 
         Optional<GHMilestone> versionedMilestone = getMilestone(repository, releaseInformation.getVersion());
@@ -128,9 +133,13 @@ public class CreateBranch implements StepHandler {
 
             Optional<GHMilestone> milestone = getMilestone(repository, releaseInformation.getBranch() + MAIN_MILESTONE_SUFFIX);
             if (milestone.isPresent()) {
-                milestone.get().setTitle(releaseInformation.getVersion());
+                try {
+                    milestone.get().setTitle(releaseInformation.getVersion());
 
-                repository.createMilestone(nextMinor + MAIN_MILESTONE_SUFFIX, "");
+                    repository.createMilestone(nextMinor + MAIN_MILESTONE_SUFFIX, "");
+                } catch (Exception e) {
+                    throw new IllegalStateException("Unable to update the milestone or create the new milestone: " + e.getMessage(), e);
+                }
             } else {
                 throw new IllegalStateException(
                         "Milestone " + releaseInformation.getVersion() + " does not exist and we were unable to find milestone "
@@ -138,25 +147,42 @@ public class CreateBranch implements StepHandler {
             }
         }
 
-        String previousMinorBranch = getPreviousMinorBranch(repository, releaseInformation.getBranch());
+        String previousMinorBranch;
+        try {
+            previousMinorBranch = getPreviousMinorBranch(repository, releaseInformation.getBranch());
+        } catch (Exception e) {
+            throw new IllegalStateException("Unable to resolve previous minor branch: " + e.getMessage(), e);
+        }
         String previousMinorBackportLabel = "triage/backport-" + previousMinorBranch;
 
         try {
             repository.getLabel(previousMinorBackportLabel);
         } catch (Exception e) {
-            repository.getLabel(BACKPORT_LABEL).update().name(previousMinorBackportLabel).done();
+            try {
+                repository.getLabel(BACKPORT_LABEL).update().name(previousMinorBackportLabel).done();
+            } catch (Exception e2) {
+                throw new IllegalStateException("Unable to rename backport label: " + e2.getMessage(), e2);
+            }
         }
 
         try {
             repository.getLabel(BACKPORT_LABEL);
         } catch (Exception e) {
-            repository.createLabel(BACKPORT_LABEL, BACKPORT_LABEL_COLOR);
+            try {
+                repository.createLabel(BACKPORT_LABEL, BACKPORT_LABEL_COLOR);
+            } catch (Exception e2) {
+                throw new IllegalStateException("Unable to create new backport label: " + e2.getMessage(), e2);
+            }
         }
 
-        List<GHPullRequest> openedPullRequestsToBackport = repository.searchPullRequests().label(previousMinorBackportLabel).isOpen().list().toList();
+        try {
+            List<GHPullRequest> openedPullRequestsToBackport = repository.searchPullRequests().label(previousMinorBackportLabel).isOpen().list().toList();
 
-        for (GHPullRequest openedPullRequestToBackport : openedPullRequestsToBackport) {
-            openedPullRequestToBackport.addLabels(BACKPORT_LABEL);
+            for (GHPullRequest openedPullRequestToBackport : openedPullRequestsToBackport) {
+                openedPullRequestToBackport.addLabels(BACKPORT_LABEL);
+            }
+        } catch (Exception e) {
+            throw new IllegalStateException("Unable to affect pull requests to the new backport label: " + e.getMessage(), e);
         }
 
         String comment = ":white_check_mark: Branch " + releaseInformation.getBranch()
@@ -183,7 +209,7 @@ public class CreateBranch implements StepHandler {
         return Versions.getPreviousMinorBranch(tags, Versions.getBranch(currentBranch));
     }
 
-    private static String getNextMinor(String currentBranch) throws IOException {
+    private static String getNextMinor(String currentBranch) {
         String[] segments = currentBranch.toString().split("\\.");
 
         if (segments.length < 2) {
