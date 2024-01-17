@@ -79,7 +79,7 @@ public class CreateBranch implements StepHandler {
 
         String previousMinor;
         try {
-            previousMinor = getPreviousMinor(Repositories.getQuarkusRepository(quarkusBotGitHub), releaseInformation.getBranch());
+            previousMinor = getPreviousMinorBranch(Repositories.getQuarkusRepository(quarkusBotGitHub), releaseInformation.getBranch());
         } catch (IOException e) {
             previousMinor = "previous minor";
         }
@@ -138,8 +138,8 @@ public class CreateBranch implements StepHandler {
             }
         }
 
-        String previousMinor = getPreviousMinor(repository, releaseInformation.getBranch());
-        String previousMinorBackportLabel = "triage/backport-" + previousMinor;
+        String previousMinorBranch = getPreviousMinorBranch(repository, releaseInformation.getBranch());
+        String previousMinorBackportLabel = "triage/backport-" + previousMinorBranch;
 
         try {
             repository.getLabel(previousMinorBackportLabel);
@@ -175,12 +175,12 @@ public class CreateBranch implements StepHandler {
         return 0;
     }
 
-    private static String getPreviousMinor(GHRepository repository, String currentBranch) throws IOException {
+    private static String getPreviousMinorBranch(GHRepository repository, String currentBranch) throws IOException {
         TreeSet<ComparableVersion> tags = repository.listTags().toList().stream()
                 .map(t -> Versions.getBranch(t.getName()))
                 .collect(Collectors.toCollection(TreeSet::new));
 
-        return Versions.getPreviousMinor(tags, Versions.getBranch(currentBranch));
+        return Versions.getPreviousMinorBranch(tags, Versions.getBranch(currentBranch));
     }
 
     private static String getNextMinor(String currentBranch) throws IOException {

@@ -69,14 +69,14 @@ public class AnnounceRelease implements StepHandler {
 
             if (releaseInformation.isFirstFinal()) {
                 try {
-                    String previousMinor = getPreviousMinor(Repositories.getQuarkusRepository(quarkusBotGitHub), releaseInformation.getBranch());
+                    String previousMinorBranch = getPreviousMinorBranch(Repositories.getQuarkusRepository(quarkusBotGitHub), releaseInformation.getBranch());
 
                     comment.append(
                             "\n\nFor new major/minor releases, we include the list of contributors in the announcement blog post.\n");
                     comment.append(
                             "You can get a rough list of contributors (check for duplicates!) since the previous minor by executing the following commands in a Quarkus repository local clone:\n\n");
                     comment.append("> git fetch upstream --tags\n");
-                    comment.append("> git shortlog -s '" + previousMinor + "'..'" + releaseInformation.getVersion()
+                    comment.append("> git shortlog -s '" + previousMinorBranch + ".0'..'" + releaseInformation.getVersion()
                             + "' | cut -d$'\\t' -f 2 | grep -v dependabot | sort -d -f -i | paste -sd ',' - | sed 's/,/, /g'\n\n");
                 } catch (Exception e) {
                     LOG.warn("An error occurred while trying to get the previous minor. Ignoring.", e);
@@ -107,11 +107,11 @@ public class AnnounceRelease implements StepHandler {
         return 0;
     }
 
-    private static String getPreviousMinor(GHRepository repository, String currentBranch) throws IOException {
+    private static String getPreviousMinorBranch(GHRepository repository, String currentBranch) throws IOException {
         TreeSet<ComparableVersion> tags = repository.listTags().toList().stream()
                 .map(t -> Versions.getBranch(t.getName()))
                 .collect(Collectors.toCollection(TreeSet::new));
 
-        return Versions.getPreviousMinor(tags, Versions.getBranch(currentBranch));
+        return Versions.getPreviousMinorBranch(tags, Versions.getBranch(currentBranch));
     }
 }

@@ -43,8 +43,8 @@ public class VersionsTest {
         existingBranches.add(Versions.getBranch("3.5.3"));
         existingBranches.add(Versions.getBranch("2.13.9"));
 
-        assertThat(Versions.getPreviousMinor(existingBranches, Versions.getBranch("3.7"))).isEqualTo("3.6.0");
-        assertThat(Versions.getPreviousMinor(existingBranches, Versions.getBranch("3.6"))).isEqualTo("3.5.0");
-        assertThat(Versions.getPreviousMinor(existingBranches, Versions.getBranch("3.5"))).isEqualTo("2.13.0");
+        assertThat(Versions.getPreviousMinorBranch(existingBranches, Versions.getBranch("3.7"))).isEqualTo("3.6");
+        assertThat(Versions.getPreviousMinorBranch(existingBranches, Versions.getBranch("3.6"))).isEqualTo("3.5");
+        assertThat(Versions.getPreviousMinorBranch(existingBranches, Versions.getBranch("3.5"))).isEqualTo("2.13");
     }
 }
