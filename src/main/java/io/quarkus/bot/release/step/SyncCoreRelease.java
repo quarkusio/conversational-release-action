@@ -68,6 +68,7 @@ public class SyncCoreRelease implements StepHandler {
                     + "**We started a separate workflow to monitor the situation for you. It will automatically continue the release process once it detects the artifacts have been synced to Maven Central.**\n\n");
 
             comment.append("---\n\n");
+            comment.append("<details><summary>If things go south</summary>\n\n");
             comment.append("If things go south, you can monitor the situation manually:\n\n");
             comment.append("* Wait for 1 hour (starting from the time of this comment)\n");
             comment.append("* Check that https://repo1.maven.org/maven2/io/quarkus/quarkus-bom/"
@@ -75,7 +76,8 @@ public class SyncCoreRelease implements StepHandler {
                     + " does not return a 404\n\n");
             comment.append(
                     "Once these two conditions are met, you can continue with the release by adding a `"
-                            + Command.CONTINUE.getFullCommand() + "` comment.");
+                            + Command.CONTINUE.getFullCommand() + "` comment.\n\n");
+            comment.append("</details>");
         } catch (Exception e) {
             comment.append("We were unable to start the core artifacts monitoring workflow, so please monitor the situation manually:\n\n");
             comment.append("* Wait for 1 hour (starting from the time of this comment)\n");
