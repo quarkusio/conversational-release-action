@@ -37,7 +37,7 @@ public class CreateBranch implements StepHandler {
 
     private static final Logger LOG = Logger.getLogger(CreateBranch.class);
 
-    private static final String BACKPORT_LABEL = "triage/backport?";
+    private static final String BACKPORT_LABEL = "triage/backport";
     private static final String BACKPORT_LABEL_COLOR = "7fe8cd";
     private static final String MAIN_MILESTONE_SUFFIX = " - main";
 
@@ -139,7 +139,7 @@ public class CreateBranch implements StepHandler {
         }
 
         String previousMinor = getPreviousMinor(repository, releaseInformation.getBranch());
-        String previousMinorBackportLabel = "triage/backport-" + previousMinor + "?";
+        String previousMinorBackportLabel = "triage/backport-" + previousMinor;
 
         try {
             repository.getLabel(previousMinorBackportLabel);
