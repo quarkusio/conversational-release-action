@@ -42,13 +42,13 @@ public class CreateBranch implements StepHandler {
     private static final String MAIN_MILESTONE_SUFFIX = " - main";
 
     @Override
-    public boolean shouldSkip(Context context, Commands commands, GitHub gitHub,
+    public boolean shouldSkip(Context context, Commands commands, GitHub quarkusBotGitHub,
             ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         return !releaseInformation.isFirstCR();
     }
 
     @Override
-    public boolean shouldPause(Context context, Commands commands, GitHub gitHub,
+    public boolean shouldPause(Context context, Commands commands, GitHub quarkusBotGitHub,
             ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
 
         StringBuilder comment = new StringBuilder();
@@ -79,7 +79,7 @@ public class CreateBranch implements StepHandler {
 
         String previousMinor;
         try {
-            previousMinor = getPreviousMinor(Repositories.getQuarkusRepository(gitHub), releaseInformation.getBranch());
+            previousMinor = getPreviousMinor(Repositories.getQuarkusRepository(quarkusBotGitHub), releaseInformation.getBranch());
         } catch (IOException e) {
             previousMinor = "previous minor";
         }
@@ -96,21 +96,21 @@ public class CreateBranch implements StepHandler {
     }
 
     @Override
-    public boolean shouldContinueAfterPause(Context context, Commands commands, GitHub gitHub,
+    public boolean shouldContinueAfterPause(Context context, Commands commands, GitHub quarkusBotGitHub,
             ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         return Command.AUTO.matches(issueComment.getBody());
     }
 
     @Override
-    public boolean shouldSkipAfterPause(Context context, Commands commands, GitHub gitHub,
+    public boolean shouldSkipAfterPause(Context context, Commands commands, GitHub quarkusBotGitHub,
             ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         return Command.MANUAL.matches(issueComment.getBody());
     }
 
     @Override
-    public int run(Context context, Commands commands, GitHub gitHub, ReleaseInformation releaseInformation,
+    public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
-        GHRepository repository = Repositories.getQuarkusRepository(gitHub);
+        GHRepository repository = Repositories.getQuarkusRepository(quarkusBotGitHub);
 
         try {
             repository.getBranch(releaseInformation.getBranch());

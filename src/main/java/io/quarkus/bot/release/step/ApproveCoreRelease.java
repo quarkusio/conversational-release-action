@@ -28,7 +28,7 @@ public class ApproveCoreRelease implements StepHandler {
     Jdks jdks;
 
     @Override
-    public boolean shouldPause(Context context, Commands commands, GitHub gitHub, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
+    public boolean shouldPause(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         StringBuilder comment = new StringBuilder();
         comment.append("We are going to release the following release:\n\n");
         comment.append("- Quarkus `").append(releaseInformation.getVersion()).append("`\n");
@@ -51,12 +51,12 @@ public class ApproveCoreRelease implements StepHandler {
 
     @Override
     public boolean shouldContinueAfterPause(Context context, Commands commands,
-            GitHub gitHub, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
+            GitHub quarkusBotGitHub, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         return Command.YES.matches(issueComment.getBody());
     }
 
     @Override
-    public int run(Context context, Commands commands, GitHub gitHub, ReleaseInformation releaseInformation,
+    public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
         issue.comment(":white_check_mark: Core release is approved, proceeding...");
         return 0;

@@ -28,7 +28,7 @@ import io.quarkus.bot.release.util.Versions;
 public class SyncCoreRelease implements StepHandler {
 
     @Override
-    public boolean shouldPause(Context context, Commands commands, GitHub gitHub,
+    public boolean shouldPause(Context context, Commands commands, GitHub quarkusBotGitHub,
             ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         StringBuilder comment = new StringBuilder();
         if (Versions.getVersion(releaseInformation.getBranch()).compareTo(Versions.VERSION_3_6) < 0) {
@@ -95,12 +95,12 @@ public class SyncCoreRelease implements StepHandler {
 
     @Override
     public boolean shouldContinueAfterPause(Context context, Commands commands,
-            GitHub gitHub, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
+            GitHub quarkusBotGitHub, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         return Command.CONTINUE.matches(issueComment.getBody());
     }
 
     @Override
-    public int run(Context context, Commands commands, GitHub gitHub, ReleaseInformation releaseInformation,
+    public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
         issue.comment(":white_check_mark: Core artifacts have been synced to Maven Central, continuing...");
         return 0;
