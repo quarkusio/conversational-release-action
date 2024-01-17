@@ -41,7 +41,7 @@ public class PreparePlatform implements StepHandler {
         if (!releaseInformation.isFinal()) {
             comment.append("* In the case of `preview releases` (e.g. `Alpha1`, `CR1`...), the release will be built from the `main` branch\n");
         }
-        comment.append("* Follow (roughly) these steps:\n\n");
+        comment.append("* Follow (roughly) these steps (`upstream` is the upstream repository, `origin` is your fork):\n\n");
         comment.append("```\n");
         comment.append("cd <your quarkus-platform clone>\n");
         comment.append("git checkout " + platformPreparationBranch + "\n");
@@ -55,7 +55,12 @@ public class PreparePlatform implements StepHandler {
         comment.append("git commit -m 'Upgrade to Quarkus " + releaseInformation.getVersion() + "'\n");
         comment.append("git push origin quarkus-" + releaseInformation.getVersion() + "\n");
         comment.append("```\n\n");
-        comment.append("* [Create a pull request](https://github.com/quarkusio/quarkus-platform/pulls) targeting branch `" + platformPreparationBranch + "`\n");
+        try {
+            comment.append("* [Create a pull request](https://github.com/quarkusio/quarkus-platform/compare/" + platformPreparationBranch + "..." + issue.getUser().getLogin() + ":quarkus-" + releaseInformation.getVersion() + "?expand=1) targeting branch `" + platformPreparationBranch + "`"
+                    + " (or [generic link if targeted link doesn't work](https://github.com/quarkusio/quarkus-platform/pulls))\n");
+        } catch (IOException e) {
+            comment.append("* [Create a pull request](https://github.com/quarkusio/quarkus-platform/pulls) targeting branch `" + platformPreparationBranch + "`\n");
+        }
         comment.append("* Wait for CI to go green\n");
         comment.append("* Merge the pull request\n");
         if (releaseInformation.isFirstFinal()) {
