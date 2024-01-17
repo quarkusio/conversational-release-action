@@ -77,14 +77,14 @@ public class CreateBranch implements StepHandler {
                 + "%3F+) also have the new `triage/backport?` label (in the UI, you can select all the pull requests with the top checkbox then use the `Label` dropdown to apply the `triage/backport?` label)\n");
         comment.append("- Send an email to [quarkus-dev@googlegroups.com](mailto:quarkus-dev@googlegroups.com) announcing that `" + releaseInformation.getBranch() + "` has been branched and post on [Zulip #dev stream](https://quarkusio.zulipchat.com/#narrow/stream/187038-dev/):\n\n");
 
-        String previousMinor;
+        String previousMinorBranch;
         try {
-            previousMinor = getPreviousMinorBranch(Repositories.getQuarkusRepository(quarkusBotGitHub), releaseInformation.getBranch());
+            previousMinorBranch = getPreviousMinorBranch(Repositories.getQuarkusRepository(quarkusBotGitHub), releaseInformation.getBranch());
         } catch (IOException e) {
-            previousMinor = "previous minor";
+            previousMinorBranch = "previous minor";
         }
 
-        comment.append(getBranchEmail(releaseInformation, previousMinor, null) + "\n\n");
+        comment.append(getBranchEmail(releaseInformation, previousMinorBranch, null) + "\n\n");
         comment.append("Once you are done with all this, add a `" + Command.MANUAL.getFullCommand() + "` comment to let the release process know you have handled everything manually.\n\n");
         comment.append("</details>\n\n");
 
@@ -166,7 +166,7 @@ public class CreateBranch implements StepHandler {
         comment += "Please announce that we branched " + releaseInformation.getBranch()
                 + " by sending an email to [quarkus-dev@googlegroups.com](mailto:quarkus-dev@googlegroups.com) and posting on [Zulip #dev stream](https://quarkusio.zulipchat.com/#narrow/stream/187038-dev/):\n\n";
         comment += "**(Make sure to adjust the version in the email if you renamed the milestone)**\n\n";
-        comment += getBranchEmail(releaseInformation, previousMinorBackportLabel, nextMinor) + "\n\n";
+        comment += getBranchEmail(releaseInformation, previousMinorBranch, nextMinor) + "\n\n";
         comment += "Apart from sending the email, no intervention is needed, the release process is in progress.\n\n";
         comment += Progress.youAreHere(releaseInformation, releaseStatus);
 
@@ -204,15 +204,16 @@ public class CreateBranch implements StepHandler {
         }
     }
 
-    private static String getBranchEmail(ReleaseInformation releaseInformation, String previousMinor, String nextMinor) {
+    private static String getBranchEmail(ReleaseInformation releaseInformation, String previousMinorBranch, String nextMinor) {
         String email = "Subject: `Quarkus " + releaseInformation.getBranch() + " branched`\n\n"
                 + "> Hi,\n"
                 + "> \n"
                 + "> We just branched " + releaseInformation.getBranch() + ". The main branch is now " + (nextMinor != null ? nextMinor : "**X.Y**") + ".\n"
                 + "> \n"
                 + "> Please make sure you add the appropriate backport labels from now on:\n"
+                + "> \n"
                 + "> - for anything required in " + releaseInformation.getBranch() + " (currently open pull requests included), please add the triage/backport? label\n"
-                + "> - for fixes we also want in future " + previousMinor + ", please add the triage/backport-" + previousMinor + "? label\n";
+                + "> - for fixes we also want in future " + previousMinorBranch + ", please add the triage/backport-" + previousMinorBranch + "? label\n";
 
         for (String ltsBranch : Branches.LTS_BRANCHES) {
             email += "> - for fixes we also want in future " + ltsBranch + ", please add the triage/backport-" + ltsBranch + "? label\n";
