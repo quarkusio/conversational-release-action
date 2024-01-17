@@ -10,6 +10,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 import org.kohsuke.github.GHIssue;
+import org.kohsuke.github.GitHub;
 
 import io.quarkiverse.githubaction.Commands;
 import io.quarkiverse.githubaction.Context;
@@ -31,8 +32,8 @@ public class Prerequisites implements StepHandler {
     Processes processes;
 
     @Override
-    public int run(Context context, Commands commands, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus,
-            GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
+    public int run(Context context, Commands commands, GitHub gitHub, ReleaseInformation releaseInformation,
+            ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
         List<String> command = new ArrayList<String>();
         command.add("./prerequisites.java");
         command.add("--branch=" + releaseInformation.getBranch());

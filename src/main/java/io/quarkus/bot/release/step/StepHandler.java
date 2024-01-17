@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHIssueComment;
+import org.kohsuke.github.GitHub;
 
 import io.quarkiverse.githubaction.Commands;
 import io.quarkiverse.githubaction.Context;
@@ -13,26 +14,30 @@ import io.quarkus.bot.release.util.UpdatedIssueBody;
 
 public interface StepHandler {
 
-    int run(Context context, Commands commands, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus,
-            GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException;
+    int run(Context context, Commands commands, GitHub gitHub, ReleaseInformation releaseInformation,
+            ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody)
+            throws IOException, InterruptedException;
 
-    default boolean shouldPause(Context context, Commands commands, ReleaseInformation releaseInformation,
-            ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
+    default boolean shouldPause(Context context, Commands commands, GitHub gitHub,
+            ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         return false;
     }
 
     default boolean shouldContinueAfterPause(Context context, Commands commands,
-            ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
+            GitHub gitHub, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue,
+            GHIssueComment issueComment) {
         return false;
     }
 
     default boolean shouldSkipAfterPause(Context context, Commands commands,
-            ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
+            GitHub gitHub, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue,
+            GHIssueComment issueComment) {
         return false;
     }
 
     default boolean shouldSkip(Context context, Commands commands,
-            ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
+            GitHub gitHub, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue,
+            GHIssueComment issueComment) {
         return false;
     }
 

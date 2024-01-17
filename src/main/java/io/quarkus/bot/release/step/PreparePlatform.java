@@ -6,6 +6,7 @@ import jakarta.inject.Singleton;
 
 import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHIssueComment;
+import org.kohsuke.github.GitHub;
 
 import io.quarkiverse.githubaction.Commands;
 import io.quarkiverse.githubaction.Context;
@@ -23,8 +24,8 @@ import io.quarkus.bot.release.util.UpdatedIssueBody;
 public class PreparePlatform implements StepHandler {
 
     @Override
-    public boolean shouldPause(Context context, Commands commands, ReleaseInformation releaseInformation,
-            ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
+    public boolean shouldPause(Context context, Commands commands, GitHub gitHub,
+            ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
 
         String platformPreparationBranch = Branches.getPlatformPreparationBranch(releaseInformation);
         String platformReleaseBranch = Branches.getPlatformReleaseBranch(releaseInformation);
@@ -96,13 +97,13 @@ public class PreparePlatform implements StepHandler {
 
     @Override
     public boolean shouldContinueAfterPause(Context context, Commands commands,
-            ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
+            GitHub gitHub, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         return Command.CONTINUE.matches(issueComment.getBody());
     }
 
     @Override
-    public int run(Context context, Commands commands, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus,
-            GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
+    public int run(Context context, Commands commands, GitHub gitHub, ReleaseInformation releaseInformation,
+            ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
         issue.comment(":white_check_mark: The Platform branch `" + Branches.getPlatformPreparationBranch(releaseInformation)
                 + "` is ready to be released, continuing...");
         return 0;

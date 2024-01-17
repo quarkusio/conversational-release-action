@@ -10,6 +10,7 @@ import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHIssueComment;
 import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHPermissionType;
+import org.kohsuke.github.GitHub;
 import org.kohsuke.github.Reactable;
 import org.kohsuke.github.ReactionContent;
 
@@ -44,7 +45,7 @@ public class ReleaseAction {
     Processes processes;
 
     @Action
-    void startRelease(Context context, Commands commands, @Issue.Opened GHEventPayload.Issue issuePayload) throws Exception {
+    void startRelease(Context context, Commands commands, GitHub gitHub, @Issue.Opened GHEventPayload.Issue issuePayload) throws Exception {
         commands.notice("Starting release...");
 
         GHIssue issue = issuePayload.getIssue();
@@ -78,7 +79,7 @@ public class ReleaseAction {
         react(commands, issue, ReactionContent.PLUS_ONE);
 
         try {
-            handleSteps(context, commands, issuePayload.getIssue(), updatedIssueBody, null, releaseInformation,
+            handleSteps(context, commands, gitHub, issuePayload.getIssue(), updatedIssueBody, null, releaseInformation,
                     new ReleaseStatus(Status.STARTED, Step.PREREQUISITES, StepStatus.STARTED, context.getGitHubRunId()));
         } finally {
             if (releaseInformation.getVersion() != null) {
@@ -88,7 +89,7 @@ public class ReleaseAction {
     }
 
     @Action
-    void continueRelease(Context context, Commands commands, @IssueComment.Created GHEventPayload.IssueComment issueCommentPayload)
+    void continueRelease(Context context, Commands commands, GitHub gitHub, @IssueComment.Created GHEventPayload.IssueComment issueCommentPayload)
             throws Exception {
         commands.notice("Continuing release...");
 
@@ -129,7 +130,7 @@ public class ReleaseAction {
         try {
             releaseStatus = releaseStatus.progress(context.getGitHubRunId());
             updateReleaseStatus(issue, updatedIssueBody, releaseStatus);
-            handleSteps(context, commands, issue, updatedIssueBody, issueComment, releaseInformation, releaseStatus);
+            handleSteps(context, commands, gitHub, issue, updatedIssueBody, issueComment, releaseInformation, releaseStatus);
         } finally {
             if (releaseInformation.getVersion() != null) {
                 commands.setOutput(Outputs.VERSION, releaseInformation.getVersion());
@@ -143,7 +144,7 @@ public class ReleaseAction {
         }
     }
 
-    private void handleSteps(Context context, Commands commands, GHIssue issue, UpdatedIssueBody updatedIssueBody,
+    private void handleSteps(Context context, Commands commands, GitHub gitHub, GHIssue issue, UpdatedIssueBody updatedIssueBody,
             GHIssueComment issueComment, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus) throws Exception {
         ReleaseStatus currentReleaseStatus = releaseStatus;
 
@@ -186,11 +187,11 @@ public class ReleaseAction {
                 // Handle paused, we will continue the process with the next step
                 StepHandler stepHandler = getStepHandler(currentReleaseStatus.getCurrentStep());
 
-                if (stepHandler.shouldContinueAfterPause(context, commands, releaseInformation, currentReleaseStatus, issue, issueComment)) {
+                if (stepHandler.shouldContinueAfterPause(context, commands, gitHub, releaseInformation, currentReleaseStatus, issue, issueComment)) {
                     react(commands, issueComment, ReactionContent.PLUS_ONE);
                     currentReleaseStatus = currentReleaseStatus.progress(StepStatus.STARTED);
                     updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
-                } else if (stepHandler.shouldSkipAfterPause(context, commands, releaseInformation, currentReleaseStatus, issue, issueComment)) {
+                } else if (stepHandler.shouldSkipAfterPause(context, commands, gitHub, releaseInformation, currentReleaseStatus, issue, issueComment)) {
                     react(commands, issueComment, ReactionContent.PLUS_ONE);
                     currentReleaseStatus = currentReleaseStatus.progress(StepStatus.SKIPPED);
                     updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
@@ -246,11 +247,11 @@ public class ReleaseAction {
                 }
 
                 if (currentReleaseStatus.getCurrentStepStatus() == StepStatus.INIT) {
-                    if (currentStepHandler.shouldSkip(context, commands, releaseInformation, currentReleaseStatus, issue, issueComment)) {
+                    if (currentStepHandler.shouldSkip(context, commands, gitHub, releaseInformation, currentReleaseStatus, issue, issueComment)) {
                         currentReleaseStatus = currentReleaseStatus.progress(StepStatus.SKIPPED);
                         updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
                         continue;
-                    } else if (currentStepHandler.shouldPause(context, commands, releaseInformation, releaseStatus, issue, issueComment)) {
+                    } else if (currentStepHandler.shouldPause(context, commands, gitHub, releaseInformation, releaseStatus, issue, issueComment)) {
                         currentReleaseStatus = currentReleaseStatus.progress(StepStatus.PAUSED);
                         updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
                         return;
@@ -260,7 +261,7 @@ public class ReleaseAction {
                     }
                 }
 
-                int exitCode = currentStepHandler.run(context, commands, releaseInformation, releaseStatus, issue, updatedIssueBody);
+                int exitCode = currentStepHandler.run(context, commands, gitHub, releaseInformation, releaseStatus, issue, updatedIssueBody);
                 handleExitCode(exitCode, currentStep);
 
                 currentReleaseStatus = currentReleaseStatus.progress(StepStatus.COMPLETED);
