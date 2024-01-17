@@ -25,7 +25,7 @@ public class ReleaseGradlePlugin implements StepHandler {
     Processes processes;
 
     @Override
-    public int run(Context context, Commands commands, GitHub gitHub, ReleaseInformation releaseInformation,
+    public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
         return processes.execute(List.of("./release-gradle-plugin.sh"));
     }

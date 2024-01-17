@@ -12,9 +12,9 @@ public final class Repositories {
     private Repositories() {
     }
 
-    public static GHRepository getQuarkusRepository(GitHub gitHub) {
+    public static GHRepository getQuarkusRepository(GitHub quarkusBotGitHub) {
         try {
-            return gitHub.getRepository(QUARKUSIO_QUARKUS);
+            return quarkusBotGitHub.getRepository(QUARKUSIO_QUARKUS);
         } catch (IOException e) {
             throw new IllegalStateException("Unable to get " + QUARKUSIO_QUARKUS + " repository", e);
         }

@@ -30,7 +30,7 @@ public class AnnounceRelease implements StepHandler {
     private static final Logger LOG = Logger.getLogger(AnnounceRelease.class);
 
     @Override
-    public int run(Context context, Commands commands, GitHub gitHub, ReleaseInformation releaseInformation,
+    public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
         StringBuilder comment = new StringBuilder();
 
@@ -69,7 +69,7 @@ public class AnnounceRelease implements StepHandler {
 
             if (releaseInformation.isFirstFinal()) {
                 try {
-                    String previousMinor = getPreviousMinor(Repositories.getQuarkusRepository(gitHub), releaseInformation.getBranch());
+                    String previousMinor = getPreviousMinor(Repositories.getQuarkusRepository(quarkusBotGitHub), releaseInformation.getBranch());
 
                     comment.append(
                             "\n\nFor new major/minor releases, we include the list of contributors in the announcement blog post.\n");
