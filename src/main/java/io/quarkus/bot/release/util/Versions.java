@@ -32,23 +32,23 @@ public final class Versions {
         return getVersion(elements[0] + "." + elements[1]);
     }
 
-    public static String getPreviousMinor(NavigableSet<ComparableVersion> existingBranches, ComparableVersion currentBranch) {
-        String previousVersion = null;
+    public static String getPreviousMinorBranch(NavigableSet<ComparableVersion> existingBranches, ComparableVersion currentBranch) {
+        String previousMinor = null;
 
         for (ComparableVersion branchCandidate : existingBranches.descendingSet()) {
             if (branchCandidate.compareTo(currentBranch) >= 0) {
                 continue;
             }
 
-            previousVersion = branchCandidate.toString() + ".0";
+            previousMinor = branchCandidate.toString();
             break;
         }
 
-        if (previousVersion == null) {
+        if (previousMinor == null) {
             throw new IllegalStateException("Unable to determine previous minor for current branch " + currentBranch
                     + " and existing branches " + existingBranches);
         }
 
-        return previousVersion;
+        return previousMinor;
     }
 }
