@@ -7,6 +7,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 import org.kohsuke.github.GHIssue;
+import org.kohsuke.github.GitHub;
 
 import io.quarkiverse.githubaction.Commands;
 import io.quarkiverse.githubaction.Context;
@@ -24,8 +25,8 @@ public class UpdateQuickstarts implements StepHandler {
     Processes processes;
 
     @Override
-    public int run(Context context, Commands commands, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus,
-            GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
+    public int run(Context context, Commands commands, GitHub gitHub, ReleaseInformation releaseInformation,
+            ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
         return processes.execute(List.of("./update-quickstarts.sh"));
     }
 

@@ -8,6 +8,7 @@ import jakarta.inject.Singleton;
 
 import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHIssueComment;
+import org.kohsuke.github.GitHub;
 
 import io.quarkiverse.githubaction.Commands;
 import io.quarkiverse.githubaction.Context;
@@ -26,8 +27,8 @@ import io.quarkus.bot.release.util.UpdatedIssueBody;
 public class SyncPlatformRelease implements StepHandler {
 
     @Override
-    public boolean shouldPause(Context context, Commands commands, ReleaseInformation releaseInformation,
-            ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
+    public boolean shouldPause(Context context, Commands commands, GitHub gitHub,
+            ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         StringBuilder comment = new StringBuilder();
 
         comment.append("The Platform artifacts have been pushed to `s01.oss.sonatype.org`.\n\n");
@@ -89,13 +90,13 @@ public class SyncPlatformRelease implements StepHandler {
 
     @Override
     public boolean shouldContinueAfterPause(Context context, Commands commands,
-            ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
+            GitHub gitHub, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         return Command.CONTINUE.matches(issueComment.getBody());
     }
 
     @Override
-    public int run(Context context, Commands commands, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus,
-            GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
+    public int run(Context context, Commands commands, GitHub gitHub, ReleaseInformation releaseInformation,
+            ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
         issue.comment(":white_check_mark: Platform artifacts have been synced to Maven Central, continuing...");
         return 0;
     }

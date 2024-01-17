@@ -16,6 +16,7 @@ import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHMilestone;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GitHub;
 
 import io.quarkiverse.githubaction.Commands;
 import io.quarkiverse.githubaction.Context;
@@ -26,6 +27,7 @@ import io.quarkus.bot.release.util.Branches;
 import io.quarkus.bot.release.util.Command;
 import io.quarkus.bot.release.util.Outputs;
 import io.quarkus.bot.release.util.Progress;
+import io.quarkus.bot.release.util.Repositories;
 import io.quarkus.bot.release.util.UpdatedIssueBody;
 import io.quarkus.bot.release.util.Versions;
 
@@ -40,14 +42,14 @@ public class CreateBranch implements StepHandler {
     private static final String MAIN_MILESTONE_SUFFIX = " - main";
 
     @Override
-    public boolean shouldSkip(Context context, Commands commands, ReleaseInformation releaseInformation,
-            ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
+    public boolean shouldSkip(Context context, Commands commands, GitHub gitHub,
+            ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         return !releaseInformation.isFirstCR();
     }
 
     @Override
-    public boolean shouldPause(Context context, Commands commands, ReleaseInformation releaseInformation,
-            ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
+    public boolean shouldPause(Context context, Commands commands, GitHub gitHub,
+            ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
 
         StringBuilder comment = new StringBuilder();
         comment.append("**IMPORTANT** This is the first Candidate Release and this release requires special care.\n\n");
@@ -77,7 +79,7 @@ public class CreateBranch implements StepHandler {
 
         String previousMinor;
         try {
-            previousMinor = getPreviousMinor(issue.getRepository(), releaseInformation.getBranch());
+            previousMinor = getPreviousMinor(Repositories.getQuarkusRepository(gitHub), releaseInformation.getBranch());
         } catch (IOException e) {
             previousMinor = "previous minor";
         }
@@ -94,21 +96,21 @@ public class CreateBranch implements StepHandler {
     }
 
     @Override
-    public boolean shouldContinueAfterPause(Context context, Commands commands, ReleaseInformation releaseInformation,
-            ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
+    public boolean shouldContinueAfterPause(Context context, Commands commands, GitHub gitHub,
+            ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         return Command.AUTO.matches(issueComment.getBody());
     }
 
     @Override
-    public boolean shouldSkipAfterPause(Context context, Commands commands, ReleaseInformation releaseInformation,
-            ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
+    public boolean shouldSkipAfterPause(Context context, Commands commands, GitHub gitHub,
+            ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         return Command.MANUAL.matches(issueComment.getBody());
     }
 
     @Override
-    public int run(Context context, Commands commands, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus,
-            GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
-        GHRepository repository = issue.getRepository();
+    public int run(Context context, Commands commands, GitHub gitHub, ReleaseInformation releaseInformation,
+            ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
+        GHRepository repository = Repositories.getQuarkusRepository(gitHub);
 
         try {
             repository.getBranch(releaseInformation.getBranch());
