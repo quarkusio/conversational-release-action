@@ -31,12 +31,7 @@ public class SyncCoreRelease implements StepHandler {
     public boolean shouldPause(Context context, Commands commands, GitHub quarkusBotGitHub,
             ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         StringBuilder comment = new StringBuilder();
-        if (Versions.getVersion(releaseInformation.getBranch()).compareTo(Versions.VERSION_3_6) < 0) {
-            comment.append("The core artifacts have been pushed to a staging repository on `s01.oss.sonatype.org`.\n\n");
-            comment.append(":warning: You need to release the staging repository **manually** at https://s01.oss.sonatype.org/#stagingRepositories.\n\n");
-        } else {
-            comment.append("The core artifacts have been pushed to `s01.oss.sonatype.org`.\n\n");
-        }
+        comment.append("The core artifacts have been pushed to `s01.oss.sonatype.org`.\n\n");
         comment.append(
                 "**IMPORTANT** You need to wait for them to be synced to Maven Central before continuing with the release:\n\n");
 
