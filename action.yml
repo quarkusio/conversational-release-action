@@ -38,7 +38,7 @@ runs:
       run: curl -Ls https://sh.jbang.dev | bash -s - app setup
       shell: bash
     - id: action
-      run: ~/.jbang/bin/jbang --repos 'github=https://maven.pkg.github.com/quarkusio/conversational-release-action/' --repos 'mavencentral' io.quarkus.bot:conversational-release-action:999-SNAPSHOT
+      run: ~/.jbang/bin/jbang --fresh --repos 'github=https://maven.pkg.github.com/quarkusio/conversational-release-action/' --repos 'mavencentral' io.quarkus.bot:conversational-release-action:999-SNAPSHOT
       shell: bash
       env:
         JSON_INPUTS: ${{ toJSON(inputs) }}
