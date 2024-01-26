@@ -43,9 +43,9 @@ public class SyncPlatformRelease implements StepHandler {
             inputs.put(MonitorArtifactPublicationInputKeys.ISSUE_NUMBER, String.valueOf(issue.getNumber()));
             inputs.put(MonitorArtifactPublicationInputKeys.MESSAGE_IF_PUBLISHED,
                     Command.CONTINUE.getFullCommand()
-                    + "\n\nWe have detected that the Platform artifacts have been synced to Maven Central.");
+                    + "\n\n:white_check_mark: We have detected that the Platform artifacts have been synced to Maven Central.");
             inputs.put(MonitorArtifactPublicationInputKeys.MESSAGE_IF_NOT_PUBLISHED,
-                    "The Platform artifacts don't seem to have been synced to Maven Central.\n\n"
+                    ":rotating_light: The Platform artifacts don't seem to have been synced to Maven Central.\n\n"
                     + "Please check the situation by yourself:\n\n"
                     + "* Check that https://repo1.maven.org/maven2/io/quarkus/platform/quarkus-bom/"
                     + releaseInformation.getVersion() + "/"
