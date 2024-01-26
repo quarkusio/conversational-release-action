@@ -85,20 +85,24 @@ public class AnnounceRelease implements StepHandler {
         } else {
             comment.append("Then it is time to send an email to [quarkus-dev@googlegroups.com](mailto:quarkus-dev@googlegroups.com):\n\n");
             comment.append("Subject: `Quarkus " + releaseInformation.getVersion() + " released`\n\n");
-            comment.append("> Hi,\n"
-                    + "> \n"
-                    + "> We released Quarkus " + releaseInformation.getVersion() + ".\n"
-                    + "> \n"
-                    + "> Changelog is here:\n"
-                    + "> https://github.com/quarkusio/quarkus/releases/tag/" + releaseInformation.getVersion() + "\n"
-                    + "> \n"
-                    + "> Please try to upgrade your applications and report back:\n"
-                    + "> - if everything is going well, just post a reply to this thread\n"
-                    + "> - if you encounter issues, please open a GitHub issue in our tracker with a simple reproducer\n"
-                    + "> \n"
-                    + "> We will build the final core artifacts next Wednesday.\n"
-                    + "> \n"
-                    + "> Thanks!\n");
+            comment.append("```\n");
+            comment.append("Hi,\n"
+                    + "\n"
+                    + "We released Quarkus " + releaseInformation.getVersion() + ".\n"
+                    + "\n"
+                    + "Changelog is here:\n"
+                    + "https://github.com/quarkusio/quarkus/releases/tag/" + releaseInformation.getVersion() + "\n"
+                    + "\n"
+                    + "Please try to upgrade your applications and report back:\n"
+                    + "- if everything is going well, just post a reply to this thread\n"
+                    + "- if you encounter issues, please open a GitHub issue in our tracker with a simple reproducer\n"
+                    + "\n"
+                    + "We will build the final core artifacts next Wednesday.\n"
+                    + "\n"
+                    + "Thanks!\n\n"
+                    + "--\n"
+                    + "The Quarkus dev team");
+            comment.append("```\n");
         }
 
         issue.comment(comment.toString());
