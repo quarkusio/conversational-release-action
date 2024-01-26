@@ -21,7 +21,6 @@ import io.quarkus.bot.release.util.MonitorArtifactPublicationInputKeys;
 import io.quarkus.bot.release.util.Outputs;
 import io.quarkus.bot.release.util.Progress;
 import io.quarkus.bot.release.util.UpdatedIssueBody;
-import io.quarkus.bot.release.util.Versions;
 
 @Singleton
 @Unremovable
@@ -31,7 +30,7 @@ public class SyncCoreRelease implements StepHandler {
     public boolean shouldPause(Context context, Commands commands, GitHub quarkusBotGitHub,
             ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         StringBuilder comment = new StringBuilder();
-        comment.append("The core artifacts have been pushed to `s01.oss.sonatype.org`.\n\n");
+        comment.append(":white_check_mark: The core artifacts have been pushed to `s01.oss.sonatype.org`.\n\n");
         comment.append(
                 "**IMPORTANT** You need to wait for them to be synced to Maven Central before continuing with the release:\n\n");
 
