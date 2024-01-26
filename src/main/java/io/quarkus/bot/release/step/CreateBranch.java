@@ -232,24 +232,26 @@ public class CreateBranch implements StepHandler {
 
     private static String getBranchEmail(ReleaseInformation releaseInformation, String previousMinorBranch, String nextMinor) {
         String email = "Subject: `Quarkus " + releaseInformation.getBranch() + " branched`\n\n"
-                + "> Hi,\n"
-                + "> \n"
-                + "> We just branched " + releaseInformation.getBranch() + ". The main branch is now " + (nextMinor != null ? nextMinor : "**X.Y**") + ".\n"
-                + "> \n"
-                + "> Please make sure you add the appropriate backport labels from now on:\n"
-                + "> \n"
-                + "> - for anything required in " + releaseInformation.getBranch() + " (currently open pull requests included), please add the triage/backport? label\n"
-                + "> - for fixes we also want in future " + previousMinorBranch + ", please add the triage/backport-" + previousMinorBranch + "? label\n";
+                + "```\n"
+                + "Hi,\n"
+                + "\n"
+                + "We just branched " + releaseInformation.getBranch() + ". The main branch is now " + (nextMinor != null ? nextMinor : "**X.Y**") + ".\n"
+                + "\n"
+                + "Please make sure you add the appropriate backport labels from now on:\n"
+                + "\n"
+                + "- for anything required in " + releaseInformation.getBranch() + " (currently open pull requests included), please add the triage/backport? label\n"
+                + "- for fixes we also want in future " + previousMinorBranch + ", please add the triage/backport-" + previousMinorBranch + "? label\n";
 
         for (String ltsBranch : Branches.LTS_BRANCHES) {
-            email += "> - for fixes we also want in future " + ltsBranch + ", please add the triage/backport-" + ltsBranch + "? label\n";
+            email += "- for fixes we also want in future " + ltsBranch + ", please add the triage/backport-" + ltsBranch + "? label\n";
         }
 
-        email += "> \n"
-                + "> Thanks!\n"
-                + "> \n"
-                + "> --\n"
-                + "> The Quarkus dev team";
+        email += "\n"
+                + "Thanks!\n"
+                + "\n"
+                + "--\n"
+                + "The Quarkus dev team\n"
+                + "```";
 
         return email;
     }

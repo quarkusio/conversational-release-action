@@ -66,15 +66,22 @@ public class PreparePlatform implements StepHandler {
         if (releaseInformation.isFirstFinal()) {
             comment.append("* Send an email to the Platform coordination mailing list: [quarkus-platform-coordination@googlegroups.com](mailto:quarkus-platform-coordination@googlegroups.com) :\n\n");
             comment.append("Subject: `Quarkus " + releaseInformation.getVersion() + " core artifacts are available`\n\n");
-            comment.append("> Hi,\n"
-                    + "> \n"
-                    + "> The Quarkus " + releaseInformation.getVersion() + " core artifacts are available on Maven Central.\n"
-                    + "> \n"
-                    + "> CI is still running for the upgrade, the pull request will be merged once CI has passed.\n"
-                    + "> We will ping teams in the pull request if some components have issues.\n\n"
-                    + "> If you want to update your components, please create your pull requests and make sure they are merged before next Tuesday.\n"
-                    + "> \n"
-                    + "> Thanks.\n\n");
+            comment.append("```\n");
+            comment.append("Hi,\n"
+                    + "\n"
+                    + "The Quarkus " + releaseInformation.getVersion() + " core artifacts are available on Maven Central.\n"
+                    + "\n"
+                    + "The pull request updating the Platform to Quarkus " + releaseInformation.getVersion() + " has been merged in the main branch.\n"
+                    + "We pinged the team maintaining components not passing the tests in the pull request.\n"
+                    + "\n"
+                    + "If you want to update your components, please create your pull requests and make sure they are merged before next Tuesday.\n"
+                    + "\n"
+                    + "Thanks.\n"
+                    + "\n"
+                    + "--\n"
+                    + "The Quarkus dev team\n"
+                    );
+            comment.append("```\n\n");
             comment.append("* If CI failed for some Platform members, please contact them so that they are aware of the issues\n\n");
             comment.append(":warning: **IMPORTANT - STOP HERE**\n");
             comment.append(":warning: **IMPORTANT - Wait a week before continuing with the Platform release**\n\n");
