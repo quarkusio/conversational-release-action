@@ -31,7 +31,7 @@ public class SyncPlatformRelease implements StepHandler {
             ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         StringBuilder comment = new StringBuilder();
 
-        comment.append("The Platform artifacts have been pushed to `s01.oss.sonatype.org`.\n\n");
+        comment.append(":white_check_mark: The Platform artifacts have been pushed to `s01.oss.sonatype.org`.\n\n");
         comment.append(
                 "**IMPORTANT** You need to wait for them to be synced to Maven Central before continuing with the release:\n\n");
 
