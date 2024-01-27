@@ -57,13 +57,14 @@ public class AnnounceRelease implements StepHandler {
             comment.append("* Send the announcement to [quarkus-dev@googlegroups.com](mailto:quarkus-dev@googlegroups.com)\n");
             comment.append("* Send the announcement to various social networks using https://buffer.com/\n");
 
-            Path announcePath = Path.of("announce-" + releaseInformation.getVersion() + ".txt");
+            Path announcePath = Path.of("work", "announce-" + releaseInformation.getVersion() + ".txt");
             try {
                 String announceText = Files.readString(announcePath);
 
                 comment.append("\n\nHere is some content that could help in writing the announcement:\n\n");
                 comment.append(announceText);
             } catch (Exception e) {
+                commands.warning("An error occurred while reading " + announcePath + ": " + e.getMessage() + ". Ignoring.");
                 LOG.warn("An error occurred while reading " + announcePath + ". Ignoring.", e);
             }
 
