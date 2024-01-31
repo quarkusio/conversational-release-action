@@ -257,7 +257,9 @@ public class ReleaseAction {
                         currentReleaseStatus = currentReleaseStatus.progress(StepStatus.SKIPPED);
                         updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
                         continue;
-                    } else if (currentStepHandler.shouldPause(context, commands, quarkusBotGitHub, releaseInformation, releaseStatus, issue, issueComment)) {
+                    // we push an updated PAUSED status here as we want that to appear in youAreHere()
+                    } else if (currentStepHandler.shouldPause(context, commands, quarkusBotGitHub, releaseInformation,
+                            currentReleaseStatus.progress(StepStatus.PAUSED), issue, issueComment)) {
                         currentReleaseStatus = currentReleaseStatus.progress(StepStatus.PAUSED);
                         updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
                         return;
@@ -267,7 +269,7 @@ public class ReleaseAction {
                     }
                 }
 
-                int exitCode = currentStepHandler.run(context, commands, quarkusBotGitHub, releaseInformation, releaseStatus, issue, updatedIssueBody);
+                int exitCode = currentStepHandler.run(context, commands, quarkusBotGitHub, releaseInformation, currentReleaseStatus, issue, updatedIssueBody);
                 handleExitCode(exitCode, currentStep);
 
                 currentReleaseStatus = currentReleaseStatus.progress(StepStatus.COMPLETED);
