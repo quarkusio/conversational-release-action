@@ -47,4 +47,24 @@ public class VersionsTest {
         assertThat(Versions.getPreviousMinorBranch(existingBranches, Versions.getBranch("3.6"))).isEqualTo("3.5");
         assertThat(Versions.getPreviousMinorBranch(existingBranches, Versions.getBranch("3.5"))).isEqualTo("2.13");
     }
+
+    @Test
+    void testUtils() {
+        assertThat(Versions.getMinorVersion("3.6.1")).isEqualTo("3.6");
+        assertThat(Versions.getMinorVersion("3.8.3")).isEqualTo("3.8");
+        assertThat(Versions.getMinorVersion("3.2.10.Final")).isEqualTo("3.2");
+
+        assertThat(Versions.getDot0("3.6.1")).isEqualTo("3.6.0");
+        assertThat(Versions.getDot0("3.8.10")).isEqualTo("3.8.0");
+
+        assertThat(Versions.getDot1("3.6.0")).isEqualTo("3.6.1");
+        assertThat(Versions.getDot1("3.8.10")).isEqualTo("3.8.1");
+
+        assertThat(Versions.isDot0("3.6.0")).isTrue();
+        assertThat(Versions.isDot0("3.8.10")).isFalse();
+
+        assertThat(Versions.isFirstMicroMaintenanceRelease("3.6.0")).isFalse();
+        assertThat(Versions.isFirstMicroMaintenanceRelease("3.8.1")).isTrue();
+        assertThat(Versions.isFirstMicroMaintenanceRelease("3.8.10")).isFalse();
+    }
 }

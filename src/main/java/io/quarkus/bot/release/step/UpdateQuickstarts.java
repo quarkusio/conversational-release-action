@@ -38,7 +38,7 @@ public class UpdateQuickstarts implements StepHandler {
                     + "You need to check the content of the `development` branch of https://github.com/quarkusio/quarkus-quickstarts/.\n\n"
                     + "If you fix the issue there, you can safely retry.";
         } else {
-            return "For minor versions, we shouldn't have code updates in the Quickstarts.\n\n"
+            return "For micro versions, we shouldn't have code updates in the Quickstarts.\n\n"
                     + "So, if you got the build failing, either something got wrongly merged in the `main` branch of https://github.com/quarkusio/quarkus-quickstarts/ or something in Quarkus broke the quickstarts.";
         }
     }

@@ -79,7 +79,7 @@ public final class Issues {
             throw new IllegalStateException("Unable to extract a branch from the description");
         }
 
-        return new ReleaseInformation(null, branch, qualifier, major, false);
+        return new ReleaseInformation(null, branch, qualifier, major, false, false);
     }
 
     public ReleaseInformation extractReleaseInformation(UpdatedIssueBody updatedIssueBody) {

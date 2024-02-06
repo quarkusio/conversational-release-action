@@ -19,7 +19,9 @@ import io.quarkus.bot.release.ReleaseInformation;
 import io.quarkus.bot.release.ReleaseStatus;
 import io.quarkus.bot.release.util.Issues;
 import io.quarkus.bot.release.util.Processes;
+import io.quarkus.bot.release.util.Repositories;
 import io.quarkus.bot.release.util.UpdatedIssueBody;
+import io.quarkus.bot.release.util.Versions;
 
 @Singleton
 @Unremovable
@@ -49,8 +51,15 @@ public class Prerequisites implements StepHandler {
             return exitCode;
         }
 
-        releaseInformation.setVersion(Files.readString(Path.of("work", "newVersion")).trim());
-        releaseInformation.setMaintenance(Files.exists(Path.of("work", "maintenance")));
+        String version = Files.readString(Path.of("work", "newVersion")).trim();
+
+        boolean firstFinal = Versions.isDot0(version) ||
+                (Versions.isFirstMicroMaintenanceRelease(version)
+                        && Repositories.getQuarkusRepository(quarkusBotGitHub).getReleaseByTagName(Versions.getDot0(version)) == null);
+        boolean maintenance = Files.exists(Path.of("work", "maintenance"));
+
+        releaseInformation.setVersion(version, firstFinal, maintenance);
+
         issues.appendReleaseInformation(updatedIssueBody, releaseInformation);
 
         return exitCode;

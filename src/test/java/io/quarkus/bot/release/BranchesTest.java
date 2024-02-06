@@ -12,7 +12,7 @@ public class BranchesTest {
 
     @Test
     void testPreviewRelease() {
-        ReleaseInformation releaseInformation = new ReleaseInformation("3.6.0.CR1", "3.6", "CR1", false, false);
+        ReleaseInformation releaseInformation = new ReleaseInformation("3.6.0.CR1", "3.6", "CR1", false, false, false);
 
         assertThat(Branches.getPlatformPreparationBranch(releaseInformation)).isEqualTo(Branches.MAIN);
         assertThat(Branches.getPlatformReleaseBranch(releaseInformation)).isEqualTo(Branches.MAIN);
@@ -20,7 +20,7 @@ public class BranchesTest {
 
     @Test
     void testFirstFinalRelease() {
-        ReleaseInformation releaseInformation = new ReleaseInformation("3.6.0", "3.6", null, false, false);
+        ReleaseInformation releaseInformation = new ReleaseInformation("3.6.0", "3.6", null, false, true, false);
 
         assertThat(Branches.getPlatformPreparationBranch(releaseInformation)).isEqualTo(Branches.MAIN);
         assertThat(Branches.getPlatformReleaseBranch(releaseInformation)).isEqualTo("3.6");
@@ -28,7 +28,7 @@ public class BranchesTest {
 
     @Test
     void testBugfixFinalRelease() {
-        ReleaseInformation releaseInformation = new ReleaseInformation("3.6.1", "3.6", null, false, false);
+        ReleaseInformation releaseInformation = new ReleaseInformation("3.6.1", "3.6", null, false, false, false);
 
         assertThat(Branches.getPlatformPreparationBranch(releaseInformation)).isEqualTo("3.6");
         assertThat(Branches.getPlatformReleaseBranch(releaseInformation)).isEqualTo("3.6");
