@@ -19,6 +19,7 @@ import io.quarkus.bot.release.util.Jdks;
 import io.quarkus.bot.release.util.Outputs;
 import io.quarkus.bot.release.util.Progress;
 import io.quarkus.bot.release.util.UpdatedIssueBody;
+import io.quarkus.bot.release.util.Versions;
 
 @Singleton
 @Unremovable
@@ -34,6 +35,10 @@ public class ApproveCoreRelease implements StepHandler {
         comment.append("- Quarkus `").append(releaseInformation.getVersion()).append("`\n");
         comment.append("- On branch `").append(releaseInformation.getBranch()).append("`\n");
         comment.append("- With Java `").append(jdks.getJdkVersion(releaseInformation.getBranch())).append("`\n");
+        if (releaseInformation.isFirstFinal() && !releaseInformation.isDot0()) {
+            comment.append("- :bulb: We detected that this `" + releaseInformation.getVersion() + "` release will be the first final as `"
+                    + Versions.getDot0(releaseInformation.getVersion()) + "` has not been fully released");
+        }
         if (releaseInformation.isMaintenance()) {
             comment.append("- This is a `maintenance` release.\n");
         }

@@ -18,6 +18,7 @@ import io.quarkus.bot.release.util.Command;
 import io.quarkus.bot.release.util.Outputs;
 import io.quarkus.bot.release.util.Progress;
 import io.quarkus.bot.release.util.UpdatedIssueBody;
+import io.quarkus.bot.release.util.Versions;
 
 @Singleton
 @Unremovable
@@ -63,7 +64,7 @@ public class PreparePlatform implements StepHandler {
         }
         comment.append("* Wait for CI to go green\n");
         comment.append("* Merge the pull request\n");
-        if (releaseInformation.isFirstFinal()) {
+        if (releaseInformation.isDot0()) {
             comment.append("* Send an email to the Platform coordination mailing list: [quarkus-platform-coordination@googlegroups.com](mailto:quarkus-platform-coordination@googlegroups.com) :\n\n");
             comment.append("Subject: `Quarkus " + releaseInformation.getVersion() + " core artifacts are available`\n\n");
             comment.append("```\n");
@@ -85,7 +86,9 @@ public class PreparePlatform implements StepHandler {
             comment.append("* If CI failed for some Platform members, please contact them so that they are aware of the issues\n\n");
             comment.append(":warning: **IMPORTANT - STOP HERE**\n");
             comment.append(":warning: **IMPORTANT - Wait a week before continuing with the Platform release**\n\n");
-            comment.append("* Make sure you have merged all the pull requests that should be included in this version of the Platform\n\n");
+        }
+        if (releaseInformation.isDot0() || releaseInformation.isFirstFinal()) {
+            comment.append("* Make sure you have merged all the member pull requests that should be included in this version of the Platform\n\n");
             comment.append("* Once all the pull requests are merged, create the branch:\n\n");
             comment.append("```\n");
             comment.append("git checkout main\n");
@@ -100,6 +103,21 @@ public class PreparePlatform implements StepHandler {
         comment.append(
                 "Once everything has been merged to branch `" + platformReleaseBranch + "`, you can continue with the release by adding a `"
                         + Command.CONTINUE.getFullCommand() + "` comment.\n\n");
+
+        if (releaseInformation.isDot0()) {
+            comment.append("---\n\n");
+            comment.append(
+                    "<details><summary>If you have to release " + Versions.getDot1(releaseInformation.getVersion())
+                            + " right away as the first Platform release</summary>\n\n");
+            comment.append("This can happen if, for instance, an important regression is detected just after the `"
+                    + releaseInformation.getVersion() + "` core release and before the Platform release.\n");
+            comment.append("It might also happen if you want to fix a CVE before releasing the Platform.\n\n");
+            comment.append("In this case, just close the comment for this release and start a new release for the `"
+                    + Versions.getDot1(releaseInformation.getVersion()) + "` release as usual.\n");
+            comment.append("The instructions will be automatically adapted.");
+            comment.append("</details>\n\n");
+        }
+
         comment.append(Progress.youAreHere(releaseInformation, releaseStatus));
 
         commands.setOutput(Outputs.INTERACTION_COMMENT, comment.toString());

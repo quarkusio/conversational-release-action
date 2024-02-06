@@ -51,4 +51,30 @@ public final class Versions {
 
         return previousMinor;
     }
+
+    public static String getMinorVersion(String version) {
+        String[] elements = version.split("\\.");
+
+        if (elements.length < 2) {
+            return version;
+        }
+
+        return elements[0] + "." + elements[1];
+    }
+
+    public static String getDot0(String version) {
+        return getMinorVersion(version) + ".0";
+    }
+
+    public static String getDot1(String version) {
+        return getMinorVersion(version) + ".1";
+    }
+
+    public static boolean isDot0(String version) {
+        return version.endsWith(".0");
+    }
+
+    public static boolean isFirstMicroMaintenanceRelease(String version) {
+        return version.endsWith(".1");
+    }
 }
