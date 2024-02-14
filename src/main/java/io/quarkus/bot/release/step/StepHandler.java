@@ -41,7 +41,23 @@ public interface StepHandler {
         return false;
     }
 
+    /**
+     * Provide some contextual help when an error occurs.
+     * <p>
+     * The help message is included into the comment reporting the error.
+     * It will be prepended by a :bulb: emoji.
+     */
     default String getErrorHelp(ReleaseInformation releaseInformation) {
+        return null;
+    }
+
+    /**
+     * Provide some contextual help when we restart from a specific step.
+     * <p>
+     * The help message is included into the comment indicating we are pursuing the release.
+     * It will be prepended by a :bulb: emoji.
+     */
+    default String getContinueFromStepHelp(ReleaseInformation releaseInformation) {
         return null;
     }
 }

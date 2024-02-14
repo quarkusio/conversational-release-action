@@ -220,7 +220,7 @@ public class ReleaseAction {
         }
 
         progressInformation(context, commands, releaseInformation, currentReleaseStatus, issue,
-                "Proceeding to step " + currentReleaseStatus.getCurrentStep().getDescription());
+                currentReleaseStatus.getCurrentStep());
 
         StepHandler currentStepHandler;
 
@@ -345,13 +345,23 @@ public class ReleaseAction {
     }
 
     private static void progressInformation(Context context, Commands commands, ReleaseInformation releaseInformation,
-            ReleaseStatus releaseStatus, GHIssue issue, String progress) {
+            ReleaseStatus releaseStatus, GHIssue issue, Step currentStep) {
         try {
-            issue.comment(":gear: " + progress + "\n\nYou can follow the progress of the workflow [here]("
-                    + getWorkflowRunUrl(context)
-                    + ").\n\n" + Progress.youAreHere(releaseInformation, releaseStatus));
-        } catch (IOException e) {
-            commands.warning("Unable to add progress comment: " + progress);
+            StringBuilder comment = new StringBuilder();
+            comment.append(":gear: Proceeding to step ").append(currentStep.getDescription()).append("\n\n");
+            comment.append("You can follow the progress of the workflow [here](").append(getWorkflowRunUrl(context)).append(").\n\n");
+
+            StepHandler stepHandler = getStepHandler(currentStep);
+            String continueFromStepHelp = stepHandler.getContinueFromStepHelp(releaseInformation);
+            if (continueFromStepHelp != null && !continueFromStepHelp.isBlank()) {
+                comment.append(":bulb: ").append(continueFromStepHelp).append("\n\n");
+            }
+
+            comment.append(Progress.youAreHere(releaseInformation, releaseStatus));
+
+            retry(3, () -> issue.comment(comment.toString()));
+        } catch (Exception e) {
+            commands.warning("Unable to add progress comment for step: " + currentStep.getDescription());
         }
     }
 
@@ -375,7 +385,7 @@ public class ReleaseAction {
             retry(3, () -> issue.setBody(issues.appendReleaseStatus(updatedIssueBody, updatedReleaseStatus)));
 
             commands.setOutput(Outputs.INTERACTION_COMMENT, ":rotating_light: " + error
-                    + (errorHelp != null && !errorHelp.isBlank() ? "\n\n" + errorHelp : "")
+                    + (errorHelp != null && !errorHelp.isBlank() ? "\n\n:bulb: " + errorHelp : "")
                     + "\n\nYou can find more information about the failure [here](" + getWorkflowRunUrl(context) + ").\n\n"
                     + "This is not a fatal error, you can retry by adding a `" + Command.RETRY.getFullCommand() + "` comment.\n\n"
                     + Progress.youAreHere(releaseInformation, currentReleaseStatus));

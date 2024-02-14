@@ -64,9 +64,18 @@ public class ApproveCoreRelease implements StepHandler {
     public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody)
             throws IOException, InterruptedException {
-        issue.comment(":white_check_mark: Core release is approved, proceeding...\n\n" +
-                "The Core release steps take approximately 2 hours and 30 minutes so don't panic if it takes time.\n" +
-                "You will receive feedback in this very issue if an error occurs or when further input is needed.");
+        StringBuilder comment = new StringBuilder(":white_check_mark: Core release is approved, proceeding...\n\n");
+
+        if(releaseInformation.isFirstCR()) {
+            // we will need input soon so let's make it clear
+            comment.append(":bulb: Don't go too far, we will need some input from you very soon.");
+        } else {
+            comment.append(":bulb: The Core release steps take approximately 2 hours and 30 minutes so don't panic if it takes time.\n");
+            comment.append("You will receive feedback in this very issue if an error occurs or when further input is needed.");
+        }
+
+        issue.comment(comment.toString());
+
         return 0;
     }
 
