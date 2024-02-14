@@ -29,4 +29,12 @@ public class CoreReleasePrepare implements StepHandler {
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
         return processes.execute(List.of("./release-prepare.sh"));
     }
+
+    @Override
+    public String getContinueFromStepHelp(ReleaseInformation releaseInformation) {
+        StringBuilder help = new StringBuilder();
+        help.append(":bulb: The Core release steps take approximately 2 hours and 30 minutes so don't panic if it takes time.\n");
+        help.append("You will receive feedback in this very issue if an error occurs or when further input is needed.");
+        return help.toString();
+    }
 }
