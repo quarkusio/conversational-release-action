@@ -102,7 +102,7 @@ public class AnnounceRelease implements StepHandler {
                     + "\n"
                     + "Thanks!\n\n"
                     + "--\n"
-                    + "The Quarkus dev team");
+                    + "The Quarkus dev team\n");
             comment.append("```\n");
         }
 
