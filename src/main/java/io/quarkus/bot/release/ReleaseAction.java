@@ -440,6 +440,7 @@ public class ReleaseAction {
         for (int i = 1; i <= iterations; i++) {
             try {
                 runnable.run();
+                break;
             } catch (Exception e) {
                 if (originalException == null) {
                     originalException = e;
