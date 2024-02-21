@@ -71,7 +71,7 @@ public class ApproveCoreRelease implements StepHandler {
             comment.append(":bulb: Don't go too far, we will need some input from you very soon.");
         } else {
             comment.append(":bulb: The Core release steps take approximately 2 hours and 30 minutes so don't panic if it takes time.\n");
-            comment.append("You will receive feedback in this very issue if an error occurs or when further input is needed.");
+            comment.append("You will receive feedback in this very issue when further input is needed or if an error occurs.");
         }
 
         issue.comment(comment.toString());
