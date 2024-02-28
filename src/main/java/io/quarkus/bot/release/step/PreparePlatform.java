@@ -32,16 +32,16 @@ public class PreparePlatform implements StepHandler {
         String platformReleaseBranch = Branches.getPlatformReleaseBranch(releaseInformation);
 
         StringBuilder comment = new StringBuilder();
-        if (releaseInformation.isFirstFinal()) {
-            comment.append("Now is time to update Quarkus in the Quarkus Platform. This is a manual process.\n\n");
+
+        comment.append("Now is time to update Quarkus in the Quarkus Platform. This is a manual process.\n\n");
+        if (releaseInformation.isDot0()) {
             comment.append(":warning: **This is the `.0` release so we update the Platform first then wait one week for the Platform members to contribute their updates then we release. Make sure you follow the instructions closely.**\n\n");
-        } else {
-            comment.append("Now is time to update Quarkus in the Quarkus Platform. This is a manual process.\n\n");
         }
 
         if (!releaseInformation.isFinal()) {
-            comment.append("* In the case of `preview releases` (e.g. `Alpha1`, `CR1`...), the release will be built from the `main` branch\n");
+            comment.append(":bulb: In the case of `preview releases` (e.g. `Alpha1`, `CR1`...), the release will be built from the `main` branch\n\n");
         }
+
         comment.append("* Follow (roughly) these steps (`upstream` is the upstream repository, `origin` is your fork):\n\n");
         comment.append("```\n");
         comment.append("cd <your quarkus-platform clone>\n");
@@ -88,7 +88,7 @@ public class PreparePlatform implements StepHandler {
             comment.append(":warning: **IMPORTANT - Wait a week before continuing with the Platform release**\n\n");
         }
         if (releaseInformation.isDot0() || releaseInformation.isFirstFinal()) {
-            comment.append("* Make sure you have merged all the member pull requests that should be included in this version of the Platform\n\n");
+            comment.append("* Make sure you have merged [all the pull requests](https://github.com/quarkusio/quarkus-platform/pulls) that should be included in this version of the Platform\n");
             comment.append("* Once all the pull requests are merged, create the branch:\n\n");
             comment.append("```\n");
             comment.append("git checkout main\n");
@@ -96,13 +96,15 @@ public class PreparePlatform implements StepHandler {
             comment.append("git checkout -b " + platformReleaseBranch + "\n");
             comment.append("git push upstream " + platformReleaseBranch + "\n");
             comment.append("```\n\n");
+            comment.append(
+                    "Once everything has been pushed to branch `" + platformReleaseBranch + "`, you can continue with the release by adding a `"
+                            + Command.CONTINUE.getFullCommand() + "` comment.\n\n");
         } else {
             comment.append("* Make sure you have merged [all the pull requests](https://github.com/quarkusio/quarkus-platform/pulls) that should be included in this version of the Platform\n\n");
+            comment.append(
+                    "Once everything has been merged to branch `" + platformReleaseBranch + "`, you can continue with the release by adding a `"
+                            + Command.CONTINUE.getFullCommand() + "` comment.\n\n");
         }
-
-        comment.append(
-                "Once everything has been merged to branch `" + platformReleaseBranch + "`, you can continue with the release by adding a `"
-                        + Command.CONTINUE.getFullCommand() + "` comment.\n\n");
 
         if (releaseInformation.isDot0()) {
             comment.append("---\n\n");
@@ -112,7 +114,7 @@ public class PreparePlatform implements StepHandler {
             comment.append("This can happen if, for instance, an important regression is detected just after the `"
                     + releaseInformation.getVersion() + "` core release and before the Platform release.\n");
             comment.append("It might also happen if you want to fix a CVE before releasing the Platform.\n\n");
-            comment.append("In this case, just close the comment for this release and start a new release for the `"
+            comment.append("In this case, just close this release issue and start a new release for the `"
                     + Versions.getDot1(releaseInformation.getVersion()) + "` release as usual.\n");
             comment.append("The instructions will be automatically adapted.");
             comment.append("</details>\n\n");
