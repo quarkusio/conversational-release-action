@@ -37,7 +37,7 @@ public class ApproveCoreRelease implements StepHandler {
         comment.append("- With Java `").append(jdks.getJdkVersion(releaseInformation.getBranch())).append("`\n");
         if (releaseInformation.isFirstFinal() && !releaseInformation.isDot0()) {
             comment.append("- :bulb: We detected that this `" + releaseInformation.getVersion() + "` release will be the first final as `"
-                    + Versions.getDot0(releaseInformation.getVersion()) + "` has not been fully released");
+                    + Versions.getDot0(releaseInformation.getVersion()) + "` has not been fully released\n");
         }
         if (releaseInformation.isMaintenance()) {
             comment.append("- This is a `maintenance` release.\n");
