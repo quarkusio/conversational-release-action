@@ -19,8 +19,6 @@ import io.quarkiverse.githubaction.Commands;
 import io.quarkiverse.githubaction.Context;
 import io.quarkiverse.githubapp.event.Issue;
 import io.quarkiverse.githubapp.event.IssueComment;
-import io.quarkus.arc.Arc;
-import io.quarkus.arc.InstanceHandle;
 import io.quarkus.bot.release.error.StatusUpdateException;
 import io.quarkus.bot.release.error.StepExecutionException;
 import io.quarkus.bot.release.step.Step;
@@ -191,7 +189,7 @@ public class ReleaseAction {
                 }
             } else if (currentReleaseStatus.getCurrentStepStatus() == StepStatus.PAUSED) {
                 // Handle paused, we will continue the process with the next step
-                StepHandler stepHandler = getStepHandler(currentReleaseStatus.getCurrentStep());
+                StepHandler stepHandler = currentReleaseStatus.getCurrentStep().getStepHandler();
 
                 if (stepHandler.shouldContinueAfterPause(context, commands, quarkusBotGitHub, releaseInformation, currentReleaseStatus, issue, issueComment)) {
                     react(commands, issueComment, ReactionContent.PLUS_ONE);
@@ -236,7 +234,7 @@ public class ReleaseAction {
 
             commands.notice("Running step " + currentStep.getDescription());
 
-            currentStepHandler = getStepHandler(currentStep);
+            currentStepHandler = currentStep.getStepHandler();
 
             try {
                 if (currentReleaseStatus.getCurrentStep() != currentStep) {
@@ -253,7 +251,7 @@ public class ReleaseAction {
                 }
 
                 if (currentReleaseStatus.getCurrentStepStatus() == StepStatus.INIT) {
-                    if (currentStepHandler.shouldSkip(context, commands, quarkusBotGitHub, releaseInformation, currentReleaseStatus, issue, issueComment)) {
+                    if (currentStepHandler.shouldSkip(releaseInformation, currentReleaseStatus)) {
                         currentReleaseStatus = currentReleaseStatus.progress(StepStatus.SKIPPED);
                         updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
                         continue;
@@ -300,16 +298,6 @@ public class ReleaseAction {
         updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
     }
 
-    private static StepHandler getStepHandler(Step step) {
-        InstanceHandle<? extends StepHandler> instanceHandle = Arc.container().instance(step.getStepHandler());
-
-        if (!instanceHandle.isAvailable()) {
-            throw new IllegalStateException("Couldn't find an appropriate StepHandler for " + step.name());
-        }
-
-        return instanceHandle.get();
-    }
-
     private static void handleExitCode(int exitCode, Step step) {
         if (exitCode != 0) {
             throw new StepExecutionException("An error occurred while executing step `" + step.getDescription() + "`.");
@@ -351,7 +339,7 @@ public class ReleaseAction {
             comment.append(":gear: Proceeding to step ").append(currentStep.getDescription()).append("\n\n");
             comment.append("You can follow the progress of the workflow [here](").append(getWorkflowRunUrl(context)).append(").\n\n");
 
-            StepHandler stepHandler = getStepHandler(currentStep);
+            StepHandler stepHandler = currentStep.getStepHandler();
             String continueFromStepHelp = stepHandler.getContinueFromStepHelp(releaseInformation);
             if (continueFromStepHelp != null && !continueFromStepHelp.isBlank()) {
                 comment.append(":bulb: ").append(continueFromStepHelp).append("\n\n");

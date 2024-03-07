@@ -35,9 +35,7 @@ public interface StepHandler {
         return false;
     }
 
-    default boolean shouldSkip(Context context, Commands commands,
-            GitHub quarkusBotGitHub, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue,
-            GHIssueComment issueComment) {
+    default boolean shouldSkip(ReleaseInformation releaseInformation, ReleaseStatus releaseStatus) {
         return false;
     }
 
