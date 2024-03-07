@@ -14,12 +14,13 @@ import io.quarkiverse.githubaction.Context;
 import io.quarkus.arc.Unremovable;
 import io.quarkus.bot.release.ReleaseInformation;
 import io.quarkus.bot.release.ReleaseStatus;
+import io.quarkus.bot.release.util.Branches;
 import io.quarkus.bot.release.util.Processes;
 import io.quarkus.bot.release.util.UpdatedIssueBody;
 
 @Singleton
 @Unremovable
-public class UpdateDocumentation implements StepHandler {
+public class UpdateQuickstartsAdditionalSyncLts implements StepHandler {
 
     @Inject
     Processes processes;
@@ -27,6 +28,12 @@ public class UpdateDocumentation implements StepHandler {
     @Override
     public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
-        return processes.execute(List.of("./update-docs.sh"));
+        return processes.execute(List.of("./update-quickstarts-lts.sh"));
+    }
+
+    @Override
+    public boolean shouldSkip(ReleaseInformation releaseInformation, ReleaseStatus releaseStatus) {
+        return !releaseInformation.isFinal() || !Branches.isLts(releaseInformation.getBranch())
+                || releaseInformation.isMaintenance();
     }
 }

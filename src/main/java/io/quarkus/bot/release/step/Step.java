@@ -1,5 +1,8 @@
 package io.quarkus.bot.release.step;
 
+import io.quarkus.arc.Arc;
+import io.quarkus.arc.InstanceHandle;
+
 public enum Step {
 
     PREREQUISITES("Prerequisites", Prerequisites.class, false, false),
@@ -10,7 +13,7 @@ public enum Step {
     SYNC_CORE_RELEASE_TO_MAVEN_CENTRAL("Sync core release to Maven Central", SyncCoreRelease.class, true, false),
     RELEASE_GRADLE_PLUGIN("Release Gradle plugin", ReleaseGradlePlugin.class, true, false),
     POST_CORE_RELEASE("Execute post-core-release operations", PostCoreRelease.class, true, false),
-//    TRIGGER_PERFORMANCE_LAB("Trigger performance lab", TriggerPerformanceLab.class, true, false),
+    //    TRIGGER_PERFORMANCE_LAB("Trigger performance lab", TriggerPerformanceLab.class, true, false),
     PREPARE_PLATFORM("Prepare the Quarkus Platform", PreparePlatform.class, true, false),
     RELEASE_PLATFORM("Release the Quarkus Platform", ReleasePlatform.class, true, false),
     SYNC_PLATFORM_RELEASE("Sync Platform release to Maven Central", SyncPlatformRelease.class, true, false),
@@ -19,7 +22,11 @@ public enum Step {
     UPDATE_JBANG_CATALOG("Update JBang catalog", UpdateJBangCatalog.class, true, true),
     PUBLISH_CLI("Publish CLI", PublishCLI.class, true, true),
     UPDATE_QUICKSTARTS("Update quickstarts", UpdateQuickstarts.class, true, true),
+    UPDATE_QUICKSTARTS_ADDITIONAL_SYNC_LTS("Update quickstarts - Additional sync for LTS", UpdateQuickstartsAdditionalSyncLts.class,
+            true, true),
     UPDATE_DOCUMENTATION("Update documentation", UpdateDocumentation.class, true, true),
+    UPDATE_DOCUMENTATION_ADDITIONAL_SYNC_LTS("Update documentation - Additional sync for LTS",
+            UpdateDocumentationAdditionalSyncLts.class, true, true),
     ANNOUNCE_RELEASE("Announce release", AnnounceRelease.class, true, false);
 
     private final String description;
@@ -41,10 +48,6 @@ public enum Step {
         return description;
     }
 
-    public Class<? extends StepHandler> getStepHandler() {
-        return stepHandler;
-    }
-
     public boolean isRecoverable() {
         return recoverable;
     }
@@ -63,5 +66,15 @@ public enum Step {
         }
 
         return Step.values()[this.ordinal() + 1];
+    }
+
+    public StepHandler getStepHandler() {
+        InstanceHandle<? extends StepHandler> instanceHandle = Arc.container().instance(stepHandler);
+
+        if (!instanceHandle.isAvailable()) {
+            throw new IllegalStateException("Couldn't find an appropriate StepHandler for " + name());
+        }
+
+        return instanceHandle.get();
     }
 }

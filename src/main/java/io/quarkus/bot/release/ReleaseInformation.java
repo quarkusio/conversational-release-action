@@ -49,6 +49,11 @@ public class ReleaseInformation {
         this.maintenance = maintenance;
     }
 
+    @JsonIgnore
+    public boolean isComplete() {
+        return version != null;
+    }
+
     public boolean isFirstFinal() {
         return firstFinal;
     }

@@ -42,8 +42,7 @@ public class CreateBranch implements StepHandler {
     private static final String MAIN_MILESTONE_SUFFIX = " - main";
 
     @Override
-    public boolean shouldSkip(Context context, Commands commands, GitHub quarkusBotGitHub,
-            ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
+    public boolean shouldSkip(ReleaseInformation releaseInformation, ReleaseStatus releaseStatus) {
         return !releaseInformation.isFirstCR();
     }
 

@@ -14,9 +14,14 @@ public final class Progress {
     }
 
     public static String youAreHere(ReleaseInformation releaseInformation, ReleaseStatus releaseStatus) {
+        if (!releaseInformation.isComplete()) {
+            return "";
+        }
+
         return "---\n\n<details><summary>Where am I?</summary>\n\n" +
                 Arrays.stream(Step.values())
                         .filter(s -> releaseInformation.isFinal() || !s.isForFinalReleasesOnly())
+                        .filter(s -> !s.getStepHandler().shouldSkip(releaseInformation, releaseStatus))
                         .map(s -> {
                             StringBuilder sb = new StringBuilder();
                             sb.append("[");
