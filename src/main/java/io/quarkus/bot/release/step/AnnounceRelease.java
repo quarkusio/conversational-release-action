@@ -19,6 +19,7 @@ import io.quarkiverse.githubaction.Context;
 import io.quarkus.arc.Unremovable;
 import io.quarkus.bot.release.ReleaseInformation;
 import io.quarkus.bot.release.ReleaseStatus;
+import io.quarkus.bot.release.util.Branches;
 import io.quarkus.bot.release.util.Repositories;
 import io.quarkus.bot.release.util.UpdatedIssueBody;
 import io.quarkus.bot.release.util.Versions;
@@ -43,9 +44,13 @@ public class AnnounceRelease implements StepHandler {
         comment.append("to trigger the performance evaluation testing for this release.\n\n");
 
         if (releaseInformation.isFinal()) {
-            comment.append("Then it is time to write the announcement:\n\n");
+            comment.append("Then it is time to announce the release:\n\n");
             if (!releaseInformation.isMaintenance()) {
-                comment.append("* Update the versions in `_data/versions.yaml`\n");
+                comment.append("* Update the versions of the website in [`_data/versions.yaml`](https://github.com/quarkusio/quarkusio.github.io/blob/develop/_data/versions.yaml)\n");
+            }
+            if (Branches.isLts(releaseInformation.getBranch())) {
+                comment.append(
+                        "* This is a LTS version so make sure the version is referenced in the `documentation:` section of [`_data/versions.yaml`](https://github.com/quarkusio/quarkusio.github.io/blob/develop/_data/versions.yaml)\n");
             }
             comment.append("* Write a blog post for [the website](https://github.com/quarkusio/quarkusio.github.io)\n");
             comment.append(

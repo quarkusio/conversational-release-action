@@ -14,6 +14,7 @@ import io.quarkiverse.githubaction.Context;
 import io.quarkus.arc.Unremovable;
 import io.quarkus.bot.release.ReleaseInformation;
 import io.quarkus.bot.release.ReleaseStatus;
+import io.quarkus.bot.release.util.Branches;
 import io.quarkus.bot.release.util.Command;
 import io.quarkus.bot.release.util.Jdks;
 import io.quarkus.bot.release.util.Outputs;
@@ -39,7 +40,9 @@ public class ApproveCoreRelease implements StepHandler {
             comment.append("- :bulb: We detected that this `" + releaseInformation.getVersion() + "` release will be the first final as `"
                     + Versions.getDot0(releaseInformation.getVersion()) + "` has not been fully released\n");
         }
-        if (releaseInformation.isMaintenance()) {
+        if (Branches.isLts(releaseInformation.getBranch())) {
+            comment.append("- This is a `LTS` release.\n");
+        } else if (releaseInformation.isMaintenance()) {
             comment.append("- This is a `maintenance` release.\n");
         }
         if (!releaseInformation.isFinal()) {
