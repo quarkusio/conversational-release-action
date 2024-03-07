@@ -35,7 +35,8 @@ public class UpdateDocumentation implements StepHandler {
         }
 
         // for LTS releases that are not maintenance release yet, we also push the version in a versioned directory
-        if (Branches.isLts(releaseInformation.getBranch()) && !releaseInformation.isMaintenance()) {
+        if (releaseInformation.isFinal() && Branches.isLts(releaseInformation.getBranch())
+                && !releaseInformation.isMaintenance()) {
             status = processes.execute(List.of("./update-docs.sh", releaseInformation.getBranch()));
         }
 
