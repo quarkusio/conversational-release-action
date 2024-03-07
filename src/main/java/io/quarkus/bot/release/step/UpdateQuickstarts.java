@@ -35,7 +35,8 @@ public class UpdateQuickstarts implements StepHandler {
         }
 
         // for LTS releases that are not maintenance release yet, we also push the version in a branch
-        if (Branches.isLts(releaseInformation.getBranch()) && !releaseInformation.isMaintenance()) {
+        if (releaseInformation.isFinal() && Branches.isLts(releaseInformation.getBranch())
+                && !releaseInformation.isMaintenance()) {
             status = processes.execute(List.of("./update-quickstarts.sh", releaseInformation.getBranch()));
         }
 
