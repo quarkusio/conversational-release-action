@@ -14,6 +14,7 @@ import io.quarkiverse.githubaction.Context;
 import io.quarkus.arc.Unremovable;
 import io.quarkus.bot.release.ReleaseInformation;
 import io.quarkus.bot.release.ReleaseStatus;
+import io.quarkus.bot.release.util.Branches;
 import io.quarkus.bot.release.util.Processes;
 import io.quarkus.bot.release.util.UpdatedIssueBody;
 
@@ -27,6 +28,17 @@ public class UpdateDocumentation implements StepHandler {
     @Override
     public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
-        return processes.execute(List.of("./update-docs.sh"));
+        int status = processes.execute(List.of("./update-docs.sh"));
+
+        if (status != 0) {
+            return status;
+        }
+
+        // for LTS releases that are not maintenance release yet, we also push the version in a versioned directory
+        if (Branches.isLts(releaseInformation.getBranch()) && !releaseInformation.isMaintenance()) {
+            status = processes.execute(List.of("./update-docs.sh", releaseInformation.getBranch()));
+        }
+
+        return status;
     }
 }

@@ -33,4 +33,14 @@ public class BranchesTest {
         assertThat(Branches.getPlatformPreparationBranch(releaseInformation)).isEqualTo("3.6");
         assertThat(Branches.getPlatformReleaseBranch(releaseInformation)).isEqualTo("3.6");
     }
+
+    @Test
+    void testLts() {
+        assertThat(Branches.isLts("2.13")).isTrue();
+        assertThat(Branches.isLts("2.14")).isFalse();
+        assertThat(Branches.isLts("3.2")).isTrue();
+        assertThat(Branches.isLts("3.4")).isFalse();
+        assertThat(Branches.isLts("3.8")).isTrue();
+        assertThat(Branches.isLts("3.9")).isFalse();
+    }
 }

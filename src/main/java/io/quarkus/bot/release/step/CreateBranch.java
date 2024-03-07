@@ -243,6 +243,10 @@ public class CreateBranch implements StepHandler {
                 + "- for fixes we also want in future " + previousMinorBranch + ", please add the triage/backport-" + previousMinorBranch + "? label\n";
 
         for (String ltsBranch : Branches.LTS_BRANCHES) {
+            if (ltsBranch.equals(releaseInformation.getBranch())) {
+                continue;
+            }
+
             email += "- for fixes we also want in future " + ltsBranch + ", please add the triage/backport-" + ltsBranch + "? label\n";
         }
 
