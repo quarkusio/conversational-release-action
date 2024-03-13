@@ -230,7 +230,11 @@ public class CreateBranch implements StepHandler {
     }
 
     private static String getBranchEmail(ReleaseInformation releaseInformation, String previousMinorBranch, String nextMinor) {
-        String email = "Subject: `Quarkus " + releaseInformation.getBranch() + " branched`\n\n"
+        String email = "Subject:\n"
+                + "```\n"
+                + "Quarkus " + releaseInformation.getBranch() + " branched\n"
+                + "```\n"
+                + "Body:\n"
                 + "```\n"
                 + "Hi,\n"
                 + "\n"

@@ -91,7 +91,11 @@ public class AnnounceRelease implements StepHandler {
             }
         } else {
             comment.append("Then it is time to send an email to [quarkus-dev@googlegroups.com](mailto:quarkus-dev@googlegroups.com):\n\n");
-            comment.append("Subject: `Quarkus " + releaseInformation.getVersion() + " released`\n\n");
+            comment.append("Subject:\n");
+            comment.append("```\n");
+            comment.append("Quarkus " + releaseInformation.getVersion() + " released\n");
+            comment.append("```\n");
+            comment.append("Body:\n");
             comment.append("```\n");
             comment.append("Hi,\n"
                     + "\n"

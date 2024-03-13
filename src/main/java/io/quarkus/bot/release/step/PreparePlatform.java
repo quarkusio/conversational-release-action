@@ -66,7 +66,11 @@ public class PreparePlatform implements StepHandler {
         comment.append("* Merge the pull request\n");
         if (releaseInformation.isDot0()) {
             comment.append("* Send an email to the Platform coordination mailing list: [quarkus-platform-coordination@googlegroups.com](mailto:quarkus-platform-coordination@googlegroups.com) :\n\n");
-            comment.append("Subject: `Quarkus " + releaseInformation.getVersion() + " core artifacts are available`\n\n");
+            comment.append("Subject:\n");
+            comment.append("```\n");
+            comment.append("Quarkus " + releaseInformation.getVersion() + " core artifacts are available\n");
+            comment.append("```\n");
+            comment.append("Body:\n");
             comment.append("```\n");
             comment.append("Hi,\n"
                     + "\n"
