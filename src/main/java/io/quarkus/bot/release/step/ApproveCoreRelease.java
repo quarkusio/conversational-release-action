@@ -42,7 +42,8 @@ public class ApproveCoreRelease implements StepHandler {
         }
         if (Branches.isLts(releaseInformation.getBranch())) {
             comment.append("- This is a `LTS` release.\n");
-        } else if (releaseInformation.isMaintenance()) {
+        }
+        if (releaseInformation.isMaintenance()) {
             comment.append("- This is a `maintenance` release.\n");
         }
         if (!releaseInformation.isFinal()) {
