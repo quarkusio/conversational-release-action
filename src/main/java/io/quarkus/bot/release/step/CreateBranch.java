@@ -192,7 +192,7 @@ public class CreateBranch implements StepHandler {
                 + " by sending an email to [quarkus-dev@googlegroups.com](mailto:quarkus-dev@googlegroups.com) and posting on [Zulip #dev stream](https://quarkusio.zulipchat.com/#narrow/stream/187038-dev/):\n\n";
         comment += "**(Make sure to adjust the version in the email if you renamed the milestone)**\n\n";
         comment += getBranchEmail(releaseInformation, previousMinorBranch, nextMinor) + "\n\n";
-        comment += "Apart from sending the email, no intervention is needed, the release process is in progress.\n\n";
+        comment += ":bulb: **Apart from sending the email and posting on Zulip, no intervention from you is needed, the release process is in progress.**\n\n";
         comment += Progress.youAreHere(releaseInformation, releaseStatus);
 
         issue.comment(comment);
@@ -238,15 +238,21 @@ public class CreateBranch implements StepHandler {
                 + "\n"
                 + "Please make sure you add the appropriate backport labels from now on:\n"
                 + "\n"
-                + "- for anything required in " + releaseInformation.getBranch() + " (currently open pull requests included), please add the triage/backport? label\n"
-                + "- for fixes we also want in future " + previousMinorBranch + ", please add the triage/backport-" + previousMinorBranch + "? label\n";
+                + "- for anything required in " + releaseInformation.getBranch() + " (currently open pull requests included), please add the triage/backport? label\n";
+
+        if (!Branches.LTS_BRANCHES.contains(previousMinorBranch)) {
+            email += "- for fixes we also want in future " + previousMinorBranch + ", please add the triage/backport-" + previousMinorBranch + "? label\n";
+        }
 
         for (String ltsBranch : Branches.LTS_BRANCHES) {
             if (ltsBranch.equals(releaseInformation.getBranch())) {
                 continue;
             }
 
-            email += "- for fixes we also want in future " + ltsBranch + ", please add the triage/backport-" + ltsBranch + "? label\n";
+            // 2.13 is not an official LTS so we have to special case it
+            email += "- for fixes we also want in future " + ltsBranch
+                    + (Branches.BRANCH_2_13.equals(ltsBranch) ? "" : " LTS") + ", please add the triage/backport-" + ltsBranch
+                    + "? label\n";
         }
 
         email += "\n"

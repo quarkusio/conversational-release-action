@@ -8,6 +8,7 @@ public class Branches {
 
     public static final String MAIN = "main";
     public static final List<String> LTS_BRANCHES = List.of("3.8", "3.2", "2.13");
+    public static final String BRANCH_2_13 = "2.13";
 
     public static String getPlatformPreparationBranch(ReleaseInformation releaseInformation) {
         if (releaseInformation.isFinal() && !releaseInformation.isFirstFinal()) {
