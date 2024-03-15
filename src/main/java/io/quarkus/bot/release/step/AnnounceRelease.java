@@ -37,6 +37,8 @@ public class AnnounceRelease implements StepHandler {
 
         comment.append(":white_check_mark: " + releaseInformation.getVersion() + " was successfully released.\n\n");
 
+        comment.append(":raised_hands: Some manual steps are required to finalize the release.\n\n");
+
         comment.append("Connected to the Red Hat VPN, in a clone of https://github.com/quarkusio/quarkus-release, run:\n");
         comment.append("```\n");
         comment.append("./trigger-performance-testing.sh " + releaseInformation.getVersion() + "\n");

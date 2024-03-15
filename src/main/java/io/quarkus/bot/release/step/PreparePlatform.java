@@ -33,7 +33,7 @@ public class PreparePlatform implements StepHandler {
 
         StringBuilder comment = new StringBuilder();
 
-        comment.append("Now is time to update Quarkus in the Quarkus Platform. This is a manual process.\n\n");
+        comment.append(":raised_hands: Now is time to update Quarkus in the Quarkus Platform. This is a manual process.\n\n");
         if (releaseInformation.isDot0()) {
             comment.append(":warning: **This is the `.0` release so we update the Platform first then wait one week for the Platform members to contribute their updates then we release. Make sure you follow the instructions closely.**\n\n");
         }
@@ -101,13 +101,13 @@ public class PreparePlatform implements StepHandler {
             comment.append("git push upstream " + platformReleaseBranch + "\n");
             comment.append("```\n\n");
             comment.append(
-                    "Once everything has been pushed to branch `" + platformReleaseBranch + "`, you can continue with the release by adding a `"
-                            + Command.CONTINUE.getFullCommand() + "` comment.\n\n");
+                    ":bulb: **Once everything has been pushed to branch `" + platformReleaseBranch + "`, you can continue with the release by adding a `"
+                            + Command.CONTINUE.getFullCommand() + "` comment.**\n\n");
         } else {
             comment.append("* Make sure you have merged [all the pull requests](https://github.com/quarkusio/quarkus-platform/pulls) that should be included in this version of the Platform\n\n");
             comment.append(
-                    "Once everything has been merged to branch `" + platformReleaseBranch + "`, you can continue with the release by adding a `"
-                            + Command.CONTINUE.getFullCommand() + "` comment.\n\n");
+                    ":bulb: **Once everything has been merged to branch `" + platformReleaseBranch + "`, you can continue with the release by adding a `"
+                            + Command.CONTINUE.getFullCommand() + "` comment.**\n\n");
         }
 
         if (releaseInformation.isDot0()) {
