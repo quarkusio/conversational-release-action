@@ -51,12 +51,12 @@ public class CreateBranch implements StepHandler {
             ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
 
         StringBuilder comment = new StringBuilder();
-        comment.append("**IMPORTANT** This is the first Candidate Release and this release requires special care.\n\n");
+        comment.append(":raised_hands: **IMPORTANT** This is the first Candidate Release and this release requires special care.\n\n");
         comment.append("You have two options:\n\n");
         comment.append("- Let the release process handle things automatically: it will create the branch automatically and handle additional housekeeping operations\n");
         comment.append("- Perform all the operations manually\n\n");
 
-        comment.append("**To let the release process handle things automatically for you, simply add a `" + Command.AUTO.getFullCommand() + "` comment**\n\n");
+        comment.append(":bulb: **To let the release process handle things automatically for you, simply add a `" + Command.AUTO.getFullCommand() + "` comment**\n\n");
 
         comment.append("---\n\n");
         comment.append("<details><summary>Handle things manually</summary>\n\n");

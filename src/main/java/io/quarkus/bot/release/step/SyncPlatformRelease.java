@@ -60,7 +60,7 @@ public class SyncPlatformRelease implements StepHandler {
 
             issue.getRepository().getWorkflow("monitor-artifact-publication.yml").dispatch(Branches.MAIN, inputs);
             comment.append("The publication of the Platform artifacts will take 20-40 minutes.\n\n"
-                    + "**We started a separate workflow to monitor the situation for you. It will automatically continue the release process once it detects the artifacts have been synced to Maven Central.**\n\n");
+                    + ":bulb: **We started a separate workflow to monitor the situation for you. It will automatically continue the release process once it detects the artifacts have been synced to Maven Central.**\n\n");
 
             comment.append("---\n\n");
             comment.append("<details><summary>If things go south</summary>\n\n");

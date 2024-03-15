@@ -32,7 +32,7 @@ public class ApproveCoreRelease implements StepHandler {
     @Override
     public boolean shouldPause(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         StringBuilder comment = new StringBuilder();
-        comment.append("We are going to release the following release:\n\n");
+        comment.append(":raised_hands: We are going to release the following release:\n\n");
         comment.append("- Quarkus `").append(releaseInformation.getVersion()).append("`\n");
         comment.append("- On branch `").append(releaseInformation.getBranch()).append("`\n");
         comment.append("- With Java `").append(jdks.getJdkVersion(releaseInformation.getBranch())).append("`\n");
@@ -51,7 +51,7 @@ public class ApproveCoreRelease implements StepHandler {
         }
 
         comment.append(
-                "\nPlease approve with a `" + Command.YES.getFullCommand() + "` comment if you want to continue with the release.\n");
+                "\n:bulb: Please approve with a `" + Command.YES.getFullCommand() + "` comment if you want to continue with the release.\n");
         comment.append("\nIf not, simply close this issue.\n\n");
         comment.append(Progress.youAreHere(releaseInformation, releaseStatus));
         commands.setOutput(Outputs.INTERACTION_COMMENT, comment.toString());
