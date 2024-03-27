@@ -14,13 +14,12 @@ import io.quarkiverse.githubaction.Context;
 import io.quarkus.arc.Unremovable;
 import io.quarkus.bot.release.ReleaseInformation;
 import io.quarkus.bot.release.ReleaseStatus;
-import io.quarkus.bot.release.util.Branches;
 import io.quarkus.bot.release.util.Processes;
 import io.quarkus.bot.release.util.UpdatedIssueBody;
 
 @Singleton
 @Unremovable
-public class UpdateQuickstartsAdditionalSyncLts implements StepHandler {
+public class UpdateQuickstartsAdditionalSyncVersionBranch implements StepHandler {
 
     @Inject
     Processes processes;
@@ -28,12 +27,13 @@ public class UpdateQuickstartsAdditionalSyncLts implements StepHandler {
     @Override
     public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
-        return processes.execute(List.of("./update-quickstarts-lts.sh", releaseInformation.getBranch()));
+        return processes.execute(List.of("./update-quickstarts-version-branch.sh", releaseInformation.getBranch()));
     }
 
     @Override
     public boolean shouldSkip(ReleaseInformation releaseInformation, ReleaseStatus releaseStatus) {
-        return !releaseInformation.isFinal() || !Branches.isLts(releaseInformation.getBranch())
-                || releaseInformation.isMaintenance();
+        // we don't push to the version branch when not final as it is updated in place
+        // we don't push to the version branch for maintenance branches as UpdateQuickstarts takes care of it already
+        return !releaseInformation.isFinal() || releaseInformation.isMaintenance();
     }
 }
