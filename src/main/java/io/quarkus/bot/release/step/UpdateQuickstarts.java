@@ -41,8 +41,9 @@ public class UpdateQuickstarts implements StepHandler {
             if (releaseInformation.isFirstFinal()) {
                 return processes.execute(List.of("./update-quickstarts.sh", Branches.MAIN, releaseInformation.getBranch()));
             } else {
-                // here we can have the standard behavior, it will take care of maintenance branch if needed
-                return processes.execute(List.of("./update-quickstarts.sh"));
+                String branch = releaseInformation.isMaintenance() ? releaseInformation.getBranch() : Branches.MAIN;
+
+                return processes.execute(List.of("./update-quickstarts.sh", branch, branch));
             }
         }
 
