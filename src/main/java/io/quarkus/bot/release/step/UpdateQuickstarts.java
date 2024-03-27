@@ -14,6 +14,7 @@ import io.quarkiverse.githubaction.Context;
 import io.quarkus.arc.Unremovable;
 import io.quarkus.bot.release.ReleaseInformation;
 import io.quarkus.bot.release.ReleaseStatus;
+import io.quarkus.bot.release.util.Branches;
 import io.quarkus.bot.release.util.Processes;
 import io.quarkus.bot.release.util.UpdatedIssueBody;
 
@@ -26,8 +27,27 @@ public class UpdateQuickstarts implements StepHandler {
 
     @Override
     public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
-            ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
-        return processes.execute(List.of("./update-quickstarts.sh"));
+            ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody)
+            throws IOException, InterruptedException {
+        if (releaseInformation.isCR()) {
+            if (releaseInformation.isFirstCR()) {
+                // first CR is specific, we want to create the branch and get the new developments from the development branch
+                return processes.execute(List.of("./update-quickstarts.sh", releaseInformation.getBranch(), "development"));
+            } else {
+                return processes.execute(
+                        List.of("./update-quickstarts.sh", releaseInformation.getBranch(), releaseInformation.getBranch()));
+            }
+        } else if (releaseInformation.isFinal()) {
+            if (releaseInformation.isFirstFinal()) {
+                return processes.execute(List.of("./update-quickstarts.sh", Branches.MAIN, releaseInformation.getBranch()));
+            } else {
+                // here we can have the standard behavior, it will take care of maintenance branch if needed
+                return processes.execute(List.of("./update-quickstarts.sh"));
+            }
+        }
+
+        throw new IllegalStateException(
+                "UpdateQuickstarts may only be executed for CR and Final versions but got: " + releaseInformation.getVersion());
     }
 
     @Override
@@ -41,5 +61,10 @@ public class UpdateQuickstarts implements StepHandler {
             return "For micro versions, we shouldn't have code updates in the Quickstarts.\n\n"
                     + "So, if you got the build failing, either something got wrongly merged in the `main` branch of https://github.com/quarkusio/quarkus-quickstarts/ or something in Quarkus broke the quickstarts.";
         }
+    }
+
+    @Override
+    public boolean shouldSkip(ReleaseInformation releaseInformation, ReleaseStatus releaseStatus) {
+        return !releaseInformation.isCR() && !releaseInformation.isFinal();
     }
 }

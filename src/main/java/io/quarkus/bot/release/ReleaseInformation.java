@@ -64,6 +64,11 @@ public class ReleaseInformation {
     }
 
     @JsonIgnore
+    public boolean isCR() {
+        return qualifier != null && qualifier.startsWith("CR");
+    }
+
+    @JsonIgnore
     public boolean isDot0() {
         if (version == null) {
             throw new IllegalStateException("Unable to know if the version is the .0 at this stage");
