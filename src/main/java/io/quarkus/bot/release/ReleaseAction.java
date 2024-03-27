@@ -232,8 +232,6 @@ public class ReleaseAction {
                 continue;
             }
 
-            commands.notice("Running step " + currentStep.getDescription());
-
             currentStepHandler = currentStep.getStepHandler();
 
             try {
@@ -266,6 +264,8 @@ public class ReleaseAction {
                         updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
                     }
                 }
+
+                commands.notice("Running step " + currentStep.getDescription());
 
                 int exitCode = currentStepHandler.run(context, commands, quarkusBotGitHub, releaseInformation, currentReleaseStatus, issue, updatedIssueBody);
                 handleExitCode(exitCode, currentStep);
