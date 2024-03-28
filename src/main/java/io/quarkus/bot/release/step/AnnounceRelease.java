@@ -84,9 +84,11 @@ public class AnnounceRelease implements StepHandler {
                     comment.append("The number of contributors can be found in the `Contributors` section of the [project home page](https://github.com/quarkusio/quarkus).\n");
                     comment.append(
                             "You can get a rough list of contributors (check for duplicates!) since the previous minor by executing the following commands in a Quarkus repository local clone:\n\n");
-                    comment.append("> git fetch upstream --tags\n");
-                    comment.append("> git shortlog -s '" + previousMinorBranch + ".0'..'" + releaseInformation.getVersion()
-                            + "' | cut -d$'\\t' -f 2 | grep -v dependabot | grep -v quarkusbot | sort -d -f -i | paste -sd ',' - | sed 's/,/, /g'\n\n");
+                    comment.append("```\n");
+                    comment.append("git fetch upstream --tags\n");
+                    comment.append("git shortlog -s '" + previousMinorBranch + ".0'..'" + releaseInformation.getVersion()
+                            + "' | cut -d$'\\t' -f 2 | grep -v dependabot | grep -v quarkusbot | sort -d -f -i | paste -sd ',' - | sed 's/,/, /g'\n");
+                    comment.append("```\n\n");
                 } catch (Exception e) {
                     LOG.warn("An error occurred while trying to get the previous minor. Ignoring.", e);
                 }
