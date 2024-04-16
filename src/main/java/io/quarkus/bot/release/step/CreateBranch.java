@@ -175,7 +175,12 @@ public class CreateBranch implements StepHandler {
         }
 
         try {
-            List<GHPullRequest> openedPullRequestsToBackport = repository.searchPullRequests().label(previousMinorBackportLabel).isOpen().list().toList();
+            // wait for 1 minute to let some time for GitHub to reindex the PRs
+            Thread.sleep(60_000L);
+
+            // look for both the old label and the new label to be extra sure
+            List<GHPullRequest> openedPullRequestsToBackport = repository.searchPullRequests()
+                    .inLabels(List.of(previousMinorBackportLabel, BACKPORT_LABEL)).isOpen().list().toList();
 
             for (GHPullRequest openedPullRequestToBackport : openedPullRequestsToBackport) {
                 openedPullRequestToBackport.addLabels(BACKPORT_LABEL);
