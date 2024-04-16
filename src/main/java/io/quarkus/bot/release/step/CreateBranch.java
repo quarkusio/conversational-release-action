@@ -59,7 +59,7 @@ public class CreateBranch implements StepHandler {
         comment.append(":bulb: **To let the release process handle things automatically for you, simply add a `" + Command.AUTO.getFullCommand() + "` comment**\n\n");
 
         comment.append("---\n\n");
-        comment.append("<details><summary>Handle things manually</summary>\n\n");
+        comment.append("<details><summary>How to perform the operations manually?</summary>\n\n");
         comment.append("If you choose to do things manually, make sure you perform all the following tasks:\n\n");
         comment.append(
                 "- Create the `" + releaseInformation.getBranch() + "` branch and push it to the upstream repository\n");
@@ -193,6 +193,8 @@ public class CreateBranch implements StepHandler {
         comment += "**(Make sure to adjust the version in the email if you renamed the milestone)**\n\n";
         comment += getBranchEmail(releaseInformation, previousMinorBranch, nextMinor) + "\n\n";
         comment += ":bulb: **Apart from sending the email and posting on Zulip, no intervention from you is needed, the release process is in progress.**\n\n";
+        comment += "The next steps take approximately 2 hours and 30 minutes so don't panic if it takes time.\n";
+        comment += "You will receive feedback in this very issue when further input is needed or if an error occurs.\n\n";
         comment += Progress.youAreHere(releaseInformation, releaseStatus);
 
         issue.comment(comment);
