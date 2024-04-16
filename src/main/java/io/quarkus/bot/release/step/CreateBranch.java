@@ -25,6 +25,7 @@ import io.quarkus.bot.release.ReleaseInformation;
 import io.quarkus.bot.release.ReleaseStatus;
 import io.quarkus.bot.release.util.Branches;
 import io.quarkus.bot.release.util.Command;
+import io.quarkus.bot.release.util.Labels;
 import io.quarkus.bot.release.util.Outputs;
 import io.quarkus.bot.release.util.Progress;
 import io.quarkus.bot.release.util.Repositories;
@@ -37,8 +38,6 @@ public class CreateBranch implements StepHandler {
 
     private static final Logger LOG = Logger.getLogger(CreateBranch.class);
 
-    private static final String BACKPORT_LABEL = "triage/backport";
-    private static final String BACKPORT_LABEL_COLOR = "7fe8cd";
     private static final String MAIN_MILESTONE_SUFFIX = " - main";
 
     @Override
@@ -67,13 +66,12 @@ public class CreateBranch implements StepHandler {
                 + " - main` milestone [here](https://github.com/quarkusio/quarkus/milestones) to " + releaseInformation.getVersion() + "\n");
         comment.append(
                 "- Create a new milestone `X.Y - main` milestone [here](https://github.com/quarkusio/quarkus/milestones/new) with `X.Y` being the next major/minor version name. Make sure you follow the naming convention, it is important.\n");
-        comment.append("- Rename the `triage/backport` label to `triage/backport-" + releaseInformation.getBranch() + "`\n");
-        comment.append("- Create a new `triage/backport` label\n");
-        comment.append("- Make sure [all the current opened pull requests with the `triage/backport-"
-                + releaseInformation.getBranch()
-                + "` label](https://github.com/quarkusio/quarkus/pulls?q=is%3Apr+is%3Aopen+label%3Atriage%2Fbackport-"
-                + releaseInformation.getBranch()
-                + "%3F+) also have the new `triage/backport` label (in the UI, you can select all the pull requests with the top checkbox then use the `Label` dropdown to apply the `triage/backport` label)\n");
+        comment.append("- Rename the `" + Labels.BACKPORT_LABEL + "` label to `" + Labels.forVersion(releaseInformation.getBranch()) + "`\n");
+        comment.append("- Create a new `" + Labels.BACKPORT_LABEL + "` label\n");
+        comment.append("- Make sure [all the current opened pull requests with the `" + Labels.forVersion(releaseInformation.getBranch())
+                + "` label](https://github.com/quarkusio/quarkus/pulls?q=is%3Apr+is%3Aopen+label%3A"
+                + Labels.forVersion(releaseInformation.getBranch()).replace("/", "%2F")
+                + "+) also have the new `" + Labels.BACKPORT_LABEL + "` label (in the UI, you can select all the pull requests with the top checkbox then use the `Label` dropdown to apply the `" + Labels.BACKPORT_LABEL + "` label)\n");
         comment.append("- Send an email to [quarkus-dev@googlegroups.com](mailto:quarkus-dev@googlegroups.com) announcing that `" + releaseInformation.getBranch() + "` has been branched and post on [Zulip #dev stream](https://quarkusio.zulipchat.com/#narrow/stream/187038-dev/):\n\n");
 
         String previousMinorBranch;
@@ -152,23 +150,23 @@ public class CreateBranch implements StepHandler {
         } catch (Exception e) {
             throw new IllegalStateException("Unable to resolve previous minor branch: " + e.getMessage(), e);
         }
-        String previousMinorBackportLabel = "triage/backport-" + previousMinorBranch;
+        String previousMinorBackportLabel = Labels.forVersion(previousMinorBranch);
 
         try {
             repository.getLabel(previousMinorBackportLabel);
         } catch (Exception e) {
             try {
-                repository.getLabel(BACKPORT_LABEL).update().name(previousMinorBackportLabel).done();
+                repository.getLabel(Labels.BACKPORT_LABEL).update().name(previousMinorBackportLabel).done();
             } catch (Exception e2) {
                 throw new IllegalStateException("Unable to rename backport label: " + e2.getMessage(), e2);
             }
         }
 
         try {
-            repository.getLabel(BACKPORT_LABEL);
+            repository.getLabel(Labels.BACKPORT_LABEL);
         } catch (Exception e) {
             try {
-                repository.createLabel(BACKPORT_LABEL, BACKPORT_LABEL_COLOR);
+                repository.createLabel(Labels.BACKPORT_LABEL, Labels.BACKPORT_LABEL_COLOR);
             } catch (Exception e2) {
                 throw new IllegalStateException("Unable to create new backport label: " + e2.getMessage(), e2);
             }
@@ -180,10 +178,10 @@ public class CreateBranch implements StepHandler {
 
             // look for both the old label and the new label to be extra sure
             List<GHPullRequest> openedPullRequestsToBackport = repository.searchPullRequests()
-                    .inLabels(List.of(previousMinorBackportLabel, BACKPORT_LABEL)).isOpen().list().toList();
+                    .inLabels(List.of(previousMinorBackportLabel, Labels.BACKPORT_LABEL)).isOpen().list().toList();
 
             for (GHPullRequest openedPullRequestToBackport : openedPullRequestsToBackport) {
-                openedPullRequestToBackport.addLabels(BACKPORT_LABEL);
+                openedPullRequestToBackport.addLabels(Labels.BACKPORT_LABEL);
             }
         } catch (Exception e) {
             throw new IllegalStateException("Unable to affect pull requests to the new backport label: " + e.getMessage(), e);
@@ -249,10 +247,10 @@ public class CreateBranch implements StepHandler {
                 + "\n"
                 + "Please make sure you add the appropriate backport labels from now on:\n"
                 + "\n"
-                + "- for anything required in " + releaseInformation.getBranch() + " (currently open pull requests included), please add the triage/backport label\n";
+                + "- for anything required in " + releaseInformation.getBranch() + " (currently open pull requests included), please add the " + Labels.BACKPORT_LABEL + " label\n";
 
         if (!Branches.LTS_BRANCHES.contains(previousMinorBranch)) {
-            email += "- for fixes we also want in future " + previousMinorBranch + ", please add the triage/backport-" + previousMinorBranch + " label\n";
+            email += "- for fixes we also want in future " + previousMinorBranch + ", please add the " + Labels.forVersion(previousMinorBranch) + " label\n";
         }
 
         for (String ltsBranch : Branches.LTS_BRANCHES) {
@@ -262,7 +260,7 @@ public class CreateBranch implements StepHandler {
 
             // 2.13 is not an official LTS so we have to special case it
             email += "- for fixes we also want in future " + ltsBranch
-                    + (Branches.BRANCH_2_13.equals(ltsBranch) ? "" : " LTS") + ", please add the triage/backport-" + ltsBranch
+                    + (Branches.BRANCH_2_13.equals(ltsBranch) ? "" : " LTS") + ", please add the " + Labels.forVersion(ltsBranch)
                     + " label\n";
         }
 
