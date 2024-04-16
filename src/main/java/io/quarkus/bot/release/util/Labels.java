@@ -8,7 +8,7 @@ public final class Labels {
     private Labels() {
     }
 
-    public static String forVersion(String branch) {
+    public static String backportForVersion(String branch) {
         return BACKPORT_LABEL + "-" + branch;
     }
 }

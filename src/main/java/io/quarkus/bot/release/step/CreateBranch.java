@@ -66,11 +66,11 @@ public class CreateBranch implements StepHandler {
                 + " - main` milestone [here](https://github.com/quarkusio/quarkus/milestones) to " + releaseInformation.getVersion() + "\n");
         comment.append(
                 "- Create a new milestone `X.Y - main` milestone [here](https://github.com/quarkusio/quarkus/milestones/new) with `X.Y` being the next major/minor version name. Make sure you follow the naming convention, it is important.\n");
-        comment.append("- Rename the `" + Labels.BACKPORT_LABEL + "` label to `" + Labels.forVersion(releaseInformation.getBranch()) + "`\n");
+        comment.append("- Rename the `" + Labels.BACKPORT_LABEL + "` label to `" + Labels.backportForVersion(releaseInformation.getBranch()) + "`\n");
         comment.append("- Create a new `" + Labels.BACKPORT_LABEL + "` label\n");
-        comment.append("- Make sure [all the current opened pull requests with the `" + Labels.forVersion(releaseInformation.getBranch())
+        comment.append("- Make sure [all the current opened pull requests with the `" + Labels.backportForVersion(releaseInformation.getBranch())
                 + "` label](https://github.com/quarkusio/quarkus/pulls?q=is%3Apr+is%3Aopen+label%3A"
-                + Labels.forVersion(releaseInformation.getBranch()).replace("/", "%2F")
+                + Labels.backportForVersion(releaseInformation.getBranch()).replace("/", "%2F")
                 + "+) also have the new `" + Labels.BACKPORT_LABEL + "` label (in the UI, you can select all the pull requests with the top checkbox then use the `Label` dropdown to apply the `" + Labels.BACKPORT_LABEL + "` label)\n");
         comment.append("- Send an email to [quarkus-dev@googlegroups.com](mailto:quarkus-dev@googlegroups.com) announcing that `" + releaseInformation.getBranch() + "` has been branched and post on [Zulip #dev stream](https://quarkusio.zulipchat.com/#narrow/stream/187038-dev/):\n\n");
 
@@ -150,7 +150,7 @@ public class CreateBranch implements StepHandler {
         } catch (Exception e) {
             throw new IllegalStateException("Unable to resolve previous minor branch: " + e.getMessage(), e);
         }
-        String previousMinorBackportLabel = Labels.forVersion(previousMinorBranch);
+        String previousMinorBackportLabel = Labels.backportForVersion(previousMinorBranch);
 
         try {
             repository.getLabel(previousMinorBackportLabel);
@@ -250,7 +250,7 @@ public class CreateBranch implements StepHandler {
                 + "- for anything required in " + releaseInformation.getBranch() + " (currently open pull requests included), please add the " + Labels.BACKPORT_LABEL + " label\n";
 
         if (!Branches.LTS_BRANCHES.contains(previousMinorBranch)) {
-            email += "- for fixes we also want in future " + previousMinorBranch + ", please add the " + Labels.forVersion(previousMinorBranch) + " label\n";
+            email += "- for fixes we also want in future " + previousMinorBranch + ", please add the " + Labels.backportForVersion(previousMinorBranch) + " label\n";
         }
 
         for (String ltsBranch : Branches.LTS_BRANCHES) {
@@ -260,7 +260,7 @@ public class CreateBranch implements StepHandler {
 
             // 2.13 is not an official LTS so we have to special case it
             email += "- for fixes we also want in future " + ltsBranch
-                    + (Branches.BRANCH_2_13.equals(ltsBranch) ? "" : " LTS") + ", please add the " + Labels.forVersion(ltsBranch)
+                    + (Branches.BRANCH_2_13.equals(ltsBranch) ? "" : " LTS") + ", please add the " + Labels.backportForVersion(ltsBranch)
                     + " label\n";
         }
 

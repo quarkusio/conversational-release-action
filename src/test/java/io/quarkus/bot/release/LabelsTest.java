@@ -10,8 +10,8 @@ public class LabelsTest {
 
     @Test
     void testForVersion() {
-        assertThat(Labels.forVersion("3.8")).isEqualTo("triage/backport-3.8");
-        assertThat(Labels.forVersion("3.10")).isEqualTo("triage/backport-3.10");
-        assertThat(Labels.forVersion("3.8").replace("/", "%2F")).isEqualTo("triage%2Fbackport-3.8");
+        assertThat(Labels.backportForVersion("3.8")).isEqualTo("triage/backport-3.8");
+        assertThat(Labels.backportForVersion("3.10")).isEqualTo("triage/backport-3.10");
+        assertThat(Labels.backportForVersion("3.8").replace("/", "%2F")).isEqualTo("triage%2Fbackport-3.8");
     }
 }
