@@ -7,7 +7,7 @@ public enum Step {
 
     PREREQUISITES("Prerequisites", Prerequisites.class, false, false),
     APPROVE_CORE_RELEASE("Approve the core release", ApproveCoreRelease.class, true, false),
-    CREATE_BRANCH("Create branch (if needed)", CreateBranch.class, true, false),
+    CREATE_BRANCH("Create branch", CreateBranch.class, true, false),
     CORE_RELEASE_PREPARE("Prepare the core release", CoreReleasePrepare.class, true, false),
     CORE_RELEASE_PERFORM("Perform the core release", CoreReleasePerform.class, true, false),
     SYNC_CORE_RELEASE_TO_MAVEN_CENTRAL("Sync core release to Maven Central", SyncCoreRelease.class, true, false),
