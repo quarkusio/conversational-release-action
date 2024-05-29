@@ -140,7 +140,7 @@ public class PreparePlatform implements StepHandler {
     @Override
     public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
-        issue.comment(":white_check_mark: The Platform branch `" + Branches.getPlatformPreparationBranch(releaseInformation)
+        issue.comment(":white_check_mark: The Platform branch `" + Branches.getPlatformReleaseBranch(releaseInformation)
                 + "` is ready to be released, continuing...");
         return 0;
     }
