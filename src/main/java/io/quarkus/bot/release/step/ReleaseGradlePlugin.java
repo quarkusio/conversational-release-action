@@ -30,4 +30,9 @@ public class ReleaseGradlePlugin implements StepHandler {
         return processes.execute(List.of("./release-gradle-plugin.sh"));
     }
 
+    @Override
+    public String getErrorHelp(ReleaseInformation releaseInformation) {
+        return "The problem might be that not all the artifacts have been synced to Maven Central.";
+    }
+
 }
