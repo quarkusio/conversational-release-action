@@ -51,8 +51,8 @@ public class SyncCoreRelease implements StepHandler {
                     + "* Wait some more if it still returns a 404.\n\n"
                     + "Once the artifact is available, wait for an additional 20 minutes then you can continue with the release by adding a `"
                     + Command.CONTINUE.getFullCommand() + "` comment.");
-            inputs.put(MonitorArtifactPublicationInputKeys.INITIAL_DELAY, "20");
-            inputs.put(MonitorArtifactPublicationInputKeys.POLL_ITERATIONS, "7");
+            inputs.put(MonitorArtifactPublicationInputKeys.INITIAL_DELAY, "30");
+            inputs.put(MonitorArtifactPublicationInputKeys.POLL_ITERATIONS, "5");
             inputs.put(MonitorArtifactPublicationInputKeys.POLL_DELAY, "10");
             inputs.put(MonitorArtifactPublicationInputKeys.POST_DELAY, "20");
 

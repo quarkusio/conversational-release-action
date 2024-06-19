@@ -53,8 +53,8 @@ public class SyncPlatformRelease implements StepHandler {
                     + "* Wait some more if it still returns a 404.\n"
                     + "Once the artifact is available, wait for an additional 10 minutes then you can continue with the release by adding a `"
                     + Command.CONTINUE.getFullCommand() + "` comment.");
-            inputs.put(MonitorArtifactPublicationInputKeys.INITIAL_DELAY, "10");
-            inputs.put(MonitorArtifactPublicationInputKeys.POLL_ITERATIONS, "6");
+            inputs.put(MonitorArtifactPublicationInputKeys.INITIAL_DELAY, "20");
+            inputs.put(MonitorArtifactPublicationInputKeys.POLL_ITERATIONS, "5");
             inputs.put(MonitorArtifactPublicationInputKeys.POLL_DELAY, "10");
             inputs.put(MonitorArtifactPublicationInputKeys.POST_DELAY, "10");
 
