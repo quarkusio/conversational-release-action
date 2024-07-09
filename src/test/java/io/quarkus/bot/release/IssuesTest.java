@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import io.quarkus.bot.release.step.Step;
 import io.quarkus.bot.release.step.StepStatus;
+import io.quarkus.bot.release.util.Branches;
 import io.quarkus.bot.release.util.Issues;
 import io.quarkus.bot.release.util.UpdatedIssueBody;
 import io.quarkus.test.junit.QuarkusTest;
@@ -26,6 +27,10 @@ public class IssuesTest {
 
             3.6
 
+            ### Origin branch
+
+            _No response_
+
             ### Qualifier
 
             _No response_
@@ -35,12 +40,16 @@ public class IssuesTest {
             - [ ] This release is a major version.
             """;
 
-        assertThat(issues.extractReleaseInformationFromForm(description)).isEqualTo(new ReleaseInformation(null, "3.6", null, false, false, false));
+        assertThat(issues.extractReleaseInformationFromForm(description)).isEqualTo(new ReleaseInformation(null, "3.6", Branches.MAIN, null, false, false, false));
 
         description = """
                 ### Branch
 
                 main
+
+                ### Origin branch
+
+                3.14
 
                 ### Qualifier
 
@@ -51,20 +60,21 @@ public class IssuesTest {
                 - [X] This release is a major version.
                 """;
 
-        assertThat(issues.extractReleaseInformationFromForm(description)).isEqualTo(new ReleaseInformation(null, "main", "CR1", true, false, false));
+        assertThat(issues.extractReleaseInformationFromForm(description)).isEqualTo(new ReleaseInformation(null, "main", "3.14", "CR1", true, false, false));
 
         assertThrows(IllegalStateException.class, () -> issues.extractReleaseInformationFromForm("foobar"));
     }
 
     @Test
     void testAppendReleaseInformation() {
-        assertThat(issues.appendReleaseInformation(new UpdatedIssueBody(""), new ReleaseInformation(null, "3.6", null, false, false, false))).isEqualTo("""
+        assertThat(issues.appendReleaseInformation(new UpdatedIssueBody(""), new ReleaseInformation(null, "3.6", Branches.MAIN, null, false, false, false))).isEqualTo("""
 
 
                 <!-- quarkus-release/release-information:
                 ---
                 version: null
                 branch: "3.6"
+                originBranch: "main"
                 qualifier: null
                 major: false
                 firstFinal: false
@@ -77,17 +87,19 @@ public class IssuesTest {
                 <!-- quarkus-release/release-information:
                 ---
                 branch: "3.6"
+                originBranch: "main"
                 qualifier: null
                 major: false
                 firstFinal: false
                 maintenance: false
-                -->"""), new ReleaseInformation("3.7.1", "3.7", "CR1", true, false, false))).isEqualTo("""
+                -->"""), new ReleaseInformation("3.7.1", "3.7", Branches.MAIN, "CR1", true, false, false))).isEqualTo("""
                         This is a comment.
 
                         <!-- quarkus-release/release-information:
                         ---
                         version: "3.7.1"
                         branch: "3.7"
+                        originBranch: "main"
                         qualifier: "CR1"
                         major: true
                         firstFinal: false
@@ -104,6 +116,7 @@ public class IssuesTest {
                 ---
                 version: null
                 branch: "4.0"
+                originBranch: "main"
                 qualifier: CR1
                 major: true
                 firstFinal: true
@@ -115,7 +128,7 @@ public class IssuesTest {
                 currentStep: "APPROVE_RELEASE"
                 currentStepStatus: "STARTED"
                 workflowRunId: 123
-                -->"""))).isEqualTo(new ReleaseInformation(null, "4.0", "CR1", true, true, true));
+                -->"""))).isEqualTo(new ReleaseInformation(null, "4.0", Branches.MAIN, "CR1", true, true, true));
 
         assertThat(issues.extractReleaseInformation(new UpdatedIssueBody("""
                 This is a comment.
@@ -124,6 +137,7 @@ public class IssuesTest {
                 ---
                 version: "4.0.0.CR1"
                 branch: "4.0"
+                originBranch: "3.99"
                 qualifier: CR1
                 major: true
                 firstFinal: false
@@ -135,7 +149,7 @@ public class IssuesTest {
                 currentStep: "APPROVE_RELEASE"
                 currentStepStatus: "STARTED"
                 workflowRunId: 123
-                -->"""))).isEqualTo(new ReleaseInformation("4.0.0.CR1", "4.0", "CR1", true, false, false));
+                -->"""))).isEqualTo(new ReleaseInformation("4.0.0.CR1", "4.0", "3.99", "CR1", true, false, false));
     }
 
     @Test

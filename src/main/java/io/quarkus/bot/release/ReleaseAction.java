@@ -24,11 +24,13 @@ import io.quarkus.bot.release.error.StepExecutionException;
 import io.quarkus.bot.release.step.Step;
 import io.quarkus.bot.release.step.StepHandler;
 import io.quarkus.bot.release.step.StepStatus;
+import io.quarkus.bot.release.util.Admonitions;
 import io.quarkus.bot.release.util.Command;
 import io.quarkus.bot.release.util.Issues;
 import io.quarkus.bot.release.util.Outputs;
 import io.quarkus.bot.release.util.Processes;
 import io.quarkus.bot.release.util.Progress;
+import io.quarkus.bot.release.util.Strings;
 import io.quarkus.bot.release.util.UpdatedIssueBody;
 import io.quarkus.bot.release.util.Users;
 
@@ -277,13 +279,20 @@ public class ReleaseAction {
                         e.getMessage());
                 throw e;
             } catch (Exception e) {
-                if (currentStep.isRecoverable()) {
+                String errorHelp;
+                if (e instanceof StepExecutionException && !Strings.isBlank(((StepExecutionException) e).getContextualTip())) {
+                    errorHelp = ((StepExecutionException) e).getContextualTip();
+                } else {
+                    errorHelp = currentStepHandler.getErrorHelp(releaseInformation);
+                }
+
+                if (currentStep.isRecoverable() && !isFatal(e)) {
                     progressError(context, commands, releaseInformation, currentReleaseStatus, issue, updatedIssueBody,
-                            e.getMessage(), currentStepHandler.getErrorHelp(releaseInformation));
+                            e.getMessage(), errorHelp);
                     throw e;
                 } else {
                     fatalError(context, commands, releaseInformation, currentReleaseStatus, issue, updatedIssueBody,
-                            e.getMessage(), currentStepHandler.getErrorHelp(releaseInformation));
+                            e.getMessage(), errorHelp);
                     throw e;
                 }
             }
@@ -341,8 +350,8 @@ public class ReleaseAction {
 
             StepHandler stepHandler = currentStep.getStepHandler();
             String continueFromStepHelp = stepHandler.getContinueFromStepHelp(releaseInformation);
-            if (continueFromStepHelp != null && !continueFromStepHelp.isBlank()) {
-                comment.append(":bulb: ").append(continueFromStepHelp).append("\n\n");
+            if (!Strings.isBlank(continueFromStepHelp)) {
+                comment.append(Admonitions.tip(continueFromStepHelp)).append("\n\n");
             }
 
             comment.append(Progress.youAreHere(releaseInformation, releaseStatus));
@@ -372,15 +381,24 @@ public class ReleaseAction {
         try {
             retry(3, () -> issue.setBody(issues.appendReleaseStatus(updatedIssueBody, updatedReleaseStatus)));
 
-            commands.setOutput(Outputs.INTERACTION_COMMENT, ":rotating_light: " + error
-                    + (errorHelp != null && !errorHelp.isBlank() ? "\n\n:bulb: " + errorHelp : "")
-                    + "\n\nYou can find more information about the failure [here](" + getWorkflowRunUrl(context) + ").\n\n"
-                    + "This is not a fatal error, you can retry by adding a `" + Command.RETRY.getFullCommand() + "` comment.\n\n"
-                    + Progress.youAreHere(releaseInformation, currentReleaseStatus));
+            StringBuilder interactionComment = new StringBuilder();
+            interactionComment.append(Admonitions.caution(error)).append("\n\n");
+            if (!Strings.isBlank(errorHelp)) {
+                interactionComment.append(Admonitions.tip(errorHelp)).append("\n\n");
+            }
+            interactionComment.append("You can find more information about the failure in the [workflow run logs](").append(getWorkflowRunUrl(context)).append(").\n\n");
+            interactionComment.append(Admonitions.important("This is not a fatal error, you can retry by adding a `" + Command.RETRY.getFullCommand() + "` comment.")).append("\n\n");
+            interactionComment.append(Progress.youAreHere(releaseInformation, currentReleaseStatus));
+
+            commands.setOutput(Outputs.INTERACTION_COMMENT, interactionComment.toString());
         } catch (Exception e) {
-            commands.setOutput(Outputs.INTERACTION_COMMENT, ":rotating_light: We were unable to report the error to the issue status.\n\n"
-                    + "The issue is in an inconsistent state, better ping @gsmet to figure out how to continue with the process.\n\n"
-                    + Progress.youAreHere(releaseInformation, updatedReleaseStatus));
+            StringBuilder interactionComment = new StringBuilder();
+            interactionComment.append(Admonitions.caution("We were unable to report the error to the issue status.\n\n" +
+                    "The issue is in an inconsistent state, better ping @gsmet to figure out how to continue with the process."));
+            interactionComment.append("\n\n");
+            interactionComment.append(Progress.youAreHere(releaseInformation, updatedReleaseStatus));
+
+            commands.setOutput(Outputs.INTERACTION_COMMENT, interactionComment.toString());
 
             throw new IllegalStateException("Unable to update the status or add progress error comment: " + error, e);
         }
@@ -397,18 +415,26 @@ public class ReleaseAction {
 
         try {
             retry(3, () -> issue.setBody(issues.appendReleaseStatus(updatedIssueBody, updatedReleaseStatus)));
-            retry(3, () -> issue.comment(":rotating_light: " + error
-                    + (errorHelp != null && !errorHelp.isBlank() ? "\n\n" + errorHelp : "")
-                    + "\n\nYou can find more information about the failure [here]("
-                    + getWorkflowRunUrl(context) + ").\n\n"
-                    + "This is a fatal error, the issue will be closed.\n\n"
-                    + Progress.youAreHere(releaseInformation, releaseStatus)));
+            retry(3, () -> {
+                StringBuilder issueComment = new StringBuilder();
+                issueComment.append(Admonitions.caution(error)).append("\n\n");
+                if (!errorHelp.isBlank()) {
+                    issueComment.append(Admonitions.tip(errorHelp)).append("\n\n");
+                }
+                issueComment.append("You can find more information about the failure in the [workflow run logs](").append(getWorkflowRunUrl(context)).append(").\n\n");
+                issueComment.append(Progress.youAreHere(releaseInformation, releaseStatus));
+
+                issue.comment(issueComment.toString());
+            });
             retry(3, () -> issue.close());
         } catch (Exception e) {
-            commands.setOutput(Outputs.INTERACTION_COMMENT,
-                    ":rotating_light: We were unable to report the fatal error to the issue status.\n\n"
-                            + "The issue should be closed and no further interaction should be made with this issue.\n\n"
-                            + Progress.youAreHere(releaseInformation, updatedReleaseStatus));
+            StringBuilder interactionComment = new StringBuilder();
+            interactionComment.append(Admonitions.caution("We were unable to report the fatal error to the issue status.\n\n" +
+                    "The issue should be closed and no further interaction should be made with this issue")).append("\n\n");
+            interactionComment.append("You can find more information about the failure in the [workflow run logs](").append(getWorkflowRunUrl(context)).append(").\n\n");
+            interactionComment.append(Progress.youAreHere(releaseInformation, updatedReleaseStatus));
+
+            commands.setOutput(Outputs.INTERACTION_COMMENT, interactionComment.toString());
 
             throw new RuntimeException(
                     "Unable to add fatal error comment or close the issue: " + error + " (because of " + e.getMessage() + ")",
@@ -443,6 +469,14 @@ public class ReleaseAction {
                 }
             }
         }
+    }
+
+    private static boolean isFatal(Exception e) {
+        if (!(e instanceof StepExecutionException)) {
+            return false;
+        }
+
+        return ((StepExecutionException) e).isFatal();
     }
 
     @FunctionalInterface

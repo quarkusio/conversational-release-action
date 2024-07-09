@@ -17,6 +17,8 @@ import io.quarkiverse.githubaction.Context;
 import io.quarkus.arc.Unremovable;
 import io.quarkus.bot.release.ReleaseInformation;
 import io.quarkus.bot.release.ReleaseStatus;
+import io.quarkus.bot.release.error.StepExecutionException;
+import io.quarkus.bot.release.util.Branches;
 import io.quarkus.bot.release.util.Issues;
 import io.quarkus.bot.release.util.Processes;
 import io.quarkus.bot.release.util.Repositories;
@@ -39,6 +41,7 @@ public class Prerequisites implements StepHandler {
         List<String> command = new ArrayList<String>();
         command.add("./prerequisites.java");
         command.add("--branch=" + releaseInformation.getBranch());
+        command.add("--origin-branch=" + releaseInformation.getOriginBranch());
         if (releaseInformation.getQualifier() != null) {
             command.add("--qualifier=" + releaseInformation.getQualifier());
         }
@@ -61,6 +64,16 @@ public class Prerequisites implements StepHandler {
         releaseInformation.setVersion(version, firstFinal, maintenance);
 
         issues.appendReleaseInformation(updatedIssueBody, releaseInformation);
+
+        // for the first CR of an LTS branch, we need the origin branch to be not be main
+        if (releaseInformation.isFirstCR() && Branches.isLts(releaseInformation.getBranch())) {
+            if (releaseInformation.isOriginBranchMain()) {
+                throw new StepExecutionException("Origin branch is set to `main` for the CR1 of a LTS release.", true,
+                        "For the first CR of a LTS branch, we need the origin branch to be the branch of the previous minor as the LTS should be a direct continuation of the previous minor.");
+            }
+        } else if (!releaseInformation.isOriginBranchMain()) {
+            throw new StepExecutionException("Origin branch may only be set when releasing the CR1 of a LTS release.", true);
+        }
 
         return exitCode;
     }

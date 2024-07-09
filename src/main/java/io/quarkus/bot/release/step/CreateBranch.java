@@ -23,6 +23,7 @@ import io.quarkiverse.githubaction.Context;
 import io.quarkus.arc.Unremovable;
 import io.quarkus.bot.release.ReleaseInformation;
 import io.quarkus.bot.release.ReleaseStatus;
+import io.quarkus.bot.release.util.Admonitions;
 import io.quarkus.bot.release.util.Branches;
 import io.quarkus.bot.release.util.Command;
 import io.quarkus.bot.release.util.Labels;
@@ -50,12 +51,14 @@ public class CreateBranch implements StepHandler {
             ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
 
         StringBuilder comment = new StringBuilder();
-        comment.append(":raised_hands: **IMPORTANT** This is the first Candidate Release and this release requires special care.\n\n");
-        comment.append("You have two options:\n\n");
-        comment.append("- Let the release process handle things automatically: it will create the branch automatically and handle additional housekeeping operations\n");
+        comment.append(Admonitions.warning("**IMPORTANT** This is the first Candidate Release and this release requires special care.") + "\n\n");
+        comment.append(":raised_hands: You have two options:\n\n");
+        comment.append("- Let the release process handle things automatically: it will create the branch automatically from **`"
+                + releaseInformation.getOriginBranch() + "`** and handle additional housekeeping operations\n");
         comment.append("- Perform all the operations manually\n\n");
 
-        comment.append(":bulb: **To let the release process handle things automatically for you, simply add a `" + Command.AUTO.getFullCommand() + "` comment**\n\n");
+        comment.append(Admonitions.important("**To let the release process handle things automatically for you, simply add a `" + Command.AUTO.getFullCommand() + "` comment**"));
+        comment.append("\n\n");
 
         comment.append("---\n\n");
         comment.append("<details><summary>How to perform the operations manually?</summary>\n\n");
@@ -114,11 +117,13 @@ public class CreateBranch implements StepHandler {
         } catch (Exception e) {
             // the branch does not exist, let's create it
             try {
-                String sha = repository.getBranch(Branches.MAIN).getSHA1();
+                String sha = repository.getBranch(releaseInformation.getOriginBranch()).getSHA1();
                 repository.createRef("refs/heads/" + releaseInformation.getBranch(), sha);
             } catch (Exception e2) {
                 throw new IllegalStateException(
-                        "Unable to create branch " + releaseInformation.getBranch() + ": " + e2.getMessage(), e2);
+                        "Unable to create branch " + releaseInformation.getBranch() + " from "
+                                + releaseInformation.getOriginBranch() + ": " + e2.getMessage(),
+                        e2);
             }
         }
 
@@ -189,15 +194,19 @@ public class CreateBranch implements StepHandler {
 
         String comment = ":white_check_mark: Branch " + releaseInformation.getBranch()
                 + " has been created and the milestone and backport labels adjusted.\n\n";
-        comment += "We created a new " + nextMinor
-                + " milestone for future developments, make sure to [adjust the name of the milestone](https://github.com/quarkusio/quarkus/milestones) if needed as the name has simply been inferred from the current release\n\n";
-        comment += "Please announce that we branched " + releaseInformation.getBranch()
-                + " by sending an email to [quarkus-dev@googlegroups.com](mailto:quarkus-dev@googlegroups.com) and posting on [Zulip #dev stream](https://quarkusio.zulipchat.com/#narrow/stream/187038-dev/):\n\n";
-        comment += "**(Make sure to adjust the version in the email if you renamed the milestone)**\n\n";
-        comment += getBranchEmail(releaseInformation, previousMinorBranch, nextMinor) + "\n\n";
-        comment += ":bulb: **Apart from sending the email and posting on Zulip, no intervention from you is needed, the release process is in progress.**\n\n";
-        comment += "The next steps take approximately 2 hours and 30 minutes so don't panic if it takes time.\n";
-        comment += "You will receive feedback in this very issue when further input is needed or if an error occurs.\n\n";
+        comment += "We created a new `" + nextMinor + " - main`"
+                + " milestone for future developments.\n\n";
+        comment += "Make sure to [adjust the name of the milestone](https://github.com/quarkusio/quarkus/milestones) if needed as the name has simply been inferred from the current release.\n\n";
+        comment += Admonitions.important("Please announce that we branched " + releaseInformation.getBranch()
+                + " by sending an email to [quarkus-dev@googlegroups.com](mailto:quarkus-dev@googlegroups.com) and posting on [Zulip #dev stream](https://quarkusio.zulipchat.com/#narrow/stream/187038-dev/):\n\n"
+                + "**(Make sure to adjust the version in the email if you renamed the milestone)**\n\n"
+                + getBranchEmail(releaseInformation, previousMinorBranch, nextMinor)) + "\n\n";
+        comment += Admonitions.tip(
+                "**Apart from sending the email and posting on Zulip, no intervention from you is needed, the release process is in progress.**\n\n"
+                        +
+                        "The next steps take approximately 2 hours and 30 minutes so don't panic if it takes time.\n" +
+                        "You will receive feedback in this very issue when further input is needed or if an error occurs.")
+                + "\n\n";
         comment += Progress.youAreHere(releaseInformation, releaseStatus);
 
         issue.comment(comment);
@@ -220,7 +229,14 @@ public class CreateBranch implements StepHandler {
             throw new IllegalStateException("CR1 releases should be made from a versioned branch and not from main");
         }
 
-        return segments[0] + "." + (Integer.parseInt(segments[1]) + 1);
+        String nextMinor = segments[0] + "." + (Integer.parseInt(segments[1]) + 1);
+
+        // if the nextMinor is an LTS version, we will skip it for the main branch, thus we increment by 2
+        if (Branches.isLts(nextMinor)) {
+            return segments[0] + "." + (Integer.parseInt(segments[1]) + 2);
+        }
+
+        return nextMinor;
     }
 
     private static Optional<GHMilestone> getMilestone(GHRepository repository, String name) {

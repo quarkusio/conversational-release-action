@@ -33,7 +33,7 @@ public class CoreReleasePrepare implements StepHandler {
     @Override
     public String getContinueFromStepHelp(ReleaseInformation releaseInformation) {
         StringBuilder help = new StringBuilder();
-        help.append(":bulb: The Core release steps take approximately 2 hours and 30 minutes so don't panic if it takes time.\n");
+        help.append("The Core release steps take approximately 2 hours and 30 minutes so don't panic if it takes time.\n");
         help.append("You will receive feedback in this very issue if an error occurs or when further input is needed.");
         return help.toString();
     }

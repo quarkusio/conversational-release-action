@@ -20,6 +20,7 @@ public final class Issues {
     private static final String BRANCH = "### Branch";
     private static final String QUALIFIER = "### Qualifier";
     private static final String MAJOR_VERSION = "### Major version";
+    private static final String ORIGIN_BRANCH = "### Origin branch";
     private static final String NO_RESPONSE = "_No response_";
 
     private static final String RELEASE_INFORMATION_MARKER = "<!-- quarkus-release/release-information:";
@@ -37,10 +38,12 @@ public final class Issues {
         String branch = null;
         String qualifier = null;
         boolean major = false;
+        String originBranch = Branches.MAIN;
 
         boolean inBranch = false;
         boolean inQualifier = false;
         boolean inMajor = false;
+        boolean inOriginBranch = false;
 
         for (String line : description.lines().map(String::trim).collect(Collectors.toList())) {
             if (line.isBlank()) {
@@ -58,6 +61,10 @@ public final class Issues {
                 inMajor = true;
                 continue;
             }
+            if (ORIGIN_BRANCH.equals(line)) {
+                inOriginBranch = true;
+                continue;
+            }
             if (inBranch) {
                 branch = line;
                 inBranch = false;
@@ -73,13 +80,18 @@ public final class Issues {
                 inMajor = false;
                 break;
             }
+            if (inOriginBranch) {
+                originBranch = NO_RESPONSE.equals(line) ? Branches.MAIN : line;
+                inOriginBranch = false;
+                continue;
+            }
         }
 
         if (branch == null) {
             throw new IllegalStateException("Unable to extract a branch from the description");
         }
 
-        return new ReleaseInformation(null, branch, qualifier, major, false, false);
+        return new ReleaseInformation(null, branch, originBranch, qualifier, major, false, false);
     }
 
     public ReleaseInformation extractReleaseInformation(UpdatedIssueBody updatedIssueBody) {

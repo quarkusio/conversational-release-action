@@ -50,5 +50,7 @@ public class GetReleaseInformationAction {
         }
 
         commands.setOutput(Outputs.JDK, jdks.getJdkVersion(releaseInformation.getBranch()));
+
+        commands.setOutput(Outputs.ORIGIN_BRANCH, releaseInformation.getOriginBranch());
     }
 }

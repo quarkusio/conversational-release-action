@@ -14,6 +14,7 @@ import io.quarkiverse.githubaction.Context;
 import io.quarkus.arc.Unremovable;
 import io.quarkus.bot.release.ReleaseInformation;
 import io.quarkus.bot.release.ReleaseStatus;
+import io.quarkus.bot.release.util.Admonitions;
 import io.quarkus.bot.release.util.Branches;
 import io.quarkus.bot.release.util.Command;
 import io.quarkus.bot.release.util.Jdks;
@@ -50,9 +51,17 @@ public class ApproveCoreRelease implements StepHandler {
             comment.append("- This is a `preview` release (e.g. `Alpha`, `Beta`, `CR`).\n");
         }
 
-        comment.append(
-                "\n:bulb: Please approve with a `" + Command.YES.getFullCommand() + "` comment if you want to continue with the release.\n");
-        comment.append("\nIf not, simply close this issue.\n\n");
+        if (!releaseInformation.isOriginBranchMain()) {
+            comment.append("\n");
+            comment.append(Admonitions.warning("This release will be branched from " + releaseInformation.getOriginBranch() + ".\n" +
+                    "You may release from an existing branch only when preparing a new LTS release.") + "\n");
+        }
+
+        comment.append("\n");
+        comment.append(Admonitions.important("Please approve with a `" + Command.YES.getFullCommand()
+                + "` comment if you want to continue with the release.\n" +
+                "\n" +
+                "If not, simply close this issue.") + "\n\n");
         comment.append(Progress.youAreHere(releaseInformation, releaseStatus));
         commands.setOutput(Outputs.INTERACTION_COMMENT, comment.toString());
         return true;
@@ -70,12 +79,13 @@ public class ApproveCoreRelease implements StepHandler {
             throws IOException, InterruptedException {
         StringBuilder comment = new StringBuilder(":white_check_mark: Core release is approved, proceeding...\n\n");
 
-        if(releaseInformation.isFirstCR()) {
+        if (releaseInformation.isFirstCR()) {
             // we will need input soon so let's make it clear
-            comment.append(":bulb: Don't go too far, we will need some input from you very soon.");
+            comment.append(Admonitions.tip("Don't go too far, we will need some input from you very soon."));
         } else {
-            comment.append(":bulb: The Core release steps take approximately 2 hours and 30 minutes so don't panic if it takes time.\n");
-            comment.append("You will receive feedback in this very issue when further input is needed or if an error occurs.");
+            comment.append(Admonitions
+                    .tip("The Core release steps take approximately 2 hours and 30 minutes so don't panic if it takes time.\n" +
+                            "You will receive feedback in this very issue when further input is needed or if an error occurs."));
         }
 
         issue.comment(comment.toString());

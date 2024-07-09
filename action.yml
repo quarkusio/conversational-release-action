@@ -21,6 +21,8 @@ outputs:
     value: ${{ steps.action.outputs.version }}
   jdk:
     value: ${{ steps.action.outputs.jdk }}
+  origin-branch:
+    value: ${{ steps.action.outputs.origin-branch }}
   status:
     value: ${{ steps.action.outputs.status }}
   current-step:
