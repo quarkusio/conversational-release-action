@@ -7,6 +7,7 @@ public final class Outputs {
     public static final String QUALIFIER = "qualifier";
     public static final String MAJOR = "major";
     public static final String JDK = "jdk";
+    public static final String ORIGIN_BRANCH = "origin-branch";
 
     public static final String STATUS = "status";
     public static final String CURRENT_STEP = "current-step";

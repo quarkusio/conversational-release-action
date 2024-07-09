@@ -33,9 +33,9 @@ public enum Step {
 
     private final Class<? extends StepHandler> stepHandler;
 
-    private final boolean forFinalReleasesOnly;
-
     private final boolean recoverable;
+
+    private final boolean forFinalReleasesOnly;
 
     Step(String description, Class<? extends StepHandler> stepHandler, boolean recoverable, boolean forFinalReleasesOnly) {
         this.description = description;

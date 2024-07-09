@@ -14,6 +14,9 @@ public class Branches {
         if (releaseInformation.isFinal() && !releaseInformation.isFirstFinal()) {
             return releaseInformation.getBranch();
         }
+        if (!releaseInformation.isOriginBranchMain()) {
+            return releaseInformation.getBranch();
+        }
 
         return MAIN;
     }

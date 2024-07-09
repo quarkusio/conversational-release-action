@@ -15,6 +15,7 @@ import io.quarkiverse.githubaction.Context;
 import io.quarkus.arc.Unremovable;
 import io.quarkus.bot.release.ReleaseInformation;
 import io.quarkus.bot.release.ReleaseStatus;
+import io.quarkus.bot.release.util.Admonitions;
 import io.quarkus.bot.release.util.Branches;
 import io.quarkus.bot.release.util.Command;
 import io.quarkus.bot.release.util.MonitorArtifactPublicationInputKeys;
@@ -31,8 +32,8 @@ public class SyncCoreRelease implements StepHandler {
             ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         StringBuilder comment = new StringBuilder();
         comment.append(":white_check_mark: The core artifacts have been pushed to `s01.oss.sonatype.org`.\n\n");
-        comment.append(
-                "**IMPORTANT** You need to wait for them to be synced to Maven Central before continuing with the release:\n\n");
+        comment.append(Admonitions.warning(
+                "**IMPORTANT** You need to wait for them to be synced to Maven Central before continuing with the release.") + "\n\n");
 
         try {
             Map<String, Object> inputs = new HashMap<>();
@@ -43,14 +44,14 @@ public class SyncCoreRelease implements StepHandler {
             inputs.put(MonitorArtifactPublicationInputKeys.MESSAGE_IF_PUBLISHED,
                     Command.CONTINUE.getFullCommand() + "\n\n:white_check_mark: We have detected that the core artifacts have been synced to Maven Central.");
             inputs.put(MonitorArtifactPublicationInputKeys.MESSAGE_IF_NOT_PUBLISHED,
-                    ":rotating_light: The core artifacts don't seem to have been synced to Maven Central.\n\n"
+                    Admonitions.caution("The core artifacts don't seem to have been synced to Maven Central.") + "\n\n"
                     + "Please check the situation by yourself:\n\n"
                     + "* Check that https://repo1.maven.org/maven2/io/quarkus/quarkus-bom/"
                     + releaseInformation.getVersion() + "/"
                     + " does not return a 404\n"
                     + "* Wait some more if it still returns a 404.\n\n"
-                    + "Once the artifact is available, wait for an additional 20 minutes then you can continue with the release by adding a `"
-                    + Command.CONTINUE.getFullCommand() + "` comment.");
+                    + Admonitions.important("Once the artifact is available, wait for an additional 20 minutes then you can continue with the release by adding a `"
+                    + Command.CONTINUE.getFullCommand() + "` comment."));
             inputs.put(MonitorArtifactPublicationInputKeys.INITIAL_DELAY, "30");
             inputs.put(MonitorArtifactPublicationInputKeys.POLL_ITERATIONS, "5");
             inputs.put(MonitorArtifactPublicationInputKeys.POLL_DELAY, "10");
@@ -58,8 +59,9 @@ public class SyncCoreRelease implements StepHandler {
 
             issue.getRepository().getWorkflow("monitor-artifact-publication.yml").dispatch(Branches.MAIN, inputs);
 
-            comment.append("The publication of the core artifacts will take 60-80 minutes.\n\n"
-                    + ":bulb: **We started a separate workflow to monitor the situation for you. It will automatically continue the release process once it detects the artifacts have been synced to Maven Central.**\n\n");
+            comment.append("The publication of the core artifacts will take 60-80 minutes.\n\n");
+            comment.append(Admonitions.tip("**We started a separate workflow to monitor the situation for you. It will automatically continue the release process once it detects the artifacts have been synced to Maven Central.**"));
+            comment.append("\n\n");
 
             comment.append("---\n\n");
             comment.append("<details><summary>If things go south</summary>\n\n");
@@ -73,14 +75,15 @@ public class SyncCoreRelease implements StepHandler {
                             + Command.CONTINUE.getFullCommand() + "` comment.\n\n");
             comment.append("</details>");
         } catch (Exception e) {
-            comment.append("We were unable to start the core artifacts monitoring workflow, so please monitor the situation manually:\n\n");
+            comment.append(Admonitions.caution("We were unable to start the core artifacts monitoring workflow.")).append("\n\n");
+            comment.append("Please monitor the situation manually:\n\n");
             comment.append("* Wait for 1 hour (starting from the time of this comment)\n");
             comment.append("* Check that https://repo1.maven.org/maven2/io/quarkus/quarkus-bom/"
                     + releaseInformation.getVersion() + "/"
                     + " does not return a 404\n\n");
             comment.append(
-                    "Once these two conditions are met, you can continue with the release by adding a `"
-                            + Command.CONTINUE.getFullCommand() + "` comment.");
+                    Admonitions.important("Once these two conditions are met, you can continue with the release by adding a `"
+                            + Command.CONTINUE.getFullCommand() + "` comment."));
         }
 
         comment.append("\n\n" + Progress.youAreHere(releaseInformation, releaseStatus));

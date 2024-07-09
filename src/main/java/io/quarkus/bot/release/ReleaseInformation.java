@@ -5,11 +5,13 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import io.quarkus.bot.release.util.Branches;
 import io.quarkus.bot.release.util.Versions;
 
 public class ReleaseInformation {
 
     private final String branch;
+    private final String originBranch;
     private final String qualifier;
     private final boolean major;
 
@@ -18,9 +20,10 @@ public class ReleaseInformation {
     private boolean maintenance;
 
     @JsonCreator
-    public ReleaseInformation(String version, String branch, String qualifier, boolean major, boolean firstFinal, boolean maintenance) {
+    public ReleaseInformation(String version, String branch, String originBranch, String qualifier, boolean major, boolean firstFinal, boolean maintenance) {
         this.version = version;
         this.branch = branch;
+        this.originBranch = originBranch;
         this.qualifier = qualifier;
         this.major = major;
         this.firstFinal = firstFinal;
@@ -33,6 +36,10 @@ public class ReleaseInformation {
 
     public String getBranch() {
         return branch;
+    }
+
+    public String getOriginBranch() {
+        return originBranch;
     }
 
     public String getQualifier() {
@@ -95,6 +102,11 @@ public class ReleaseInformation {
         return major;
     }
 
+    @JsonIgnore
+    public boolean isOriginBranchMain() {
+        return Branches.MAIN.equals(originBranch);
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(branch, major, qualifier);
@@ -109,7 +121,10 @@ public class ReleaseInformation {
         if (getClass() != obj.getClass())
             return false;
         ReleaseInformation other = (ReleaseInformation) obj;
-        return Objects.equals(version, this.version) && Objects.equals(branch, other.branch) && major == other.major
+        return Objects.equals(version, this.version)
+                && Objects.equals(branch, other.branch)
+                && Objects.equals(originBranch, other.originBranch)
+                && major == other.major
                 && Objects.equals(qualifier, other.qualifier)
                 && firstFinal == other.firstFinal
                 && maintenance == other.maintenance;
@@ -117,7 +132,8 @@ public class ReleaseInformation {
 
     @Override
     public String toString() {
-        return "ReleaseInformation [version=" + version + ", branch=" + branch + ", qualifier=" + qualifier + ", major=" + major
+        return "ReleaseInformation [version=" + version + ", branch=" + branch + ", originBranch=" + originBranch
+                + ", qualifier=" + qualifier + ", major=" + major
                 + ",firstFinal=" + firstFinal + ",maintenance=" + maintenance
                 + "]";
     }
