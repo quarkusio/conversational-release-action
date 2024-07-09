@@ -15,7 +15,8 @@ The subactions are all part of the same action and uses the `action` name featur
 
 The subactions are designed to be carefully orchestrated by a carefully crafted workflow.
 
-:warning: This action is automatically published when the `main` branch is pushed.
+> [!WARNING]
+> This action is automatically published when the `main` branch is pushed.
 
 ## `looking`
 
