@@ -35,4 +35,13 @@ public class ReleasePlatform implements StepHandler {
                 platformReleaseBranch
         ));
     }
+
+    @Override
+    public String getErrorHelp(ReleaseInformation releaseInformation) {
+        return "Please check the workflow run logs but there is a good chance "
+                + "that the issue was due to a problem with accessing `s01.oss.sonatype.org` "
+                + "either when authenticating or when uploading the artifacts.\n"
+                + "If so, please retry.\n\n"
+                + "Status page for `s01.oss.sonatype.org`: https://status.maven.org/.";
+    }
 }
