@@ -35,7 +35,11 @@ public class ApproveCoreRelease implements StepHandler {
         StringBuilder comment = new StringBuilder();
         comment.append(":raised_hands: We are going to release the following release:\n\n");
         comment.append("- Quarkus `").append(releaseInformation.getVersion()).append("`\n");
-        comment.append("- On branch `").append(releaseInformation.getBranch()).append("`\n");
+        comment.append("- On branch `").append(releaseInformation.getBranch()).append("`");
+        if (releaseInformation.isFirstCR()) {
+            comment.append(" (it will get created further in the process)");
+        }
+        comment.append("\n");
         comment.append("- With Java `").append(jdks.getJdkVersion(releaseInformation.getBranch())).append("`\n");
         if (releaseInformation.isFirstFinal() && !releaseInformation.isDot0()) {
             comment.append("- :bulb: We detected that this `" + releaseInformation.getVersion() + "` release will be the first final as `"
