@@ -42,7 +42,8 @@ public class AnnounceRelease implements StepHandler {
 
         comment.append(Admonitions.important("You need to:\n\n"
                 + "- Trigger the performance testing (we can't automate it for now for security reasons)\n"
-                + "- Announce the release on social networks and on `quarkus-dev@`\n\n"
+                + "- Announce the release on `quarkus-dev@`" + (releaseInformation.isFinal() ? " and on social networks" : "")
+                + "\n\n"
                 + "You can find detailed instructions below.") + "\n\n");
 
         comment.append("## Trigger performance testing\n\n");
