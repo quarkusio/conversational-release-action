@@ -19,6 +19,7 @@ import io.quarkiverse.githubaction.Context;
 import io.quarkus.arc.Unremovable;
 import io.quarkus.bot.release.ReleaseInformation;
 import io.quarkus.bot.release.ReleaseStatus;
+import io.quarkus.bot.release.util.Admonitions;
 import io.quarkus.bot.release.util.Branches;
 import io.quarkus.bot.release.util.Repositories;
 import io.quarkus.bot.release.util.UpdatedIssueBody;
@@ -38,6 +39,11 @@ public class AnnounceRelease implements StepHandler {
         comment.append(":white_check_mark: " + releaseInformation.getVersion() + " was successfully released.\n\n");
 
         comment.append(":raised_hands: Some manual steps are required to finalize the release.\n\n");
+
+        comment.append(Admonitions.important("You need to:\n\n"
+                + "- Trigger the performance testing (we can't automate it for now for security reasons)\n"
+                + "- Announce the release on social networks and on `quarkus-dev@`\n\n"
+                + "You can find detailed instructions below.") + "\n\n");
 
         comment.append("## Trigger performance testing\n\n");
 
@@ -72,7 +78,7 @@ public class AnnounceRelease implements StepHandler {
             try {
                 String announceText = Files.readString(announcePath);
 
-                comment.append("\n\nHere is some content that could help in writing the announcement:\n\n");
+                comment.append("\n\nYou can find below a template that can help you with writing the announcement email.\n\n");
                 comment.append(announceText);
             } catch (Exception e) {
                 commands.warning("An error occurred while reading " + announcePath + ": " + e.getMessage() + ". Ignoring.");
