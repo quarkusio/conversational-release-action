@@ -57,7 +57,7 @@ public class CreateBranch implements StepHandler {
                 + releaseInformation.getOriginBranch() + "`** and handle additional housekeeping operations\n");
         comment.append("- Perform all the operations manually\n\n");
 
-        comment.append(Admonitions.important("**To let the release process handle things automatically for you, simply add a `" + Command.AUTO.getFullCommand() + "` comment**"));
+        comment.append(Admonitions.important("**To let the release process handle things automatically for you, simply add a `" + Command.AUTO.getFullCommand() + "` comment**."));
         comment.append("\n\n");
 
         comment.append("---\n\n");
