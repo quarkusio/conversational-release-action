@@ -6,7 +6,6 @@ import jakarta.inject.Singleton;
 
 import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHIssueComment;
-import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
 
 import io.quarkiverse.githubaction.Commands;
@@ -44,6 +43,9 @@ public class PreparePlatform implements StepHandler {
         if (!releaseInformation.isFinal() && releaseInformation.isOriginBranchMain()) {
             comment.append(Admonitions.tip("In the case of `preview releases` (e.g. `Alpha1`, `CR1`...), the release will be built from the `main` branch") + "\n\n");
         }
+
+        comment.append(Admonitions.important("First, you need to update the Platform locally, create a pull request, wait for CI and merge it.\n\n" +
+                "You can find detailed instructions below.") + "\n\n");
 
         comment.append("* Follow (roughly) these steps (`upstream` is the upstream repository, `origin` is your fork):\n\n");
         comment.append("```\n");
