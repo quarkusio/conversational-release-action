@@ -384,7 +384,7 @@ public class ReleaseAction {
             StringBuilder interactionComment = new StringBuilder();
             interactionComment.append(Admonitions.caution(error)).append("\n\n");
             if (!Strings.isBlank(errorHelp)) {
-                interactionComment.append(Admonitions.tip(errorHelp)).append("\n\n");
+                interactionComment.append(Admonitions.note(errorHelp)).append("\n\n");
             }
             interactionComment.append("You can find more information about the failure in the [workflow run logs](").append(getWorkflowRunUrl(context)).append(").\n\n");
             interactionComment.append(Admonitions.important("This is not a fatal error, you can retry by adding a `" + Command.RETRY.getFullCommand() + "` comment.")).append("\n\n");
