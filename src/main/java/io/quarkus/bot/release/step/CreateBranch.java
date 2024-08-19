@@ -84,7 +84,7 @@ public class CreateBranch implements StepHandler {
             previousMinorBranch = "previous minor";
         }
 
-        comment.append(getBranchEmail(releaseInformation, previousMinorBranch, null) + "\n\n");
+        comment.append(getBranchEmail(releaseInformation, previousMinorBranch, null, false, null) + "\n\n");
         comment.append("Once you are done with all this, add a `" + Command.MANUAL.getFullCommand() + "` comment to let the release process know you have handled everything manually.\n\n");
         comment.append("</details>\n\n");
 
@@ -129,6 +129,13 @@ public class CreateBranch implements StepHandler {
 
         Optional<GHMilestone> versionedMilestone = getMilestone(repository, releaseInformation.getVersion());
         String nextMinor = getNextMinor(releaseInformation.getBranch());
+        boolean isNextMinorLts = false;
+        String nextMinorInMain = nextMinor;
+
+        if (Branches.isLts(nextMinor)) {
+            isNextMinorLts = true;
+            nextMinorInMain = getNextMinor(nextMinor);
+        }
 
         if (versionedMilestone.isEmpty()) {
             // the version milestone does not exist, we try to rename the "X.Y - main" milestone to the version
@@ -138,7 +145,7 @@ public class CreateBranch implements StepHandler {
                 try {
                     milestone.get().setTitle(releaseInformation.getVersion());
 
-                    repository.createMilestone(nextMinor + MAIN_MILESTONE_SUFFIX, "");
+                    repository.createMilestone(nextMinorInMain + MAIN_MILESTONE_SUFFIX, "");
                 } catch (Exception e) {
                     throw new IllegalStateException("Unable to update the milestone or create the new milestone: " + e.getMessage(), e);
                 }
@@ -194,13 +201,13 @@ public class CreateBranch implements StepHandler {
 
         String comment = ":white_check_mark: Branch " + releaseInformation.getBranch()
                 + " has been created and the milestone and backport labels adjusted.\n\n";
-        comment += "We created a new `" + nextMinor + " - main`"
+        comment += "We created a new `" + nextMinorInMain + " - main`"
                 + " milestone for future developments.\n\n";
         comment += "Make sure to [adjust the name of the milestone](https://github.com/quarkusio/quarkus/milestones) if needed as the name has simply been inferred from the current release.\n\n";
         comment += Admonitions.important("Please announce that we branched " + releaseInformation.getBranch()
                 + " by sending an email to [quarkus-dev@googlegroups.com](mailto:quarkus-dev@googlegroups.com) and posting on [Zulip #dev stream](https://quarkusio.zulipchat.com/#narrow/stream/187038-dev/):\n\n"
                 + "**(Make sure to adjust the version in the email if you renamed the milestone)**\n\n"
-                + getBranchEmail(releaseInformation, previousMinorBranch, nextMinor)) + "\n\n";
+                + getBranchEmail(releaseInformation, previousMinorBranch, nextMinor, isNextMinorLts, nextMinorInMain)) + "\n\n";
         comment += Admonitions.tip(
                 "**Apart from sending the email and posting on Zulip, no intervention from you is needed, the release process is in progress.**\n\n"
                         +
@@ -229,14 +236,7 @@ public class CreateBranch implements StepHandler {
             throw new IllegalStateException("CR1 releases should be made from a versioned branch and not from main");
         }
 
-        String nextMinor = segments[0] + "." + (Integer.parseInt(segments[1]) + 1);
-
-        // if the nextMinor is an LTS version, we will skip it for the main branch, thus we increment by 2
-        if (Branches.isLts(nextMinor)) {
-            return segments[0] + "." + (Integer.parseInt(segments[1]) + 2);
-        }
-
-        return nextMinor;
+        return segments[0] + "." + (Integer.parseInt(segments[1]) + 1);
     }
 
     private static Optional<GHMilestone> getMilestone(GHRepository repository, String name) {
@@ -250,7 +250,8 @@ public class CreateBranch implements StepHandler {
         }
     }
 
-    private static String getBranchEmail(ReleaseInformation releaseInformation, String previousMinorBranch, String nextMinor) {
+    private static String getBranchEmail(ReleaseInformation releaseInformation, String previousMinorBranch, String nextMinor,
+            boolean isNextMinorLts, String nextMinorInMain) {
         String email = "Subject:\n"
                 + "```\n"
                 + "Quarkus " + releaseInformation.getBranch() + " branched\n"
@@ -259,7 +260,14 @@ public class CreateBranch implements StepHandler {
                 + "```\n"
                 + "Hi,\n"
                 + "\n"
-                + "We just branched " + releaseInformation.getBranch() + ". The main branch is now " + (nextMinor != null ? nextMinor : "**X.Y**") + ".\n"
+                + "We just branched " + releaseInformation.getBranch() + ". The main branch is now "
+                + (nextMinorInMain != null ? nextMinorInMain : "**X.Y**");
+
+        if (isNextMinorLts && nextMinor != null) {
+            email += " (" + nextMinor + " will be branched from " + releaseInformation.getBranch() + ")";
+        }
+
+        email += ".\n"
                 + "\n"
                 + "Please make sure you add the appropriate backport labels from now on:\n"
                 + "\n"
