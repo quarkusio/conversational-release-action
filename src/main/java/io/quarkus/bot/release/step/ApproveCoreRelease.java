@@ -37,7 +37,7 @@ public class ApproveCoreRelease implements StepHandler {
         comment.append("- Quarkus `").append(releaseInformation.getVersion()).append("`\n");
         comment.append("- On branch `").append(releaseInformation.getBranch()).append("`");
         if (releaseInformation.isFirstCR()) {
-            comment.append(" (it will get created further in the process)");
+            comment.append(" (it will get created a bit further in the process)");
         }
         comment.append("\n");
         comment.append("- With Java `").append(jdks.getJdkVersion(releaseInformation.getBranch())).append("`\n");
@@ -66,6 +66,20 @@ public class ApproveCoreRelease implements StepHandler {
                 + "` comment if you want to continue with the release.\n" +
                 "\n" +
                 "If not, simply close this issue.") + "\n\n");
+
+        if (releaseInformation.isFirstCR()) {
+            comment.append(Admonitions.tip("Don't go too far, we will need further input from you very soon.") + "\n\n");
+        }
+
+        comment.append("---\n\n<details><summary>Legend for the admonitions</summary>\n\n");
+        comment.append(Admonitions.important("A manual confirmation/intervention is needed.") + "\n\n");
+        comment.append(Admonitions.tip("Some useful information about the release process.") + "\n\n");
+        comment.append(Admonitions.note("Some additional information.") + "\n\n");
+        comment.append(Admonitions.warning("Something important to consider.") + "\n\n");
+        comment.append(Admonitions.caution("An error occurred.") + "\n\n");
+        comment.append("</details>\n\n");
+
+
         comment.append(Progress.youAreHere(releaseInformation, releaseStatus));
         commands.setOutput(Outputs.INTERACTION_COMMENT, comment.toString());
         return true;

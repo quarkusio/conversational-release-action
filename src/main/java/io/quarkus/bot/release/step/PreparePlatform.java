@@ -47,9 +47,12 @@ public class PreparePlatform implements StepHandler {
         comment.append(Admonitions.important("First, you need to update the Platform locally, create a pull request, wait for CI and merge it.\n\n" +
                 "You can find detailed instructions below.") + "\n\n");
 
-        comment.append("* Follow (roughly) these steps (`upstream` is the upstream repository, `origin` is your fork):\n\n");
+        comment.append("* Go into your Quarkus Platform clone directory:\n\n");
         comment.append("```\n");
         comment.append("cd <your quarkus-platform clone>\n");
+        comment.append("```\n");
+        comment.append("* Follow (roughly) these steps (`upstream` is the upstream repository, `origin` is your fork):\n\n");
+        comment.append("```\n");
         if (releaseInformation.isOriginBranchMain()) {
             comment.append("git checkout " + platformPreparationBranch + "\n");
             comment.append("git pull upstream " + platformPreparationBranch + "\n");
