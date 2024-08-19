@@ -71,6 +71,15 @@ public class ApproveCoreRelease implements StepHandler {
             comment.append(Admonitions.tip("Don't go too far, we will need further input from you very soon.") + "\n\n");
         }
 
+        comment.append("---\n\n<details><summary>Legend for the admonitions</summary>\n\n");
+        comment.append(Admonitions.important("A manual confirmation/intervention is needed.") + "\n\n");
+        comment.append(Admonitions.tip("Some useful information about the release process.") + "\n\n");
+        comment.append(Admonitions.note("Some additional information.") + "\n\n");
+        comment.append(Admonitions.warning("Something important to consider.") + "\n\n");
+        comment.append(Admonitions.caution("An error occurred.") + "\n\n");
+        comment.append("</details>\n\n");
+
+
         comment.append(Progress.youAreHere(releaseInformation, releaseStatus));
         commands.setOutput(Outputs.INTERACTION_COMMENT, comment.toString());
         return true;
