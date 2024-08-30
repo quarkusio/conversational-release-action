@@ -34,6 +34,15 @@ public class ReleaseInformation {
         return version;
     }
 
+    @JsonIgnore
+    public String getFullVersion() {
+        if (Branches.isLts(branch)) {
+            return version + " LTS";
+        }
+
+        return version;
+    }
+
     public String getBranch() {
         return branch;
     }
