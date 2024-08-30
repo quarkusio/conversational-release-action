@@ -48,6 +48,9 @@ public class Prerequisites implements StepHandler {
         if (releaseInformation.isMajor()) {
             command.add("--major");
         }
+        if (Branches.isLts(releaseInformation.getBranch())) {
+            command.add("--lts");
+        }
 
         int exitCode = processes.execute(command);
         if (exitCode != 0) {
