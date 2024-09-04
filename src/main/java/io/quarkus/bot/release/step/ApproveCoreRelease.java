@@ -61,8 +61,21 @@ public class ApproveCoreRelease implements StepHandler {
                     "You may release from an existing branch only when preparing a new LTS release.") + "\n");
         }
 
+        String mergeInfo;
+        if (releaseInformation.isFirstCR()) {
+            mergeInfo = "**Make sure you have merged all the required [pull requests](https://github.com/quarkusio/quarkus/pulls) in the ["
+                    + releaseInformation.getOriginBranch() + "](https://github.com/quarkusio/quarkus/commits/"
+                    + releaseInformation.getOriginBranch() + "/) branch.**";
+        } else {
+            mergeInfo = "**Make sure you have merged all the [backport pull requests](https://github.com/quarkusio/quarkus/pulls?q=is%3Apr+base%3A"
+                    + releaseInformation.getBranch() + "+is%3Aopen) in the ["
+                    + releaseInformation.getBranch() + "](https://github.com/quarkusio/quarkus/commits/"
+                    + releaseInformation.getBranch() + "/) branch.**";
+        }
+
         comment.append("\n");
-        comment.append(Admonitions.important("Please approve with a `" + Command.YES.getFullCommand()
+        comment.append(Admonitions.important(mergeInfo + "\n\n"
+                + "Please approve with a `" + Command.YES.getFullCommand()
                 + "` comment if you want to continue with the release.\n" +
                 "\n" +
                 "If not, simply close this issue.") + "\n\n");
