@@ -201,8 +201,10 @@ public class CreateBranch implements StepHandler {
 
         String comment = ":white_check_mark: Branch " + releaseInformation.getBranch()
                 + " has been created and the milestone and backport labels adjusted.\n\n";
-        comment += "We created a new `" + nextMinorInMain + " - main`"
-                + " milestone for future developments.\n\n";
+        if (releaseInformation.isOriginBranchMain()) {
+            comment += "We created a new `" + nextMinorInMain + " - main`"
+                    + " milestone for future developments.\n\n";
+        }
         comment += "Make sure to [adjust the name of the milestone](https://github.com/quarkusio/quarkus/milestones) if needed as the name has simply been inferred from the current release.\n\n";
         comment += Admonitions.important("Please announce that we branched " + releaseInformation.getBranch()
                 + " by sending an email to [quarkus-dev@googlegroups.com](mailto:quarkus-dev@googlegroups.com) and posting on [Zulip #dev stream](https://quarkusio.zulipchat.com/#narrow/stream/187038-dev/):\n\n"
@@ -254,13 +256,13 @@ public class CreateBranch implements StepHandler {
             boolean isNextMinorLts, String nextMinorInMain) {
         String email = "Subject:\n"
                 + "```\n"
-                + "Quarkus " + releaseInformation.getBranch() + " branched\n"
+                + "Quarkus " + releaseInformation.getFullBranch() + " branched\n"
                 + "```\n"
                 + "Body:\n"
                 + "```\n"
                 + "Hi,\n"
                 + "\n"
-                + "We just branched " + releaseInformation.getBranch() + ". The main branch is now "
+                + "We just branched " + releaseInformation.getFullBranch() + ". The main branch is now "
                 + (nextMinorInMain != null ? nextMinorInMain : "**X.Y**");
 
         if (isNextMinorLts && nextMinor != null) {
@@ -271,7 +273,7 @@ public class CreateBranch implements StepHandler {
                 + "\n"
                 + "Please make sure you add the appropriate backport labels from now on:\n"
                 + "\n"
-                + "- for anything required in " + releaseInformation.getBranch() + " (currently open pull requests included), please add the " + Labels.BACKPORT_LABEL + " label\n";
+                + "- for anything required in " + releaseInformation.getFullBranch() + " (currently open pull requests included), please add the " + Labels.BACKPORT_LABEL + " label\n";
 
         email += "- for fixes we also want in future " + previousMinorBranch + ", please add the " + Labels.backportForVersion(previousMinorBranch) + " label\n";
 
