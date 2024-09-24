@@ -418,7 +418,7 @@ public class ReleaseAction {
             retry(3, () -> {
                 StringBuilder issueComment = new StringBuilder();
                 issueComment.append(Admonitions.caution(error)).append("\n\n");
-                if (!errorHelp.isBlank()) {
+                if (!Strings.isBlank(errorHelp)) {
                     issueComment.append(Admonitions.tip(errorHelp)).append("\n\n");
                 }
                 issueComment.append("You can find more information about the failure in the [workflow run logs](").append(getWorkflowRunUrl(context)).append(").\n\n");
