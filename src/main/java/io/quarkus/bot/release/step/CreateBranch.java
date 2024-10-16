@@ -275,12 +275,12 @@ public class CreateBranch implements StepHandler {
                 + "\n"
                 + "- for anything required in " + releaseInformation.getFullBranch() + " (currently open pull requests included), please add the " + Labels.BACKPORT_LABEL + " label\n";
 
-        email += "- for fixes we also want in future " + previousMinorBranch + ", please add the " + Labels.backportForVersion(previousMinorBranch) + " label\n";
+        email += "- for fixes we also want in future " + Branches.getFullBranch(previousMinorBranch) + ", please add the " + Labels.backportForVersion(previousMinorBranch) + " label\n";
 
         for (String ltsBranch : Branches.getLtsVersionsReleasedBefore(previousMinorBranch).reversed()) {
             // 2.13 is not an official LTS so we have to special case it
-            email += "- for fixes we also want in future " + ltsBranch
-                    + (Branches.BRANCH_2_13.equals(ltsBranch) ? "" : " LTS") + ", please add the " + Labels.backportForVersion(ltsBranch)
+            email += "- for fixes we also want in future "
+                    + (Branches.BRANCH_2_13.equals(ltsBranch) ? ltsBranch : Branches.getFullBranch(ltsBranch)) + ", please add the " + Labels.backportForVersion(ltsBranch)
                     + " label\n";
         }
 
