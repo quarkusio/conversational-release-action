@@ -49,6 +49,14 @@ public class Branches {
                 .toList();
     }
 
+    public static String getFullBranch(String branch) {
+        if (isLts(branch)) {
+            return branch + " LTS";
+        }
+
+        return branch;
+    }
+
     private Branches() {
     }
 }
