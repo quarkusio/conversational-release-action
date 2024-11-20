@@ -65,7 +65,8 @@ public class PreparePlatform implements StepHandler {
         comment.append("git checkout -b quarkus-" + releaseInformation.getVersion() + "\n");
         comment.append("./update-quarkus-version.sh " + releaseInformation.getVersion() + "\n");
         comment.append("```\n\n");
-        comment.append("* Check the diff with `git diff`\n\n");
+        comment.append("* Check the diff with `git diff`\n");
+        comment.append("* Then:\n\n");
         comment.append("```\n");
         comment.append("git add .\n");
         comment.append("git commit -m 'Upgrade to Quarkus " + releaseInformation.getVersion() + "'\n");
