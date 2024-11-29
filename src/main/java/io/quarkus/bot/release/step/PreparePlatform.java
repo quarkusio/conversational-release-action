@@ -95,9 +95,9 @@ public class PreparePlatform implements StepHandler {
                     + "The pull request updating the Platform to Quarkus " + releaseInformation.getVersion() + " has been merged in the main branch.\n"
                     + "We pinged the team maintaining components not passing the tests in the pull request.\n"
                     + "\n"
-                    + "If you want to update your components, please create your pull requests and make sure they are merged before next Tuesday.\n");
+                    + "If you want to update your components, please create your pull requests targeting the main branch and make sure they are merged before next Tuesday.\n");
             if (!releaseInformation.isOriginBranchMain()) {
-                comment.append("Make sure you mention in the description that your pull request should be be backported to the "
+                comment.append("\nMake sure you mention in the description that your pull request should be be backported to the "
                         + releaseInformation.getBranch() + " branch as " + releaseInformation.getBranch()
                         + " has already been branched, given it is a LTS.\n");
             }
