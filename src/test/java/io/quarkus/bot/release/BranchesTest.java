@@ -42,6 +42,8 @@ public class BranchesTest {
         assertThat(Branches.isLts("3.4")).isFalse();
         assertThat(Branches.isLts("3.8")).isTrue();
         assertThat(Branches.isLts("3.9")).isFalse();
+        assertThat(Branches.isLts("3.15")).isTrue();
+        assertThat(Branches.isLts("3.20")).isTrue();
     }
 
     @Test
