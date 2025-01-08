@@ -20,4 +20,4 @@ jobs:
           distribution: temurin
           cache: maven
       - name: Build
-        run: ./mvnw -B clean verify -Dquarkus.package.type=uber-jar -Dquarkus.package.add-runner-suffix=false
+        run: ./mvnw -B clean verify -Dquarkus.package.jar.type=uber-jar -Dquarkus.package.jar.add-runner-suffix=false
