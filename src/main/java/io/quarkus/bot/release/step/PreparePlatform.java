@@ -40,6 +40,12 @@ public class PreparePlatform implements StepHandler {
             comment.append(Admonitions.warning("**This is the `.0` release so we update the Platform first then wait one week for the Platform members to contribute their updates then we release. Make sure you follow the instructions closely.**") + "\n\n");
         }
 
+        if (releaseInformation.isLtsMaintenanceReleaseWithRegularReleaseCadence()) {
+            comment.append(Admonitions.warning(
+                    "**This is a maintenance release for a LTS version with regular release cadence so we update the Platform first then wait one week for the Platform members to potentially contribute compatibility fixes then we release. Make sure you follow the instructions closely.**")
+                    + "\n\n");
+        }
+
         if (!releaseInformation.isFinal() && releaseInformation.isOriginBranchMain()) {
             comment.append(Admonitions.tip("In the case of `preview releases` (e.g. `Alpha1`, `CR1`...), the release will be built from the `main` branch") + "\n\n");
         }
@@ -93,7 +99,7 @@ public class PreparePlatform implements StepHandler {
                     + "The Quarkus " + releaseInformation.getVersion() + " core artifacts are available on Maven Central.\n"
                     + "\n"
                     + "The pull request updating the Platform to Quarkus " + releaseInformation.getVersion() + " has been merged in the main branch.\n"
-                    + "We pinged the team maintaining components not passing the tests in the pull request.\n"
+                    + "We pinged in the pull request the teams maintaining components not passing the tests.\n"
                     + "\n"
                     + "If you want to update your components, please create your pull requests targeting the main branch and make sure they are merged before next Tuesday.\n");
             if (!releaseInformation.isOriginBranchMain()) {
@@ -101,6 +107,32 @@ public class PreparePlatform implements StepHandler {
                         + releaseInformation.getBranch() + " branch as " + releaseInformation.getBranch()
                         + " has already been branched, given it is a LTS.\n");
             }
+            comment.append("\n"
+                    + "Thanks.\n"
+                    + "\n"
+                    + "--\n"
+                    + "The Quarkus dev team\n"
+                    );
+            comment.append("```\n\n");
+            comment.append("* If CI failed for some Platform members, please contact them so that they are aware of the issues\n\n");
+            comment.append(Admonitions.warning("**IMPORTANT - STOP HERE**\n**IMPORTANT - Wait a week before continuing with the Platform release**") + "\n\n");
+        }
+        if (releaseInformation.isLtsMaintenanceReleaseWithRegularReleaseCadence()) {
+            comment.append("* Send an email to the Platform coordination mailing list: [quarkus-platform-coordination@googlegroups.com](mailto:quarkus-platform-coordination@googlegroups.com) :\n\n");
+            comment.append("Subject:\n");
+            comment.append("```\n");
+            comment.append("Quarkus " + releaseInformation.getFullVersion() + " core artifacts are available\n");
+            comment.append("```\n");
+            comment.append("Body:\n");
+            comment.append("```\n");
+            comment.append("Hi,\n"
+                    + "\n"
+                    + "The Quarkus " + releaseInformation.getFullVersion() + " core artifacts are available on Maven Central.\n"
+                    + "\n"
+                    + "The pull request updating the Platform to Quarkus " + releaseInformation.getFullVersion() + " has been merged in the main branch.\n"
+                    + "We pinged in the pull request the teams maintaining components not passing the tests.\n"
+                    + "\n"
+                    + "If you need to update your components to fix compatibility issues with this new micro (and only for this reason!), please create your pull requests targeting the " + releaseInformation.getBranch() + " branch and make sure they are merged before next Monday.\n");
             comment.append("\n"
                     + "Thanks.\n"
                     + "\n"

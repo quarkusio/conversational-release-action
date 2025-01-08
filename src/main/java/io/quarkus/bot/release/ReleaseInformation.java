@@ -103,15 +103,6 @@ public class ReleaseInformation {
     }
 
     @JsonIgnore
-    public boolean isFirstMicroMaintenanceRelease() {
-        if (version == null) {
-            throw new IllegalStateException("Unable to know if the version is the first micro maintenance at this stage");
-        }
-
-        return Versions.isFirstMicroMaintenanceRelease(version);
-    }
-
-    @JsonIgnore
     public boolean isFirstCR() {
         return "CR1".equalsIgnoreCase(qualifier);
     }
@@ -123,6 +114,15 @@ public class ReleaseInformation {
     @JsonIgnore
     public boolean isOriginBranchMain() {
         return Branches.MAIN.equals(originBranch);
+    }
+
+    @JsonIgnore
+    public boolean isLtsMaintenanceReleaseWithRegularReleaseCadence() {
+        if (version == null) {
+            throw new IllegalStateException("Unable to know if the version is a LTS maintenance release with regular release cadence at this stage");
+        }
+
+        return Branches.isLtsBranchWithRegularReleaseCadence(branch) && isFinal() && !isFirstFinal();
     }
 
     @Override
