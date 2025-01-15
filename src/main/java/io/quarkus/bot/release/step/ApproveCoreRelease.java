@@ -115,7 +115,7 @@ public class ApproveCoreRelease implements StepHandler {
             comment.append(Admonitions.tip("Don't go too far, we will need some input from you very soon."));
         } else {
             comment.append(Admonitions
-                    .tip("The Core release steps take approximately 2 hours and 30 minutes so don't panic if it takes time.\n" +
+                    .tip("The Core release steps take approximately " + CoreReleasePrepare.DURATION + " so don't panic if it takes time.\n" +
                             "You will receive feedback in this very issue when further input is needed or if an error occurs."));
         }
 

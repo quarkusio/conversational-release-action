@@ -213,7 +213,7 @@ public class CreateBranch implements StepHandler {
         comment += Admonitions.tip(
                 "**Apart from sending the email and posting on Zulip, no intervention from you is needed, the release process is in progress.**\n\n"
                         +
-                        "The next steps take approximately 2 hours and 30 minutes so don't panic if it takes time.\n" +
+                        "The next steps take approximately " + CoreReleasePrepare.DURATION + " so don't panic if it takes time.\n" +
                         "You will receive feedback in this very issue when further input is needed or if an error occurs.")
                 + "\n\n";
         comment += Progress.youAreHere(releaseInformation, releaseStatus);

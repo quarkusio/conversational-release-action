@@ -21,6 +21,8 @@ import io.quarkus.bot.release.util.UpdatedIssueBody;
 @Unremovable
 public class CoreReleasePrepare implements StepHandler {
 
+    static String DURATION = "3 hours";
+
     @Inject
     Processes processes;
 
@@ -33,7 +35,7 @@ public class CoreReleasePrepare implements StepHandler {
     @Override
     public String getContinueFromStepHelp(ReleaseInformation releaseInformation) {
         StringBuilder help = new StringBuilder();
-        help.append("The Core release steps take approximately 3 hours so don't panic if it takes time.\n");
+        help.append("The Core release steps take approximately " + DURATION + " so don't panic if it takes time.\n");
         help.append("You will receive feedback in this very issue if an error occurs or when further input is needed.");
         return help.toString();
     }
