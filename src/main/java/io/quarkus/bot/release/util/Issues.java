@@ -19,6 +19,7 @@ public final class Issues {
 
     private static final String BRANCH = "### Branch";
     private static final String QUALIFIER = "### Qualifier";
+    private static final String EMERGENCY_RELEASE = "### Emergency release";
     private static final String MAJOR_VERSION = "### Major version";
     private static final String ORIGIN_BRANCH = "### Origin branch";
     private static final String NO_RESPONSE = "_No response_";
@@ -38,10 +39,12 @@ public final class Issues {
         String branch = null;
         String qualifier = null;
         boolean major = false;
+        boolean emergency = false;
         String originBranch = Branches.MAIN;
 
         boolean inBranch = false;
         boolean inQualifier = false;
+        boolean inEmergencyRelease = false;
         boolean inMajor = false;
         boolean inOriginBranch = false;
 
@@ -55,6 +58,10 @@ public final class Issues {
             }
             if (QUALIFIER.equals(line)) {
                 inQualifier = true;
+                continue;
+            }
+            if (EMERGENCY_RELEASE.equals(line)) {
+                inEmergencyRelease = true;
                 continue;
             }
             if (MAJOR_VERSION.equals(line)) {
@@ -75,15 +82,20 @@ public final class Issues {
                 inQualifier = false;
                 continue;
             }
-            if (inMajor) {
-                major = line.contains("[X]");
-                inMajor = false;
-                break;
+            if (inEmergencyRelease) {
+                emergency = line.contains("[X]");
+                inEmergencyRelease = false;
+                continue;
             }
             if (inOriginBranch) {
                 originBranch = NO_RESPONSE.equals(line) ? Branches.MAIN : line;
                 inOriginBranch = false;
                 continue;
+            }
+            if (inMajor) {
+                major = line.contains("[X]");
+                inMajor = false;
+                break;
             }
         }
 
@@ -91,7 +103,11 @@ public final class Issues {
             throw new IllegalStateException("Unable to extract a branch from the description");
         }
 
-        return new ReleaseInformation(null, branch, originBranch, qualifier, major, false, false);
+        ReleaseInformation releaseInformation = new ReleaseInformation(null, branch, originBranch, qualifier, emergency, major, false, false);
+
+        releaseInformation.checkConsistency();
+
+        return releaseInformation;
     }
 
     public ReleaseInformation extractReleaseInformation(UpdatedIssueBody updatedIssueBody) {

@@ -45,6 +45,9 @@ public class Prerequisites implements StepHandler {
         if (releaseInformation.getQualifier() != null) {
             command.add("--qualifier=" + releaseInformation.getQualifier());
         }
+        if (releaseInformation.isEmergency()) {
+            command.add("--emergency");
+        }
         if (releaseInformation.isMajor()) {
             command.add("--major");
         }
