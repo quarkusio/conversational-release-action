@@ -23,6 +23,8 @@ public class ReleaseInformation {
     @JsonCreator
     public ReleaseInformation(String version, String branch, String originBranch, String qualifier, boolean emergency,
             boolean major, boolean firstFinal, boolean maintenance) {
+        checkConsistency(branch, qualifier, emergency, major);
+
         this.version = version;
         this.branch = branch;
         this.originBranch = originBranch;
@@ -188,8 +190,7 @@ public class ReleaseInformation {
         return Branches.isLtsBranchWithRegularReleaseCadence(branch) && isFinal() && !isFirstFinal();
     }
 
-    @JsonIgnore
-    public void checkConsistency() {
+    private static void checkConsistency(String branch, String qualifier, boolean emergency, boolean major) {
         if (emergency) {
             if (!Branches.isLtsBranchWithRegularReleaseCadence(branch)) {
                 throw new IllegalStateException("Emergency releases are only supported for LTS branches with regular release cadence.");

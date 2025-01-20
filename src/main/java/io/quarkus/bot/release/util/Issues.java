@@ -103,11 +103,7 @@ public final class Issues {
             throw new IllegalStateException("Unable to extract a branch from the description");
         }
 
-        ReleaseInformation releaseInformation = new ReleaseInformation(null, branch, originBranch, qualifier, emergency, major, false, false);
-
-        releaseInformation.checkConsistency();
-
-        return releaseInformation;
+        return new ReleaseInformation(null, branch, originBranch, qualifier, emergency, major, false, false);
     }
 
     public ReleaseInformation extractReleaseInformation(UpdatedIssueBody updatedIssueBody) {
