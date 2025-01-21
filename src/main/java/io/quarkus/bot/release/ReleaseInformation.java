@@ -13,6 +13,7 @@ public class ReleaseInformation {
     private final String branch;
     private final String originBranch;
     private final String qualifier;
+    private final boolean emergency;
     private final boolean major;
 
     private String version;
@@ -20,12 +21,15 @@ public class ReleaseInformation {
     private boolean maintenance;
 
     @JsonCreator
-    public ReleaseInformation(String version, String branch, String originBranch, String qualifier, boolean major,
-            boolean firstFinal, boolean maintenance) {
+    public ReleaseInformation(String version, String branch, String originBranch, String qualifier, boolean emergency,
+            boolean major, boolean firstFinal, boolean maintenance) {
+        checkConsistency(branch, qualifier, emergency, major);
+
         this.version = version;
         this.branch = branch;
         this.originBranch = originBranch;
         this.qualifier = qualifier;
+        this.emergency = emergency;
         this.major = major;
         this.firstFinal = firstFinal;
         this.maintenance = maintenance;
@@ -93,6 +97,10 @@ public class ReleaseInformation {
         this.version = version;
         this.firstFinal = firstFinal;
         this.maintenance = maintenance;
+
+        if (firstFinal && emergency) {
+            throw new IllegalStateException("An emergency release may not be the first final release of a branch");
+        }
     }
 
     @JsonIgnore
@@ -153,6 +161,13 @@ public class ReleaseInformation {
     }
 
     /**
+     * @return whether this is an emergency release (e.g. 3.17.7.1). Emergency releases are only used for LTS branches with regular release cadence.
+     */
+    public boolean isEmergency() {
+        return emergency;
+    }
+
+    /**
      * @return whether the origin branch for creating the branch is the main branch (see {@link #getOriginBranch()} for more
      *         details)
      */
@@ -175,9 +190,23 @@ public class ReleaseInformation {
         return Branches.isLtsBranchWithRegularReleaseCadence(branch) && isFinal() && !isFirstFinal();
     }
 
+    private static void checkConsistency(String branch, String qualifier, boolean emergency, boolean major) {
+        if (emergency) {
+            if (!Branches.isLtsBranchWithRegularReleaseCadence(branch)) {
+                throw new IllegalStateException("Emergency releases are only supported for LTS branches with regular release cadence.");
+            }
+            if (major) {
+                throw new IllegalStateException("A release may not be both an emergency and a major release");
+            }
+            if (qualifier != null) {
+                throw new IllegalStateException("An emergency release may not have a qualifier");
+            }
+        }
+    }
+
     @Override
     public int hashCode() {
-        return Objects.hash(branch, major, qualifier);
+        return Objects.hash(branch, qualifier, emergency, major);
     }
 
     @Override
@@ -192,6 +221,7 @@ public class ReleaseInformation {
         return Objects.equals(version, this.version)
                 && Objects.equals(branch, other.branch)
                 && Objects.equals(originBranch, other.originBranch)
+                && emergency == other.emergency
                 && major == other.major
                 && Objects.equals(qualifier, other.qualifier)
                 && firstFinal == other.firstFinal
@@ -201,8 +231,8 @@ public class ReleaseInformation {
     @Override
     public String toString() {
         return "ReleaseInformation [version=" + version + ", branch=" + branch + ", originBranch=" + originBranch
-                + ", qualifier=" + qualifier + ", major=" + major
-                + ",firstFinal=" + firstFinal + ",maintenance=" + maintenance
+                + ", qualifier=" + qualifier + ", emergency=" + emergency + ", major=" + major
+                + ", firstFinal=" + firstFinal + ", maintenance=" + maintenance
                 + "]";
     }
 }
