@@ -266,7 +266,7 @@ public class CreateBranch implements StepHandler {
                 + (nextMinorInMain != null ? nextMinorInMain : "**X.Y**");
 
         if (isNextMinorLts && nextMinor != null) {
-            email += " (" + nextMinor + " will be branched from " + releaseInformation.getBranch() + ")";
+            email += " (" + nextMinor + " LTS will be branched from " + releaseInformation.getBranch() + ")";
         }
 
         email += ".\n"
