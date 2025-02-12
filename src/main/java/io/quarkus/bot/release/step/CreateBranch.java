@@ -280,7 +280,7 @@ public class CreateBranch implements StepHandler {
         for (String ltsBranch : Branches.getLtsVersionsReleasedBefore(previousMinorBranch).reversed()) {
             // 2.13 is not an official LTS so we have to special case it
             email += "- for fixes we also want in future "
-                    + (Branches.BRANCH_2_13.equals(ltsBranch) ? ltsBranch : Branches.getFullBranch(ltsBranch)) + ", please add the " + Labels.backportForVersion(ltsBranch)
+                    + Branches.getFullBranch(ltsBranch) + ", please add the " + Labels.backportForVersion(ltsBranch)
                     + " label\n";
         }
 
