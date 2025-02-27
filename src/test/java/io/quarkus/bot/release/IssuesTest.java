@@ -58,7 +58,7 @@ public class IssuesTest {
 
                 ### Major version
 
-                - [X] This release is a major version.
+                - [x] This release is a major version.
                 """;
 
         assertThat(issues.extractReleaseInformationFromForm(description)).isEqualTo(new ReleaseInformation(null, "main", "3.14", "CR1", false, true, false, false));
@@ -78,7 +78,7 @@ public class IssuesTest {
 
                 ### Emergency release
 
-                - [X] This release is an emergency release.
+                - [x] This release is an emergency release.
 
                 ### Major version
 
@@ -104,7 +104,7 @@ public class IssuesTest {
 
                 ### Emergency release
 
-                - [X] This release is an emergency release.
+                - [x] This release is an emergency release.
 
                 ### Major version
 
@@ -130,11 +130,11 @@ public class IssuesTest {
 
                 ### Emergency release
 
-                - [X] This release is an emergency release.
+                - [x] This release is an emergency release.
 
                 ### Major version
 
-                - [X] This release is a major version.
+                - [x] This release is a major version.
                 """;
 
         assertThatThrownBy(() -> issues.extractReleaseInformationFromForm(invalidEmergencyVersionMajor))
@@ -156,7 +156,7 @@ public class IssuesTest {
 
                 ### Emergency release
 
-                - [X] This release is an emergency release.
+                - [x] This release is an emergency release.
 
                 ### Major version
 

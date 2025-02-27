@@ -83,7 +83,7 @@ public final class Issues {
                 continue;
             }
             if (inEmergencyRelease) {
-                emergency = line.contains("[X]");
+                emergency = line.contains("[x]");
                 inEmergencyRelease = false;
                 continue;
             }
@@ -93,7 +93,7 @@ public final class Issues {
                 continue;
             }
             if (inMajor) {
-                major = line.contains("[X]");
+                major = line.contains("[x]");
                 inMajor = false;
                 break;
             }
