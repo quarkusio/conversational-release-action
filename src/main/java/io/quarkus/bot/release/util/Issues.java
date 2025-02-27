@@ -1,5 +1,6 @@
 package io.quarkus.bot.release.util;
 
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -83,7 +84,7 @@ public final class Issues {
                 continue;
             }
             if (inEmergencyRelease) {
-                emergency = line.contains("[x]");
+                emergency = line.toLowerCase(Locale.ROOT).contains("[x]");
                 inEmergencyRelease = false;
                 continue;
             }
@@ -93,7 +94,7 @@ public final class Issues {
                 continue;
             }
             if (inMajor) {
-                major = line.contains("[x]");
+                major = line.toLowerCase(Locale.ROOT).contains("[x]");
                 inMajor = false;
                 break;
             }
