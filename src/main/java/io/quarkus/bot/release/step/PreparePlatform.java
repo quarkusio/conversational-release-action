@@ -40,7 +40,7 @@ public class PreparePlatform implements StepHandler {
             comment.append(Admonitions.warning("**This is the `.0` release so we update the Platform first then wait one week for the Platform members to contribute their updates then we release. Make sure you follow the instructions closely.**") + "\n\n");
         }
 
-        if (releaseInformation.isLtsMaintenanceReleaseWithRegularReleaseCadence()) {
+        if (releaseInformation.isLtsMaintenanceReleaseWithRegularReleaseCadence() && !releaseInformation.isEmergency()) {
             comment.append(Admonitions.warning(
                     "**This is a maintenance release for a LTS version with regular release cadence so we update the Platform first then wait one week for the Platform members to potentially contribute compatibility fixes then we release. Make sure you follow the instructions closely.**")
                     + "\n\n");
@@ -117,7 +117,7 @@ public class PreparePlatform implements StepHandler {
             comment.append("* If CI failed for some Platform members, please contact them so that they are aware of the issues\n\n");
             comment.append(Admonitions.warning("**IMPORTANT - STOP HERE**\n**IMPORTANT - Wait a week before continuing with the Platform release**") + "\n\n");
         }
-        if (releaseInformation.isLtsMaintenanceReleaseWithRegularReleaseCadence()) {
+        if (releaseInformation.isLtsMaintenanceReleaseWithRegularReleaseCadence() && !releaseInformation.isEmergency()) {
             comment.append("* Send an email to the Platform coordination mailing list: [quarkus-platform-coordination@googlegroups.com](mailto:quarkus-platform-coordination@googlegroups.com) :\n\n");
             comment.append("Subject:\n");
             comment.append("```\n");
