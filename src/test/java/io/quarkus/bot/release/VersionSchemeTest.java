@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.apache.maven.artifact.versioning.ComparableVersion;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.junit.jupiter.api.Test;
 
 import io.smallrye.common.version.VersionScheme;
@@ -28,6 +29,17 @@ public class VersionSchemeTest {
         TreeSet<ComparableVersion> mavenVersions = new TreeSet<>();
         for (String version : SHUFFLED_VERSIONS) {
             mavenVersions.add(new ComparableVersion(version));
+        }
+
+        assertThat(mavenVersions.stream().map(v -> v.toString()).toList())
+                .containsExactly(SORTED_VERSIONS.toArray(new String[0]));
+    }
+
+    @Test
+    public void testDefaultArtifactVersion() {
+        TreeSet<DefaultArtifactVersion> mavenVersions = new TreeSet<>();
+        for (String version : SHUFFLED_VERSIONS) {
+            mavenVersions.add(new DefaultArtifactVersion(version));
         }
 
         assertThat(mavenVersions.stream().map(v -> v.toString()).toList())
