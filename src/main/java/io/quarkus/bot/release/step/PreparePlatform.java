@@ -98,10 +98,10 @@ public class PreparePlatform implements StepHandler {
                     + "\n"
                     + "The Quarkus " + releaseInformation.getVersion() + " core artifacts are available on Maven Central.\n"
                     + "\n"
-                    + "The pull request updating the Platform to Quarkus " + releaseInformation.getVersion() + " has been merged in the main branch.\n"
+                    + "The pull request updating the Platform to Quarkus " + releaseInformation.getVersion() + " has been merged in the " + platformPreparationBranch + " branch.\n"
                     + "We pinged in the pull request the teams maintaining components not passing the tests.\n"
                     + "\n"
-                    + "If you want to update your components, please create your pull requests targeting the main branch and make sure they are merged before next Tuesday.\n");
+                    + "If you want to update your components, please create your pull requests targeting the " + platformPreparationBranch + " branch and make sure they are merged before next Tuesday.\n");
             if (!releaseInformation.isOriginBranchMain()) {
                 comment.append("\nMake sure you mention in the description that your pull request should be be backported to the "
                         + releaseInformation.getBranch() + " branch as " + releaseInformation.getBranch()
@@ -116,8 +116,7 @@ public class PreparePlatform implements StepHandler {
             comment.append("```\n\n");
             comment.append("* If CI failed for some Platform members, please contact them so that they are aware of the issues\n\n");
             comment.append(Admonitions.warning("**IMPORTANT - STOP HERE**\n**IMPORTANT - Wait a week before continuing with the Platform release**") + "\n\n");
-        }
-        if (releaseInformation.isLtsMaintenanceReleaseWithRegularReleaseCadence() && !releaseInformation.isEmergency()) {
+        } else if (releaseInformation.isLtsMaintenanceReleaseWithRegularReleaseCadence() && !releaseInformation.isEmergency()) {
             comment.append("* Send an email to the Platform coordination mailing list: [quarkus-platform-coordination@googlegroups.com](mailto:quarkus-platform-coordination@googlegroups.com) :\n\n");
             comment.append("Subject:\n");
             comment.append("```\n");
@@ -129,10 +128,10 @@ public class PreparePlatform implements StepHandler {
                     + "\n"
                     + "The Quarkus " + releaseInformation.getFullVersion() + " core artifacts are available on Maven Central.\n"
                     + "\n"
-                    + "The pull request updating the Platform to Quarkus " + releaseInformation.getFullVersion() + " has been merged in the main branch.\n"
+                    + "The pull request updating the Platform to Quarkus " + releaseInformation.getFullVersion() + " has been merged in the " + platformPreparationBranch + " branch.\n"
                     + "We pinged in the pull request the teams maintaining components not passing the tests.\n"
                     + "\n"
-                    + "If you need to update your components to fix compatibility issues with this new micro (and only for this reason!), please create your pull requests targeting the " + releaseInformation.getBranch() + " branch and make sure they are merged before next Monday.\n");
+                    + "If you need to update your components to fix compatibility issues with this new micro (and only for this reason!), please create your pull requests targeting the " + platformPreparationBranch + " branch and make sure they are merged before next Monday.\n");
             comment.append("\n"
                     + "Thanks.\n"
                     + "\n"
