@@ -13,7 +13,8 @@ public class Branches {
     public static final String BRANCH_3_8 = "3.8";
 
     public static String getPlatformPreparationBranch(ReleaseInformation releaseInformation) {
-        if (releaseInformation.isFinal() && !releaseInformation.isFirstFinal()) {
+        if (releaseInformation.isFinal()
+                && (!releaseInformation.isFirstFinal() || Branches.isLts(releaseInformation.getBranch()))) {
             return releaseInformation.getBranch();
         }
         if (!releaseInformation.isOriginBranchMain()) {
