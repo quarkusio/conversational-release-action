@@ -48,7 +48,7 @@ public class AnnounceRelease implements StepHandler {
 
         comment.append("## Trigger performance testing\n\n");
 
-        comment.append("Connected to the Red Hat VPN, in a clone of https://github.com/quarkusio/quarkus-release, run:\n");
+        comment.append("Connected to the Red Hat VPN, in a clone of https://github.com/quarkusio/main-release-scripts, run:\n");
         comment.append("```\n");
         comment.append("./trigger-performance-testing.sh " + releaseInformation.getVersion() + "\n");
         comment.append("```\n");
