@@ -30,6 +30,17 @@ public class CoreReleasePublish implements StepHandler {
     }
 
     @Override
+    public void afterSuccess(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation, ReleaseStatus currentReleaseStatus, GHIssue issue) throws IOException, InterruptedException {
+        issue.comment("""
+                :white_check_mark: The Core artifacts have been published to Central Portal.
+                
+                We will now wait for them to get synced to Maven Central.
+                
+                The operations will continue automatically once we have detected all the artifacts have been synced.
+                """);
+    }
+
+    @Override
     public String getErrorHelp(ReleaseInformation releaseInformation) {
         return "Please check the workflow run logs but there is a good chance "
                 + "that the issue was due to a problem accessing [Central Portal](https://central.sonatype.com/publishing/deployments) "

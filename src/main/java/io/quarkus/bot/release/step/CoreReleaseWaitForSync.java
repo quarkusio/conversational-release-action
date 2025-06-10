@@ -30,6 +30,15 @@ public class CoreReleaseWaitForSync implements StepHandler {
     }
 
     @Override
+    public void afterSuccess(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation, ReleaseStatus currentReleaseStatus, GHIssue issue) throws IOException, InterruptedException {
+        issue.comment("""
+                :white_check_mark: The Core artifacts have been synced to Maven Central.
+                
+                We will now proceed with the rest of the release process.
+                """);
+    }
+
+    @Override
     public String getErrorHelp(ReleaseInformation releaseInformation) {
         return "The sync to [Central Portal](https://central.sonatype.com/publishing/deployments) "
                 + "took longer than expected.\n\n"

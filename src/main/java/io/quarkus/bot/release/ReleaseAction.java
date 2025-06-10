@@ -274,6 +274,12 @@ public class ReleaseAction {
 
                 currentReleaseStatus = currentReleaseStatus.progress(StepStatus.COMPLETED);
                 updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
+
+                try {
+                    currentStepHandler.afterSuccess(context, commands, quarkusBotGitHub, releaseInformation, currentReleaseStatus, issue);
+                } catch (Exception e) {
+                    LOG.warnf(e, "An error occurred in afterSuccess() of step: %s, ignoring", currentStep);
+                }
             } catch (StatusUpdateException e) {
                 fatalError(context, commands, releaseInformation, currentReleaseStatus, issue, updatedIssueBody,
                         e.getMessage());
