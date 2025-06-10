@@ -27,7 +27,8 @@ public class UpdateDocumentationAdditionalSyncLts implements StepHandler {
 
     @Override
     public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
-            ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
+            ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody)
+            throws IOException, InterruptedException {
         return processes.execute(List.of("./update-docs.sh", releaseInformation.getBranch()));
     }
 

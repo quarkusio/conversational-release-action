@@ -37,7 +37,8 @@ public class Prerequisites implements StepHandler {
 
     @Override
     public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
-            ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
+            ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody)
+            throws IOException, InterruptedException {
         List<String> command = new ArrayList<String>();
         command.add("./prerequisites.java");
         command.add("--branch=" + releaseInformation.getBranch());
@@ -64,7 +65,8 @@ public class Prerequisites implements StepHandler {
 
         boolean firstFinal = Versions.isDot0(version) ||
                 (Versions.isFirstMicroMaintenanceRelease(version)
-                        && Repositories.getQuarkusRepository(quarkusBotGitHub).getReleaseByTagName(Versions.getDot0(version)) == null);
+                        && Repositories.getQuarkusRepository(quarkusBotGitHub)
+                                .getReleaseByTagName(Versions.getDot0(version)) == null);
         boolean maintenance = Files.exists(Path.of("work", "maintenance"));
 
         releaseInformation.setVersion(version, firstFinal, maintenance);

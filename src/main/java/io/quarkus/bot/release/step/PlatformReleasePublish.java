@@ -27,22 +27,23 @@ public class PlatformReleasePublish implements StepHandler {
 
     @Override
     public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
-            ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
+            ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody)
+            throws IOException, InterruptedException {
         String platformReleaseBranch = Branches.getPlatformReleaseBranch(releaseInformation);
 
         return processes.execute(List.of(
                 "./release-platform-publish.sh",
-                platformReleaseBranch
-        ));
+                platformReleaseBranch));
     }
 
     @Override
-    public void afterSuccess(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation, ReleaseStatus currentReleaseStatus, GHIssue issue) throws IOException, InterruptedException {
+    public void afterSuccess(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
+            ReleaseStatus currentReleaseStatus, GHIssue issue) throws IOException, InterruptedException {
         issue.comment("""
                 :white_check_mark: The Platform artifacts have been published to Central Portal.
-                
+
                 We will now wait for them to get synced to Maven Central.
-                
+
                 The operations will continue automatically once we have detected all the artifacts have been synced.
                 """);
     }

@@ -21,7 +21,7 @@ public class ReleaseInformationTest {
             "3.15.2,3.15,,false,true",
             "3.16.2,3.16,,false,false",
             "3.20.0,3.20,,true,false",
-            "3.20.1,3.20,,false,true"})
+            "3.20.1,3.20,,false,true" })
     public void testIsLtsMaintenanceReleaseWithRegularReleaseCadence(ArgumentsAccessor argumentsAccessor) {
         String version = argumentsAccessor.getString(0);
         String branch = argumentsAccessor.getString(1);
@@ -29,7 +29,9 @@ public class ReleaseInformationTest {
         boolean firstFinal = argumentsAccessor.getBoolean(3);
         boolean expectedResult = argumentsAccessor.getBoolean(4);
 
-        ReleaseInformation releaseInformation = new ReleaseInformation(version, branch, Branches.MAIN, qualifier, false, false, firstFinal, false);
-        assertThat(releaseInformation.isLtsMaintenanceReleaseWithRegularReleaseCadence()).as("Version %s", releaseInformation.getVersion()).isEqualTo(expectedResult);
+        ReleaseInformation releaseInformation = new ReleaseInformation(version, branch, Branches.MAIN, qualifier, false, false,
+                firstFinal, false);
+        assertThat(releaseInformation.isLtsMaintenanceReleaseWithRegularReleaseCadence())
+                .as("Version %s", releaseInformation.getVersion()).isEqualTo(expectedResult);
     }
 }

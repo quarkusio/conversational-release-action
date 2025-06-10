@@ -79,7 +79,8 @@ public class ReleaseAction {
         react(commands, issue, ReactionContent.PLUS_ONE);
 
         try {
-            handleSteps(context, commands, getQuarkusBotGitHub(), issuePayload.getIssue(), updatedIssueBody, null, releaseInformation,
+            handleSteps(context, commands, getQuarkusBotGitHub(), issuePayload.getIssue(), updatedIssueBody, null,
+                    releaseInformation,
                     new ReleaseStatus(Status.STARTED, Step.PREREQUISITES, StepStatus.STARTED, context.getGitHubRunId()));
         } finally {
             if (releaseInformation.getVersion() != null) {
@@ -89,7 +90,8 @@ public class ReleaseAction {
     }
 
     @Action
-    void continueRelease(Context context, Commands commands, @IssueComment.Created GHEventPayload.IssueComment issueCommentPayload)
+    void continueRelease(Context context, Commands commands,
+            @IssueComment.Created GHEventPayload.IssueComment issueCommentPayload)
             throws Exception {
         commands.notice("Continuing release...");
 
@@ -130,7 +132,8 @@ public class ReleaseAction {
         try {
             releaseStatus = releaseStatus.progress(context.getGitHubRunId());
             updateReleaseStatus(issue, updatedIssueBody, releaseStatus);
-            handleSteps(context, commands, getQuarkusBotGitHub(), issue, updatedIssueBody, issueComment, releaseInformation, releaseStatus);
+            handleSteps(context, commands, getQuarkusBotGitHub(), issue, updatedIssueBody, issueComment, releaseInformation,
+                    releaseStatus);
         } finally {
             if (releaseInformation.getVersion() != null) {
                 commands.setOutput(Outputs.VERSION, releaseInformation.getVersion());
@@ -150,7 +153,8 @@ public class ReleaseAction {
         }
     }
 
-    private void handleSteps(Context context, Commands commands, GitHub quarkusBotGitHub, GHIssue issue, UpdatedIssueBody updatedIssueBody,
+    private void handleSteps(Context context, Commands commands, GitHub quarkusBotGitHub, GHIssue issue,
+            UpdatedIssueBody updatedIssueBody,
             GHIssueComment issueComment, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus) throws Exception {
         ReleaseStatus currentReleaseStatus = releaseStatus;
 
@@ -193,11 +197,13 @@ public class ReleaseAction {
                 // Handle paused, we will continue the process with the next step
                 StepHandler stepHandler = currentReleaseStatus.getCurrentStep().getStepHandler();
 
-                if (stepHandler.shouldContinueAfterPause(context, commands, quarkusBotGitHub, releaseInformation, currentReleaseStatus, issue, issueComment)) {
+                if (stepHandler.shouldContinueAfterPause(context, commands, quarkusBotGitHub, releaseInformation,
+                        currentReleaseStatus, issue, issueComment)) {
                     react(commands, issueComment, ReactionContent.PLUS_ONE);
                     currentReleaseStatus = currentReleaseStatus.progress(StepStatus.STARTED);
                     updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
-                } else if (stepHandler.shouldSkipAfterPause(context, commands, quarkusBotGitHub, releaseInformation, currentReleaseStatus, issue, issueComment)) {
+                } else if (stepHandler.shouldSkipAfterPause(context, commands, quarkusBotGitHub, releaseInformation,
+                        currentReleaseStatus, issue, issueComment)) {
                     react(commands, issueComment, ReactionContent.PLUS_ONE);
                     currentReleaseStatus = currentReleaseStatus.progress(StepStatus.SKIPPED);
                     updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
@@ -255,7 +261,7 @@ public class ReleaseAction {
                         currentReleaseStatus = currentReleaseStatus.progress(StepStatus.SKIPPED);
                         updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
                         continue;
-                    // we push an updated PAUSED status here as we want that to appear in youAreHere()
+                        // we push an updated PAUSED status here as we want that to appear in youAreHere()
                     } else if (currentStepHandler.shouldPause(context, commands, quarkusBotGitHub, releaseInformation,
                             currentReleaseStatus.progress(StepStatus.PAUSED), issue, issueComment)) {
                         currentReleaseStatus = currentReleaseStatus.progress(StepStatus.PAUSED);
@@ -269,14 +275,16 @@ public class ReleaseAction {
 
                 commands.notice("Running step " + currentStep.getDescription());
 
-                int exitCode = currentStepHandler.run(context, commands, quarkusBotGitHub, releaseInformation, currentReleaseStatus, issue, updatedIssueBody);
+                int exitCode = currentStepHandler.run(context, commands, quarkusBotGitHub, releaseInformation,
+                        currentReleaseStatus, issue, updatedIssueBody);
                 handleExitCode(exitCode, currentStep);
 
                 currentReleaseStatus = currentReleaseStatus.progress(StepStatus.COMPLETED);
                 updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
 
                 try {
-                    currentStepHandler.afterSuccess(context, commands, quarkusBotGitHub, releaseInformation, currentReleaseStatus, issue);
+                    currentStepHandler.afterSuccess(context, commands, quarkusBotGitHub, releaseInformation,
+                            currentReleaseStatus, issue);
                 } catch (Exception e) {
                     LOG.warnf(e, "An error occurred in afterSuccess() of step: %s, ignoring", currentStep);
                 }
@@ -352,7 +360,8 @@ public class ReleaseAction {
         try {
             StringBuilder comment = new StringBuilder();
             comment.append(":gear: Proceeding to step ").append(currentStep.getDescription()).append("\n\n");
-            comment.append("You can follow the progress of the workflow [here](").append(getWorkflowRunUrl(context)).append(").\n\n");
+            comment.append("You can follow the progress of the workflow [here](").append(getWorkflowRunUrl(context))
+                    .append(").\n\n");
 
             StepHandler stepHandler = currentStep.getStepHandler();
             String continueFromStepHelp = stepHandler.getContinueFromStepHelp(releaseInformation);
@@ -372,7 +381,7 @@ public class ReleaseAction {
             final ReleaseStatus currentReleaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody, String error,
             String errorHelp) {
         ReleaseStatus updatedReleaseStatus;
-        switch(currentReleaseStatus.getCurrentStepStatus()) {
+        switch (currentReleaseStatus.getCurrentStepStatus()) {
             case INIT:
                 updatedReleaseStatus = currentReleaseStatus.progress(StepStatus.INIT_FAILED);
                 break;
@@ -392,8 +401,11 @@ public class ReleaseAction {
             if (!Strings.isBlank(errorHelp)) {
                 interactionComment.append(Admonitions.note(errorHelp)).append("\n\n");
             }
-            interactionComment.append("You can find more information about the failure in the [workflow run logs](").append(getWorkflowRunUrl(context)).append(").\n\n");
-            interactionComment.append(Admonitions.important("This is not a fatal error, you can retry by adding a `" + Command.RETRY.getFullCommand() + "` comment.")).append("\n\n");
+            interactionComment.append("You can find more information about the failure in the [workflow run logs](")
+                    .append(getWorkflowRunUrl(context)).append(").\n\n");
+            interactionComment.append(Admonitions.important(
+                    "This is not a fatal error, you can retry by adding a `" + Command.RETRY.getFullCommand() + "` comment."))
+                    .append("\n\n");
             interactionComment.append(Progress.youAreHere(releaseInformation, currentReleaseStatus));
 
             commands.setOutput(Outputs.INTERACTION_COMMENT, interactionComment.toString());
@@ -427,7 +439,8 @@ public class ReleaseAction {
                 if (!Strings.isBlank(errorHelp)) {
                     issueComment.append(Admonitions.tip(errorHelp)).append("\n\n");
                 }
-                issueComment.append("You can find more information about the failure in the [workflow run logs](").append(getWorkflowRunUrl(context)).append(").\n\n");
+                issueComment.append("You can find more information about the failure in the [workflow run logs](")
+                        .append(getWorkflowRunUrl(context)).append(").\n\n");
                 issueComment.append(Progress.youAreHere(releaseInformation, releaseStatus));
 
                 issue.comment(issueComment.toString());
@@ -437,7 +450,8 @@ public class ReleaseAction {
             StringBuilder interactionComment = new StringBuilder();
             interactionComment.append(Admonitions.caution("We were unable to report the fatal error to the issue status.\n\n" +
                     "The issue should be closed and no further interaction should be made with this issue")).append("\n\n");
-            interactionComment.append("You can find more information about the failure in the [workflow run logs](").append(getWorkflowRunUrl(context)).append(").\n\n");
+            interactionComment.append("You can find more information about the failure in the [workflow run logs](")
+                    .append(getWorkflowRunUrl(context)).append(").\n\n");
             interactionComment.append(Progress.youAreHere(releaseInformation, updatedReleaseStatus));
 
             commands.setOutput(Outputs.INTERACTION_COMMENT, interactionComment.toString());

@@ -33,7 +33,8 @@ public class AnnounceRelease implements StepHandler {
 
     @Override
     public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
-            ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
+            ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody)
+            throws IOException, InterruptedException {
         StringBuilder comment = new StringBuilder();
 
         comment.append(":white_check_mark: " + releaseInformation.getVersion() + " was successfully released.\n\n");
@@ -59,7 +60,8 @@ public class AnnounceRelease implements StepHandler {
         if (releaseInformation.isFinal()) {
             comment.append("Then it is time to announce the release:\n\n");
             if (!releaseInformation.isMaintenance()) {
-                comment.append("* Update the versions of the website in [`_data/versions.yaml`](https://github.com/quarkusio/quarkusio.github.io/blob/develop/_data/versions.yaml)\n");
+                comment.append(
+                        "* Update the versions of the website in [`_data/versions.yaml`](https://github.com/quarkusio/quarkusio.github.io/blob/develop/_data/versions.yaml)\n");
             }
             if (Branches.isLts(releaseInformation.getBranch())) {
                 comment.append(
@@ -71,7 +73,8 @@ public class AnnounceRelease implements StepHandler {
             if (releaseInformation.isFirstFinal()) {
                 comment.append("  * If a Mandrel/GraalVM upgrade is necessary, make sure it is prominent in the announcement");
             }
-            comment.append("* Push it and wait for it to be live on [quarkus.io](https://quarkus.io/blog/) - you can follow the progress of the deployment on [GitHub Actions](https://github.com/quarkusio/quarkusio.github.io/actions)\n");
+            comment.append(
+                    "* Push it and wait for it to be live on [quarkus.io](https://quarkus.io/blog/) - you can follow the progress of the deployment on [GitHub Actions](https://github.com/quarkusio/quarkusio.github.io/actions)\n");
             comment.append("* Send the announcement to [quarkus-dev@googlegroups.com](mailto:quarkus-dev@googlegroups.com)\n");
             comment.append("* Send the announcement to various social networks using https://buffer.com/\n");
 
@@ -88,11 +91,13 @@ public class AnnounceRelease implements StepHandler {
 
             if (releaseInformation.isFirstFinal()) {
                 try {
-                    String previousMinorBranch = getPreviousMinorBranch(Repositories.getQuarkusRepository(quarkusBotGitHub), releaseInformation.getBranch());
+                    String previousMinorBranch = getPreviousMinorBranch(Repositories.getQuarkusRepository(quarkusBotGitHub),
+                            releaseInformation.getBranch());
 
                     comment.append(
                             "\n\nFor new major/minor releases, we include the list of contributors in the announcement blog post.\n");
-                    comment.append("The number of contributors can be found in the `Contributors` section of the [project home page](https://github.com/quarkusio/quarkus).\n");
+                    comment.append(
+                            "The number of contributors can be found in the `Contributors` section of the [project home page](https://github.com/quarkusio/quarkus).\n");
                     comment.append(
                             "You can get a rough list of contributors (check for duplicates!) since the previous minor by executing the following commands in a Quarkus repository local clone:\n\n");
                     comment.append("```\n");
@@ -105,7 +110,8 @@ public class AnnounceRelease implements StepHandler {
                 }
             }
         } else {
-            comment.append("Then it is time to send an email to [quarkus-dev@googlegroups.com](mailto:quarkus-dev@googlegroups.com):\n\n");
+            comment.append(
+                    "Then it is time to send an email to [quarkus-dev@googlegroups.com](mailto:quarkus-dev@googlegroups.com):\n\n");
             comment.append("Subject:\n");
             comment.append("```\n");
             comment.append("Quarkus " + releaseInformation.getVersion() + " released\n");

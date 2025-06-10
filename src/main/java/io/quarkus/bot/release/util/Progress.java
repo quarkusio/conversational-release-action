@@ -27,7 +27,8 @@ public final class Progress {
                             sb.append("[");
                             if (releaseStatus.getCurrentStep().ordinal() > s.ordinal() ||
                                     (releaseStatus.getCurrentStep() == s
-                                            && (releaseStatus.getCurrentStepStatus() == StepStatus.COMPLETED || releaseStatus.getCurrentStepStatus() == StepStatus.SKIPPED))) {
+                                            && (releaseStatus.getCurrentStepStatus() == StepStatus.COMPLETED
+                                                    || releaseStatus.getCurrentStepStatus() == StepStatus.SKIPPED))) {
                                 sb.append("X");
                             } else {
                                 sb.append(" ");

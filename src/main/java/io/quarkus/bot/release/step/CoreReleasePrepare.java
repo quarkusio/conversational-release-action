@@ -28,14 +28,16 @@ public class CoreReleasePrepare implements StepHandler {
 
     @Override
     public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
-            ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
+            ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody)
+            throws IOException, InterruptedException {
         return processes.execute(List.of("./release-core-prepare.sh"));
     }
 
     @Override
     public String getContinueFromStepHelp(ReleaseInformation releaseInformation) {
         StringBuilder help = new StringBuilder();
-        help.append("The Core release steps take approximately ").append(DURATION).append(" so don't panic if it takes time.\n");
+        help.append("The Core release steps take approximately ").append(DURATION)
+                .append(" so don't panic if it takes time.\n");
         help.append("You will receive feedback in this very issue if an error occurs or when further input is needed.");
         return help.toString();
     }
