@@ -29,8 +29,10 @@ public final class Issues {
     private static final String RELEASE_STATUS_MARKER = "<!-- quarkus-release/release-status:";
     private static final String END_OF_MARKER = "-->";
 
-    private static final Pattern RELEASE_INFORMATION_PATTERN = Pattern.compile(RELEASE_INFORMATION_MARKER + "(.*?)" + END_OF_MARKER, Pattern.DOTALL);
-    private static final Pattern RELEASE_STATUS_PATTERN = Pattern.compile(RELEASE_STATUS_MARKER + "(.*?)" + END_OF_MARKER, Pattern.DOTALL);
+    private static final Pattern RELEASE_INFORMATION_PATTERN = Pattern
+            .compile(RELEASE_INFORMATION_MARKER + "(.*?)" + END_OF_MARKER, Pattern.DOTALL);
+    private static final Pattern RELEASE_STATUS_PATTERN = Pattern.compile(RELEASE_STATUS_MARKER + "(.*?)" + END_OF_MARKER,
+            Pattern.DOTALL);
 
     @Inject
     @Yaml
@@ -126,7 +128,8 @@ public final class Issues {
 
     public String appendReleaseInformation(UpdatedIssueBody updatedIssueBody, ReleaseInformation releaseInformation) {
         try {
-            String descriptor = RELEASE_INFORMATION_MARKER + "\n" + objectMapper.writeValueAsString(releaseInformation) + END_OF_MARKER;
+            String descriptor = RELEASE_INFORMATION_MARKER + "\n" + objectMapper.writeValueAsString(releaseInformation)
+                    + END_OF_MARKER;
 
             if (!updatedIssueBody.contains(RELEASE_INFORMATION_MARKER)) {
                 return updatedIssueBody.append(descriptor);

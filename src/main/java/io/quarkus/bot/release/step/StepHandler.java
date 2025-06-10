@@ -19,11 +19,14 @@ public interface StepHandler {
             throws IOException, InterruptedException;
 
     /**
-     * This method is executed if run() has been successfully executed and is executed after the step status has been marked to COMPLETED.
+     * This method is executed if run() has been successfully executed and is executed after the step status has been marked to
+     * COMPLETED.
      * <p>
      * It may be used to add a comment indicating the progress of step.
      */
-    default void afterSuccess(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation, ReleaseStatus currentReleaseStatus, GHIssue issue) throws IOException, InterruptedException {
+    default void afterSuccess(Context context, Commands commands, GitHub quarkusBotGitHub,
+            ReleaseInformation releaseInformation, ReleaseStatus currentReleaseStatus, GHIssue issue)
+            throws IOException, InterruptedException {
     }
 
     default boolean shouldPause(Context context, Commands commands, GitHub quarkusBotGitHub,

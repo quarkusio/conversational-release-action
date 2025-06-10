@@ -31,7 +31,8 @@ public class CoreReleaseApprove implements StepHandler {
     Jdks jdks;
 
     @Override
-    public boolean shouldPause(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
+    public boolean shouldPause(Context context, Commands commands, GitHub quarkusBotGitHub,
+            ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
         StringBuilder comment = new StringBuilder();
         comment.append(":raised_hands: We are going to release the following release:\n\n");
         comment.append("- Quarkus `").append(releaseInformation.getVersion()).append("`\n");
@@ -42,7 +43,8 @@ public class CoreReleaseApprove implements StepHandler {
         comment.append("\n");
         comment.append("- With Java `").append(jdks.getJdkVersion(releaseInformation.getBranch())).append("`\n");
         if (releaseInformation.isFirstFinal() && !releaseInformation.isDot0()) {
-            comment.append("- :bulb: We detected that this `" + releaseInformation.getVersion() + "` release will be the first final as `"
+            comment.append("- :bulb: We detected that this `" + releaseInformation.getVersion()
+                    + "` release will be the first final as `"
                     + Versions.getDot0(releaseInformation.getVersion()) + "` has not been fully released\n");
         }
         if (Branches.isLts(releaseInformation.getBranch())) {
@@ -60,8 +62,9 @@ public class CoreReleaseApprove implements StepHandler {
 
         if (!releaseInformation.isOriginBranchMain()) {
             comment.append("\n");
-            comment.append(Admonitions.warning("This release will be branched from " + releaseInformation.getOriginBranch() + ".\n" +
-                    "You may release from an existing branch only when preparing a new LTS release.") + "\n");
+            comment.append(
+                    Admonitions.warning("This release will be branched from " + releaseInformation.getOriginBranch() + ".\n" +
+                            "You may release from an existing branch only when preparing a new LTS release.") + "\n");
         }
 
         String mergeInfo;
@@ -95,7 +98,6 @@ public class CoreReleaseApprove implements StepHandler {
         comment.append(Admonitions.caution("An error occurred.") + "\n\n");
         comment.append("</details>\n\n");
 
-
         comment.append(Progress.youAreHere(releaseInformation, releaseStatus));
         commands.setOutput(Outputs.INTERACTION_COMMENT, comment.toString());
         return true;
@@ -103,7 +105,8 @@ public class CoreReleaseApprove implements StepHandler {
 
     @Override
     public boolean shouldContinueAfterPause(Context context, Commands commands,
-            GitHub quarkusBotGitHub, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
+            GitHub quarkusBotGitHub, ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue,
+            GHIssueComment issueComment) {
         return Command.YES.matches(issueComment.getBody());
     }
 
@@ -118,7 +121,8 @@ public class CoreReleaseApprove implements StepHandler {
             comment.append(Admonitions.tip("Don't go too far, we will need some input from you very soon."));
         } else {
             comment.append(Admonitions
-                    .tip("The Core release steps take approximately " + CoreReleasePrepare.DURATION + " so don't panic if it takes time.\n" +
+                    .tip("The Core release steps take approximately " + CoreReleasePrepare.DURATION
+                            + " so don't panic if it takes time.\n" +
                             "You will receive feedback in this very issue when further input is needed or if an error occurs."));
         }
 

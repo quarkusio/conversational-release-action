@@ -24,7 +24,8 @@ public enum Step {
     UPDATE_JBANG_CATALOG("Update JBang catalog", UpdateJBangCatalog.class, true, true),
     PUBLISH_CLI("Publish CLI", PublishCLI.class, true, true),
     UPDATE_QUICKSTARTS("Update quickstarts", UpdateQuickstarts.class, true, false),
-    UPDATE_QUICKSTARTS_ADDITIONAL_SYNC_LTS("Update quickstarts - Additional sync to version branch", UpdateQuickstartsAdditionalSyncVersionBranch.class,
+    UPDATE_QUICKSTARTS_ADDITIONAL_SYNC_LTS("Update quickstarts - Additional sync to version branch",
+            UpdateQuickstartsAdditionalSyncVersionBranch.class,
             true, true),
     UPDATE_DOCUMENTATION("Update documentation", UpdateDocumentation.class, true, true),
     UPDATE_DOCUMENTATION_ADDITIONAL_SYNC_LTS("Update documentation - Additional sync for LTS",
@@ -59,7 +60,7 @@ public enum Step {
     }
 
     public boolean isLast() {
-        return this.ordinal() == values().length -1;
+        return this.ordinal() == values().length - 1;
     }
 
     public Step next() {

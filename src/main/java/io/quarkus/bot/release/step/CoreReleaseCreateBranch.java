@@ -51,13 +51,16 @@ public class CoreReleaseCreateBranch implements StepHandler {
             ReleaseInformation releaseInformation, ReleaseStatus releaseStatus, GHIssue issue, GHIssueComment issueComment) {
 
         StringBuilder comment = new StringBuilder();
-        comment.append(Admonitions.warning("**IMPORTANT** This is the first Candidate Release and this release requires special care.") + "\n\n");
+        comment.append(
+                Admonitions.warning("**IMPORTANT** This is the first Candidate Release and this release requires special care.")
+                        + "\n\n");
         comment.append(":raised_hands: You have two options:\n\n");
         comment.append("- Let the release process handle things automatically: it will create the branch automatically from **`"
                 + releaseInformation.getOriginBranch() + "`** and handle additional housekeeping operations\n");
         comment.append("- Perform all the operations manually\n\n");
 
-        comment.append(Admonitions.important("**To let the release process handle things automatically for you, simply add a `" + Command.AUTO.getFullCommand() + "` comment**."));
+        comment.append(Admonitions.important("**To let the release process handle things automatically for you, simply add a `"
+                + Command.AUTO.getFullCommand() + "` comment**."));
         comment.append("\n\n");
 
         comment.append("---\n\n");
@@ -66,26 +69,36 @@ public class CoreReleaseCreateBranch implements StepHandler {
         comment.append(
                 "- Create the `" + releaseInformation.getBranch() + "` branch and push it to the upstream repository\n");
         comment.append("- Rename the `" + releaseInformation.getBranch()
-                + " - main` milestone [here](https://github.com/quarkusio/quarkus/milestones) to " + releaseInformation.getVersion() + "\n");
+                + " - main` milestone [here](https://github.com/quarkusio/quarkus/milestones) to "
+                + releaseInformation.getVersion() + "\n");
         comment.append(
                 "- Create a new milestone `X.Y - main` milestone [here](https://github.com/quarkusio/quarkus/milestones/new) with `X.Y` being the next major/minor version name. Make sure you follow the naming convention, it is important.\n");
-        comment.append("- Rename the `" + Labels.BACKPORT_LABEL + "` label to `" + Labels.backportForVersion(releaseInformation.getBranch()) + "`\n");
+        comment.append("- Rename the `" + Labels.BACKPORT_LABEL + "` label to `"
+                + Labels.backportForVersion(releaseInformation.getBranch()) + "`\n");
         comment.append("- Create a new `" + Labels.BACKPORT_LABEL + "` label\n");
-        comment.append("- Make sure [all the current opened pull requests with the `" + Labels.backportForVersion(releaseInformation.getBranch())
+        comment.append("- Make sure [all the current opened pull requests with the `"
+                + Labels.backportForVersion(releaseInformation.getBranch())
                 + "` label](https://github.com/quarkusio/quarkus/pulls?q=is%3Apr+is%3Aopen+label%3A"
                 + Labels.backportForVersion(releaseInformation.getBranch()).replace("/", "%2F")
-                + "+) also have the new `" + Labels.BACKPORT_LABEL + "` label (in the UI, you can select all the pull requests with the top checkbox then use the `Label` dropdown to apply the `" + Labels.BACKPORT_LABEL + "` label)\n");
-        comment.append("- Send an email to [quarkus-dev@googlegroups.com](mailto:quarkus-dev@googlegroups.com) announcing that `" + releaseInformation.getBranch() + "` has been branched and post on [Zulip #dev stream](https://quarkusio.zulipchat.com/#narrow/stream/187038-dev/):\n\n");
+                + "+) also have the new `" + Labels.BACKPORT_LABEL
+                + "` label (in the UI, you can select all the pull requests with the top checkbox then use the `Label` dropdown to apply the `"
+                + Labels.BACKPORT_LABEL + "` label)\n");
+        comment.append(
+                "- Send an email to [quarkus-dev@googlegroups.com](mailto:quarkus-dev@googlegroups.com) announcing that `"
+                        + releaseInformation.getBranch()
+                        + "` has been branched and post on [Zulip #dev stream](https://quarkusio.zulipchat.com/#narrow/stream/187038-dev/):\n\n");
 
         String previousMinorBranch;
         try {
-            previousMinorBranch = getPreviousMinorBranch(Repositories.getQuarkusRepository(quarkusBotGitHub), releaseInformation.getBranch());
+            previousMinorBranch = getPreviousMinorBranch(Repositories.getQuarkusRepository(quarkusBotGitHub),
+                    releaseInformation.getBranch());
         } catch (IOException e) {
             previousMinorBranch = "previous minor";
         }
 
         comment.append(getBranchEmail(releaseInformation, previousMinorBranch, null, false, null) + "\n\n");
-        comment.append("Once you are done with all this, add a `" + Command.MANUAL.getFullCommand() + "` comment to let the release process know you have handled everything manually.\n\n");
+        comment.append("Once you are done with all this, add a `" + Command.MANUAL.getFullCommand()
+                + "` comment to let the release process know you have handled everything manually.\n\n");
         comment.append("</details>\n\n");
 
         comment.append(Progress.youAreHere(releaseInformation, releaseStatus));
@@ -109,7 +122,8 @@ public class CoreReleaseCreateBranch implements StepHandler {
 
     @Override
     public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
-            ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody) throws InterruptedException, IOException {
+            ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody)
+            throws InterruptedException, IOException {
         GHRepository repository = Repositories.getQuarkusRepository(quarkusBotGitHub);
 
         try {
@@ -147,7 +161,8 @@ public class CoreReleaseCreateBranch implements StepHandler {
 
                     repository.createMilestone(nextMinorInMain + MAIN_MILESTONE_SUFFIX, "");
                 } catch (Exception e) {
-                    throw new IllegalStateException("Unable to update the milestone or create the new milestone: " + e.getMessage(), e);
+                    throw new IllegalStateException(
+                            "Unable to update the milestone or create the new milestone: " + e.getMessage(), e);
                 }
             } else {
                 throw new IllegalStateException(
@@ -213,7 +228,8 @@ public class CoreReleaseCreateBranch implements StepHandler {
         comment += Admonitions.tip(
                 "**Apart from sending the email and posting on Zulip, no intervention from you is needed, the release process is in progress.**\n\n"
                         +
-                        "The next steps take approximately " + CoreReleasePrepare.DURATION + " so don't panic if it takes time.\n" +
+                        "The next steps take approximately " + CoreReleasePrepare.DURATION
+                        + " so don't panic if it takes time.\n" +
                         "You will receive feedback in this very issue when further input is needed or if an error occurs.")
                 + "\n\n";
         comment += Progress.youAreHere(releaseInformation, releaseStatus);
@@ -273,9 +289,11 @@ public class CoreReleaseCreateBranch implements StepHandler {
                 + "\n"
                 + "Please make sure you add the appropriate backport labels from now on:\n"
                 + "\n"
-                + "- for anything required in " + releaseInformation.getFullBranch() + " (currently open pull requests included), please add the " + Labels.BACKPORT_LABEL + " label\n";
+                + "- for anything required in " + releaseInformation.getFullBranch()
+                + " (currently open pull requests included), please add the " + Labels.BACKPORT_LABEL + " label\n";
 
-        email += "- for fixes we also want in future " + Branches.getFullBranch(previousMinorBranch) + ", please add the " + Labels.backportForVersion(previousMinorBranch) + " label\n";
+        email += "- for fixes we also want in future " + Branches.getFullBranch(previousMinorBranch) + ", please add the "
+                + Labels.backportForVersion(previousMinorBranch) + " label\n";
 
         for (String ltsBranch : Branches.getLtsVersionsReleasedBefore(previousMinorBranch).reversed()) {
             // 2.13 is not an official LTS so we have to special case it

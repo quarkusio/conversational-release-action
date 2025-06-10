@@ -24,24 +24,25 @@ public class IssuesTest {
     @Test
     void testExtractReleaseInformationFromForm() {
         String description = """
-            ### Branch
+                ### Branch
 
-            3.6
+                3.6
 
-            ### Origin branch
+                ### Origin branch
 
-            _No response_
+                _No response_
 
-            ### Qualifier
+                ### Qualifier
 
-            _No response_
+                _No response_
 
-            ### Major version
+                ### Major version
 
-            - [ ] This release is a major version.
-            """;
+                - [ ] This release is a major version.
+                """;
 
-        assertThat(issues.extractReleaseInformationFromForm(description)).isEqualTo(new ReleaseInformation(null, "3.6", Branches.MAIN, null, false, false, false, false));
+        assertThat(issues.extractReleaseInformationFromForm(description))
+                .isEqualTo(new ReleaseInformation(null, "3.6", Branches.MAIN, null, false, false, false, false));
 
         description = """
                 ### Branch
@@ -61,7 +62,8 @@ public class IssuesTest {
                 - [x] This release is a major version.
                 """;
 
-        assertThat(issues.extractReleaseInformationFromForm(description)).isEqualTo(new ReleaseInformation(null, "main", "3.14", "CR1", false, true, false, false));
+        assertThat(issues.extractReleaseInformationFromForm(description))
+                .isEqualTo(new ReleaseInformation(null, "main", "3.14", "CR1", false, true, false, false));
 
         description = """
                 ### Branch
@@ -85,7 +87,8 @@ public class IssuesTest {
                 - [ ] This release is a major version.
                 """;
 
-        assertThat(issues.extractReleaseInformationFromForm(description)).isEqualTo(new ReleaseInformation(null, "3.20", "main", null, true, false, false, false));
+        assertThat(issues.extractReleaseInformationFromForm(description))
+                .isEqualTo(new ReleaseInformation(null, "3.20", "main", null, true, false, false, false));
 
         assertThrows(IllegalStateException.class, () -> issues.extractReleaseInformationFromForm("foobar"));
 
@@ -191,20 +194,21 @@ public class IssuesTest {
 
     @Test
     void testAppendReleaseInformation() {
-        assertThat(issues.appendReleaseInformation(new UpdatedIssueBody(""), new ReleaseInformation(null, "3.6", Branches.MAIN, null, false, false, false, false))).isEqualTo("""
+        assertThat(issues.appendReleaseInformation(new UpdatedIssueBody(""),
+                new ReleaseInformation(null, "3.6", Branches.MAIN, null, false, false, false, false))).isEqualTo("""
 
 
-                <!-- quarkus-release/release-information:
-                ---
-                version: null
-                branch: "3.6"
-                originBranch: "main"
-                qualifier: null
-                emergency: false
-                major: false
-                firstFinal: false
-                maintenance: false
-                -->""");
+                        <!-- quarkus-release/release-information:
+                        ---
+                        version: null
+                        branch: "3.6"
+                        originBranch: "main"
+                        qualifier: null
+                        emergency: false
+                        major: false
+                        firstFinal: false
+                        maintenance: false
+                        -->""");
 
         assertThat(issues.appendReleaseInformation(new UpdatedIssueBody("""
                 This is a comment.
@@ -219,19 +223,19 @@ public class IssuesTest {
                 firstFinal: false
                 maintenance: false
                 -->"""), new ReleaseInformation("3.7.1", "3.7", Branches.MAIN, "CR1", false, true, false, false))).isEqualTo("""
-                        This is a comment.
+                This is a comment.
 
-                        <!-- quarkus-release/release-information:
-                        ---
-                        version: "3.7.1"
-                        branch: "3.7"
-                        originBranch: "main"
-                        qualifier: "CR1"
-                        emergency: false
-                        major: true
-                        firstFinal: false
-                        maintenance: false
-                        -->""");
+                <!-- quarkus-release/release-information:
+                ---
+                version: "3.7.1"
+                branch: "3.7"
+                originBranch: "main"
+                qualifier: "CR1"
+                emergency: false
+                major: true
+                firstFinal: false
+                maintenance: false
+                -->""");
     }
 
     @Test
@@ -283,17 +287,18 @@ public class IssuesTest {
 
     @Test
     void testAppendReleaseStatus() {
-        assertThat(issues.appendReleaseStatus(new UpdatedIssueBody(""), new ReleaseStatus(Status.STARTED, Step.CORE_RELEASE_APPROVE, StepStatus.STARTED, 123L))).matches("""
+        assertThat(issues.appendReleaseStatus(new UpdatedIssueBody(""),
+                new ReleaseStatus(Status.STARTED, Step.CORE_RELEASE_APPROVE, StepStatus.STARTED, 123L))).matches("""
 
 
-                <!-- quarkus-release/release-status:
-                ---
-                status: "STARTED"
-                currentStep: "CORE_RELEASE_APPROVE"
-                currentStepStatus: "STARTED"
-                workflowRunId: 123
-                date: ".*"
-                -->""");
+                        <!-- quarkus-release/release-status:
+                        ---
+                        status: "STARTED"
+                        currentStep: "CORE_RELEASE_APPROVE"
+                        currentStepStatus: "STARTED"
+                        workflowRunId: 123
+                        date: ".*"
+                        -->""");
 
         assertThat(issues.appendReleaseStatus(new UpdatedIssueBody("""
                 This is a comment.
@@ -311,7 +316,8 @@ public class IssuesTest {
                 currentStep: "CORE_RELEASE_APPROVE"
                 currentStepStatus: "STARTED"
                 workflowRunId: 123
-                -->"""), new ReleaseStatus(Status.COMPLETED, Step.CORE_RELEASE_PREPARE, StepStatus.COMPLETED, 145L))).matches("""
+                -->"""), new ReleaseStatus(Status.COMPLETED, Step.CORE_RELEASE_PREPARE, StepStatus.COMPLETED, 145L)))
+                .matches("""
                         This is a comment.
 
                         <!-- quarkus-release/release-information:

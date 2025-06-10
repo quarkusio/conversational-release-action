@@ -161,7 +161,8 @@ public class ReleaseInformation {
     }
 
     /**
-     * @return whether this is an emergency release (e.g. 3.17.7.1). Emergency releases are only used for LTS branches with regular release cadence.
+     * @return whether this is an emergency release (e.g. 3.17.7.1). Emergency releases are only used for LTS branches with
+     *         regular release cadence.
      */
     public boolean isEmergency() {
         return emergency;
@@ -193,7 +194,8 @@ public class ReleaseInformation {
     private static void checkConsistency(String branch, String qualifier, boolean emergency, boolean major) {
         if (emergency) {
             if (!Branches.isLtsBranchWithRegularReleaseCadence(branch)) {
-                throw new IllegalStateException("Emergency releases are only supported for LTS branches with regular release cadence.");
+                throw new IllegalStateException(
+                        "Emergency releases are only supported for LTS branches with regular release cadence.");
             }
             if (major) {
                 throw new IllegalStateException("A release may not be both an emergency and a major release");

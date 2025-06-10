@@ -32,7 +32,8 @@ public final class Versions {
         return getVersion(elements[0] + "." + elements[1]);
     }
 
-    public static String getPreviousMinorBranch(NavigableSet<ComparableVersion> existingBranches, ComparableVersion currentBranch) {
+    public static String getPreviousMinorBranch(NavigableSet<ComparableVersion> existingBranches,
+            ComparableVersion currentBranch) {
         String previousMinor = null;
 
         for (ComparableVersion branchCandidate : existingBranches.descendingSet()) {
