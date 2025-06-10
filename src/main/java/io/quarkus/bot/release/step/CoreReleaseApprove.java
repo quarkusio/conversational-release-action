@@ -25,7 +25,7 @@ import io.quarkus.bot.release.util.Versions;
 
 @Singleton
 @Unremovable
-public class ApproveCoreRelease implements StepHandler {
+public class CoreReleaseApprove implements StepHandler {
 
     @Inject
     Jdks jdks;

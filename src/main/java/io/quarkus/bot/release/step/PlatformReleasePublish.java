@@ -20,7 +20,7 @@ import io.quarkus.bot.release.util.UpdatedIssueBody;
 
 @Singleton
 @Unremovable
-public class ReleasePlatform implements StepHandler {
+public class PlatformReleasePublish implements StepHandler {
 
     @Inject
     Processes processes;
@@ -31,17 +31,33 @@ public class ReleasePlatform implements StepHandler {
         String platformReleaseBranch = Branches.getPlatformReleaseBranch(releaseInformation);
 
         return processes.execute(List.of(
-                "./release-platform.sh",
+                "./release-platform-publish.sh",
                 platformReleaseBranch
         ));
     }
 
     @Override
+    public void afterSuccess(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation, ReleaseStatus currentReleaseStatus, GHIssue issue) throws IOException, InterruptedException {
+        issue.comment("""
+                :white_check_mark: The Platform artifacts have been published to Central Portal.
+                
+                We will now wait for them to get synced to Maven Central.
+                
+                The operations will continue automatically once we have detected all the artifacts have been synced.
+                """);
+    }
+
+    @Override
     public String getErrorHelp(ReleaseInformation releaseInformation) {
         return "Please check the workflow run logs but there is a good chance "
-                + "that the issue was due to a problem with accessing `s01.oss.sonatype.org` "
+                + "that the issue was due to a problem accessing [Central Portal](https://central.sonatype.com/publishing/deployments) "
                 + "either when authenticating or when uploading the artifacts.\n"
                 + "If so, please retry.\n\n"
-                + "Status page for `s01.oss.sonatype.org`: https://status.maven.org/.";
+                + "Status page for Central Portal: https://status.maven.org/.";
+    }
+
+    @Override
+    public String getContinueFromStepHelp(ReleaseInformation releaseInformation) {
+        return StepHandler.super.getContinueFromStepHelp(releaseInformation);
     }
 }

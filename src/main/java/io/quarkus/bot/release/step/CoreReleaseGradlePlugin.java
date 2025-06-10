@@ -19,7 +19,7 @@ import io.quarkus.bot.release.util.UpdatedIssueBody;
 
 @Singleton
 @Unremovable
-public class ReleaseGradlePlugin implements StepHandler {
+public class CoreReleaseGradlePlugin implements StepHandler {
 
     @Inject
     Processes processes;
@@ -27,7 +27,7 @@ public class ReleaseGradlePlugin implements StepHandler {
     @Override
     public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
-        return processes.execute(List.of("./release-gradle-plugin.sh"));
+        return processes.execute(List.of("./release-core-gradle-plugin.sh"));
     }
 
     @Override

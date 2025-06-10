@@ -24,7 +24,7 @@ import io.quarkus.bot.release.util.Versions;
 
 @Singleton
 @Unremovable
-public class PreparePlatform implements StepHandler {
+public class PlatformReleasePrepare implements StepHandler {
 
     @Override
     public boolean shouldPause(Context context, Commands commands, GitHub quarkusBotGitHub,

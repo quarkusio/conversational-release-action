@@ -35,9 +35,9 @@ import io.quarkus.bot.release.util.Versions;
 
 @Singleton
 @Unremovable
-public class CreateBranch implements StepHandler {
+public class CoreReleaseCreateBranch implements StepHandler {
 
-    private static final Logger LOG = Logger.getLogger(CreateBranch.class);
+    private static final Logger LOG = Logger.getLogger(CoreReleaseCreateBranch.class);
 
     private static final String MAIN_MILESTONE_SUFFIX = " - main";
 

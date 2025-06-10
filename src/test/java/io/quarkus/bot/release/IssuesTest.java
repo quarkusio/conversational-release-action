@@ -183,7 +183,7 @@ public class IssuesTest {
                 <!-- quarkus-release/release-status:
                 ---
                 status: "STARTED"
-                currentStep: "APPROVE_CORE_RELEASE"
+                currentStep: "CORE_RELEASE_APPROVE"
                 currentStepStatus: "STARTED"
                 workflowRunId: 123
                 -->"""))).isEqualTo(new ReleaseInformation(null, "4.0", null, "CR1", false, true, false, false));
@@ -253,7 +253,7 @@ public class IssuesTest {
 
                 <!-- quarkus-release/release-status:
                 ---
-                currentStep: "APPROVE_RELEASE"
+                currentStep: "CORE_RELEASE_APPROVE"
                 currentStepStatus: "STARTED"
                 workflowRunId: 123
                 -->"""))).isEqualTo(new ReleaseInformation(null, "4.0", Branches.MAIN, "CR1", false, true, true, true));
@@ -275,7 +275,7 @@ public class IssuesTest {
 
                 <!-- quarkus-release/release-status:
                 ---
-                currentStep: "APPROVE_RELEASE"
+                currentStep: "CORE_RELEASE_APPROVE"
                 currentStepStatus: "STARTED"
                 workflowRunId: 123
                 -->"""))).isEqualTo(new ReleaseInformation("4.0.0.CR1", "4.0", "3.99", "CR1", false, true, false, false));
@@ -283,13 +283,13 @@ public class IssuesTest {
 
     @Test
     void testAppendReleaseStatus() {
-        assertThat(issues.appendReleaseStatus(new UpdatedIssueBody(""), new ReleaseStatus(Status.STARTED, Step.APPROVE_CORE_RELEASE, StepStatus.STARTED, 123L))).matches("""
+        assertThat(issues.appendReleaseStatus(new UpdatedIssueBody(""), new ReleaseStatus(Status.STARTED, Step.CORE_RELEASE_APPROVE, StepStatus.STARTED, 123L))).matches("""
 
 
                 <!-- quarkus-release/release-status:
                 ---
                 status: "STARTED"
-                currentStep: "APPROVE_CORE_RELEASE"
+                currentStep: "CORE_RELEASE_APPROVE"
                 currentStepStatus: "STARTED"
                 workflowRunId: 123
                 date: ".*"
@@ -308,7 +308,7 @@ public class IssuesTest {
                 <!-- quarkus-release/release-status:
                 ---
                 status: "STARTED"
-                currentStep: "APPROVE_CORE_RELEASE"
+                currentStep: "CORE_RELEASE_APPROVE"
                 currentStepStatus: "STARTED"
                 workflowRunId: 123
                 -->"""), new ReleaseStatus(Status.COMPLETED, Step.CORE_RELEASE_PREPARE, StepStatus.COMPLETED, 145L))).matches("""
@@ -346,10 +346,10 @@ public class IssuesTest {
                 <!-- quarkus-release/release-status:
                 ---
                 status: "STARTED"
-                currentStep: "APPROVE_CORE_RELEASE"
+                currentStep: "CORE_RELEASE_APPROVE"
                 currentStepStatus: "STARTED"
                 workflowRunId: 123
-                -->"""))).isEqualTo(new ReleaseStatus(Status.STARTED, Step.APPROVE_CORE_RELEASE, StepStatus.STARTED, 123L));
+                -->"""))).isEqualTo(new ReleaseStatus(Status.STARTED, Step.CORE_RELEASE_APPROVE, StepStatus.STARTED, 123L));
     }
 
 }
