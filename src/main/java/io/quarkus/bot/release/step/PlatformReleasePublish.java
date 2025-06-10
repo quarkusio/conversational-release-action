@@ -14,14 +14,13 @@ import io.quarkiverse.githubaction.Context;
 import io.quarkus.arc.Unremovable;
 import io.quarkus.bot.release.ReleaseInformation;
 import io.quarkus.bot.release.ReleaseStatus;
+import io.quarkus.bot.release.util.Branches;
 import io.quarkus.bot.release.util.Processes;
 import io.quarkus.bot.release.util.UpdatedIssueBody;
 
 @Singleton
 @Unremovable
-public class CoreReleasePrepare implements StepHandler {
-
-    static String DURATION = "2 hours";
+public class PlatformReleasePublish implements StepHandler {
 
     @Inject
     Processes processes;
@@ -29,14 +28,20 @@ public class CoreReleasePrepare implements StepHandler {
     @Override
     public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody) throws IOException, InterruptedException {
-        return processes.execute(List.of("./release-core-prepare.sh"));
+        String platformReleaseBranch = Branches.getPlatformReleaseBranch(releaseInformation);
+
+        return processes.execute(List.of(
+                "./release-platform-publish.sh",
+                platformReleaseBranch
+        ));
     }
 
     @Override
-    public String getContinueFromStepHelp(ReleaseInformation releaseInformation) {
-        StringBuilder help = new StringBuilder();
-        help.append("The Core release steps take approximately ").append(DURATION).append(" so don't panic if it takes time.\n");
-        help.append("You will receive feedback in this very issue if an error occurs or when further input is needed.");
-        return help.toString();
+    public String getErrorHelp(ReleaseInformation releaseInformation) {
+        return "Please check the workflow run logs but there is a good chance "
+                + "that the issue was due to a problem accessing [Central Portal](https://central.sonatype.com/publishing/deployments) "
+                + "either when authenticating or when uploading the artifacts.\n"
+                + "If so, please retry.\n\n"
+                + "Status page for Central Portal: https://status.maven.org/.";
     }
 }
