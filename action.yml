@@ -1,6 +1,9 @@
 name: 'Conversational release action'
 description: 'Release Quarkus by conversing with a GitHub Action'
 inputs:
+  jdk-path:
+    description: 'Path to JDK'
+    required: true
   github-token:
     description: 'GitHub token'
     required: true
@@ -63,11 +66,12 @@ runs:
     - name: Run the action
       id: action
       run: |
-        if [[ -z "${JAVA_HOME_21_X64}" ]]; then
-          jbang jdk install -o 21 ${JAVA_HOME_21_X64}
+        if [[ -z "${JDK_PATH}" ]]; then
+          jbang jdk install -o 21 ${JDK_PATH}
         fi
         jbang --java 21 --fresh --repos 'quarkus-github-action=https://maven.pkg.github.com/quarkusio/conversational-release-action/' --repos 'mavencentral' io.quarkus.bot:conversational-release-action:999-SNAPSHOT
       shell: bash
       env:
         JSON_INPUTS: ${{ toJSON(inputs) }}
         GITHUB_TOKEN: ${{ inputs.github-token }}
+        JDK_PATH: ${{ inputs.jdk-path }}
