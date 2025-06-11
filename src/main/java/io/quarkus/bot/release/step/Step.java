@@ -10,7 +10,7 @@ public enum Step {
     CORE_RELEASE_CREATE_BRANCH("Create branch", CoreReleaseCreateBranch.class, true, false),
     CORE_RELEASE_PREPARE("Prepare the core release", CoreReleasePrepare.class, true, false),
     CORE_RELEASE_DEPLOY_LOCALLY("Deploy the core release locally", CoreReleaseDeployLocally.class, true, false),
-    CORE_RELEASE_VALIDATE("Validate the core release artifacts", CoreReleaseValidate.class, false, false),
+    CORE_RELEASE_VALIDATE("Validate the core release artifacts", CoreReleaseValidate.class, true, false),
     CORE_RELEASE_PUBLISH("Publish the core release to Central Portal", CoreReleasePublish.class, true, false),
     CORE_RELEASE_WAIT_FOR_SYNC("Wait for core release sync to Central Portal", CoreReleaseWaitForSync.class, true, false),
     CORE_RELEASE_GRADLE_PLUGIN("Release Gradle plugin", CoreReleaseGradlePlugin.class, true, false),
