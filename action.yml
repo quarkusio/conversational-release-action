@@ -66,7 +66,7 @@ runs:
         echo "Java 21: ${JAVA_HOME_21_X64}"
         if [[ -n "${JAVA_HOME_21_X64}" ]]; then
           echo "Installing ${JAVA_HOME_21_X64} as JDK 21 for JBang"
-          jbang jdk install 21 ${JAVA_HOME_21_X64}
+          jbang --verbose jdk install 21 ${JAVA_HOME_21_X64}
         fi
         jbang --java 21 --fresh --repos 'quarkus-github-action=https://maven.pkg.github.com/quarkusio/conversational-release-action/' --repos 'mavencentral' io.quarkus.bot:conversational-release-action:999-SNAPSHOT
       shell: bash
