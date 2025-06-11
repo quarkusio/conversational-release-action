@@ -16,6 +16,7 @@ import io.quarkus.bot.release.ReleaseInformation;
 import io.quarkus.bot.release.ReleaseStatus;
 import io.quarkus.bot.release.util.Branches;
 import io.quarkus.bot.release.util.Processes;
+import io.quarkus.bot.release.util.Progress;
 import io.quarkus.bot.release.util.UpdatedIssueBody;
 
 @Singleton
@@ -38,14 +39,16 @@ public class PlatformReleasePublish implements StepHandler {
 
     @Override
     public void afterSuccess(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
-            ReleaseStatus currentReleaseStatus, GHIssue issue) throws IOException, InterruptedException {
+            ReleaseStatus releaseStatus, GHIssue issue) throws IOException, InterruptedException {
         issue.comment("""
                 :white_check_mark: The Platform artifacts have been published to Central Portal.
 
                 We will now wait for them to get synced to Maven Central.
 
                 The operations will continue automatically once we have detected all the artifacts have been synced.
-                """);
+
+
+                """ + Progress.youAreHere(releaseInformation, releaseStatus));
     }
 
     @Override
