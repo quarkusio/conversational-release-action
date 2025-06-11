@@ -15,7 +15,6 @@ import io.quarkus.arc.Unremovable;
 import io.quarkus.bot.release.ReleaseInformation;
 import io.quarkus.bot.release.ReleaseStatus;
 import io.quarkus.bot.release.util.Processes;
-import io.quarkus.bot.release.util.Progress;
 import io.quarkus.bot.release.util.UpdatedIssueBody;
 
 @Singleton
@@ -31,17 +30,5 @@ public class CoreReleaseDeployLocally implements StepHandler {
             throws IOException, InterruptedException {
 
         return processes.execute(List.of("./release-core-deploy-locally.sh"));
-    }
-
-    @Override
-    public void afterSuccess(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
-            ReleaseStatus releaseStatus, GHIssue issue) throws IOException, InterruptedException {
-        issue.comment("""
-                :white_check_mark: The Core artifacts have been deployed locally.
-
-                We will now publish them to Central Portal.
-
-
-                """ + Progress.youAreHere(releaseInformation, releaseStatus));
     }
 }
