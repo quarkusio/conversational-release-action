@@ -15,6 +15,7 @@ import io.quarkus.arc.Unremovable;
 import io.quarkus.bot.release.ReleaseInformation;
 import io.quarkus.bot.release.ReleaseStatus;
 import io.quarkus.bot.release.util.Processes;
+import io.quarkus.bot.release.util.Progress;
 import io.quarkus.bot.release.util.UpdatedIssueBody;
 
 @Singleton
@@ -34,12 +35,14 @@ public class PlatformReleaseWaitForSync implements StepHandler {
 
     @Override
     public void afterSuccess(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
-            ReleaseStatus currentReleaseStatus, GHIssue issue) throws IOException, InterruptedException {
+            ReleaseStatus releaseStatus, GHIssue issue) throws IOException, InterruptedException {
         issue.comment("""
                 :white_check_mark: The Platform artifacts have been synced to Maven Central.
 
                 We will now proceed with the rest of the release process.
-                """);
+
+
+                """ + Progress.youAreHere(releaseInformation, releaseStatus));
     }
 
     @Override
