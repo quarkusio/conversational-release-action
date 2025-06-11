@@ -228,7 +228,7 @@ public class PlatformReleasePrepare implements StepHandler {
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody)
             throws IOException, InterruptedException {
         issue.comment(":white_check_mark: The Platform branch `" + Branches.getPlatformReleaseBranch(releaseInformation)
-                + "` is ready to be released, continuing...");
+                + "` is ready to be released, continuing...\n\n" + Progress.youAreHere(releaseInformation, releaseStatus));
         return 0;
     }
 }

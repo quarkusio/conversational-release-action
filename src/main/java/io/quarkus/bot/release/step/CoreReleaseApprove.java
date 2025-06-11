@@ -126,6 +126,8 @@ public class CoreReleaseApprove implements StepHandler {
                             "You will receive feedback in this very issue when progress is made, further input is needed, or if an error occurs."));
         }
 
+        comment.append("\n\n").append(Progress.youAreHere(releaseInformation, releaseStatus));
+
         issue.comment(comment.toString());
 
         return 0;
