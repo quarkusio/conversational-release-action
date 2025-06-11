@@ -62,7 +62,11 @@ runs:
       uses: jbangdev/setup-jbang@main
     - name: Run the action
       id: action
-      run: jbang --java 21 --fresh --repos 'quarkus-github-action=https://maven.pkg.github.com/quarkusio/conversational-release-action/' --repos 'mavencentral' io.quarkus.bot:conversational-release-action:999-SNAPSHOT
+      run: |
+        if [[ -z "${JAVA_HOME_21_X64}" ]]; then
+          jbang jdk install -o 21 ${JAVA_HOME_21_X64}
+        fi
+        jbang --java 21 --fresh --repos 'quarkus-github-action=https://maven.pkg.github.com/quarkusio/conversational-release-action/' --repos 'mavencentral' io.quarkus.bot:conversational-release-action:999-SNAPSHOT
       shell: bash
       env:
         JSON_INPUTS: ${{ toJSON(inputs) }}
