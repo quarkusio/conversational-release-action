@@ -123,7 +123,7 @@ public class CoreReleaseApprove implements StepHandler {
             comment.append(Admonitions
                     .tip("The Core release steps take approximately " + CoreReleasePrepare.DURATION
                             + " so don't panic if it takes time.\n" +
-                            "You will receive feedback in this very issue when further input is needed or if an error occurs."));
+                            "You will receive feedback in this very issue when progress is made, further input is needed, or if an error occurs."));
         }
 
         issue.comment(comment.toString());
