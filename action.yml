@@ -73,3 +73,4 @@ runs:
       env:
         JSON_INPUTS: ${{ toJSON(inputs) }}
         GITHUB_TOKEN: ${{ inputs.github-token }}
+        JAVA_HOME: ${{ env.JAVA_HOME_21_X64 }}
