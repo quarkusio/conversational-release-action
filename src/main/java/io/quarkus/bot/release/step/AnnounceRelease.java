@@ -75,7 +75,7 @@ public class AnnounceRelease implements StepHandler {
                         "* Update the versions of the website in [`_data/versions.yaml`](https://github.com/quarkusio/quarkusio.github.io/blob/develop/_data/versions.yaml):\n");
                 comment.append("  * Update `version:` to `").append(releaseInformation.getVersion()).append("`\n");
                 comment.append("  * Update `announce:` to `/blog/").append(blogPostSlug).append(
-                        "/` - be careful, we use the branch for the first final and the full version for other releases\n");
+                        "/` - be careful, we use the minor version in the URL for the first final and the full version for follow-up micro releases\n");
                 if (releaseInformation.isFirstFinal()) {
                     comment.append("  * Update requirements if needed\n");
                 }
