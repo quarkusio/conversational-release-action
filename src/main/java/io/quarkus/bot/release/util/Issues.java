@@ -3,7 +3,6 @@ package io.quarkus.bot.release.util;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -21,6 +20,7 @@ public final class Issues {
     private static final String BRANCH = "### Branch";
     private static final String QUALIFIER = "### Qualifier";
     private static final String EMERGENCY_RELEASE = "### Emergency release";
+    private static final String EMERGENCY_RELEASE_CORE_BRANCH = "### Emergency release Core branch";
     private static final String MAJOR_VERSION = "### Major version";
     private static final String ORIGIN_BRANCH = "### Origin branch";
     private static final String NO_RESPONSE = "_No response_";
@@ -43,15 +43,17 @@ public final class Issues {
         String qualifier = null;
         boolean major = false;
         boolean emergency = false;
+        String emergencyReleaseCoreBranch = null;
         String originBranch = Branches.MAIN;
 
         boolean inBranch = false;
         boolean inQualifier = false;
         boolean inEmergencyRelease = false;
+        boolean inEmergencyReleaseCoreBranch = false;
         boolean inMajor = false;
         boolean inOriginBranch = false;
 
-        for (String line : description.lines().map(String::trim).collect(Collectors.toList())) {
+        for (String line : description.lines().map(String::trim).toList()) {
             if (line.isBlank()) {
                 continue;
             }
@@ -65,6 +67,10 @@ public final class Issues {
             }
             if (EMERGENCY_RELEASE.equals(line)) {
                 inEmergencyRelease = true;
+                continue;
+            }
+            if (EMERGENCY_RELEASE_CORE_BRANCH.equals(line)) {
+                inEmergencyReleaseCoreBranch = true;
                 continue;
             }
             if (MAJOR_VERSION.equals(line)) {
@@ -90,6 +96,11 @@ public final class Issues {
                 inEmergencyRelease = false;
                 continue;
             }
+            if (inEmergencyReleaseCoreBranch) {
+                emergencyReleaseCoreBranch = NO_RESPONSE.equals(line) ? null : line;
+                inEmergencyReleaseCoreBranch = false;
+                continue;
+            }
             if (inOriginBranch) {
                 originBranch = NO_RESPONSE.equals(line) ? Branches.MAIN : line;
                 inOriginBranch = false;
@@ -106,7 +117,8 @@ public final class Issues {
             throw new IllegalStateException("Unable to extract a branch from the description");
         }
 
-        return new ReleaseInformation(null, branch, originBranch, qualifier, emergency, major, false, false);
+        return new ReleaseInformation(null, branch, originBranch, qualifier, emergency, emergencyReleaseCoreBranch, major,
+                false, false);
     }
 
     public ReleaseInformation extractReleaseInformation(UpdatedIssueBody updatedIssueBody) {

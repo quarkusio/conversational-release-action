@@ -14,6 +14,7 @@ public class ReleaseInformation {
     private final String originBranch;
     private final String qualifier;
     private final boolean emergency;
+    private final String emergencyReleaseCoreBranch;
     private final boolean major;
 
     private String version;
@@ -22,14 +23,15 @@ public class ReleaseInformation {
 
     @JsonCreator
     public ReleaseInformation(String version, String branch, String originBranch, String qualifier, boolean emergency,
-            boolean major, boolean firstFinal, boolean maintenance) {
-        checkConsistency(branch, qualifier, emergency, major);
+            String emergencyReleaseCoreBranch, boolean major, boolean firstFinal, boolean maintenance) {
+        checkConsistency(branch, qualifier, emergency, emergencyReleaseCoreBranch, major);
 
         this.version = version;
         this.branch = branch;
         this.originBranch = originBranch;
         this.qualifier = qualifier;
         this.emergency = emergency;
+        this.emergencyReleaseCoreBranch = emergencyReleaseCoreBranch;
         this.major = major;
         this.firstFinal = firstFinal;
         this.maintenance = maintenance;
@@ -169,6 +171,14 @@ public class ReleaseInformation {
     }
 
     /**
+     * @return in the case of an emergency release, we might want to point to a branch that has been prepared specifically for
+     *         this emergency release.
+     */
+    public String getEmergencyReleaseCoreBranch() {
+        return emergencyReleaseCoreBranch;
+    }
+
+    /**
      * @return whether the origin branch for creating the branch is the main branch (see {@link #getOriginBranch()} for more
      *         details)
      */
@@ -191,7 +201,8 @@ public class ReleaseInformation {
         return Branches.isLtsBranchWithRegularReleaseCadence(branch) && isFinal() && !isFirstFinal();
     }
 
-    private static void checkConsistency(String branch, String qualifier, boolean emergency, boolean major) {
+    private static void checkConsistency(String branch, String qualifier, boolean emergency,
+            String emergencyReleaseCoreBranch, boolean major) {
         if (emergency) {
             if (!Branches.isLtsBranchWithRegularReleaseCadence(branch)) {
                 throw new IllegalStateException(
@@ -203,6 +214,8 @@ public class ReleaseInformation {
             if (qualifier != null) {
                 throw new IllegalStateException("An emergency release may not have a qualifier");
             }
+        } else if (emergencyReleaseCoreBranch != null) {
+            throw new IllegalStateException("An emergency release Core branch may only be defined for emergency releases");
         }
     }
 
@@ -220,10 +233,11 @@ public class ReleaseInformation {
         if (getClass() != obj.getClass())
             return false;
         ReleaseInformation other = (ReleaseInformation) obj;
-        return Objects.equals(version, this.version)
+        return Objects.equals(version, other.version)
                 && Objects.equals(branch, other.branch)
                 && Objects.equals(originBranch, other.originBranch)
                 && emergency == other.emergency
+                && Objects.equals(emergencyReleaseCoreBranch, other.emergencyReleaseCoreBranch)
                 && major == other.major
                 && Objects.equals(qualifier, other.qualifier)
                 && firstFinal == other.firstFinal
@@ -233,7 +247,8 @@ public class ReleaseInformation {
     @Override
     public String toString() {
         return "ReleaseInformation [version=" + version + ", branch=" + branch + ", originBranch=" + originBranch
-                + ", qualifier=" + qualifier + ", emergency=" + emergency + ", major=" + major
+                + ", qualifier=" + qualifier + ", emergency=" + emergency
+                + ", emergencyReleaseCoreBranch=" + emergencyReleaseCoreBranch + ", major=" + major
                 + ", firstFinal=" + firstFinal + ", maintenance=" + maintenance
                 + "]";
     }

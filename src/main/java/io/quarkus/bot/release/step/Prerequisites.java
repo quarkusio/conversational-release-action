@@ -48,6 +48,9 @@ public class Prerequisites implements StepHandler {
         }
         if (releaseInformation.isEmergency()) {
             command.add("--emergency");
+            if (releaseInformation.getEmergencyReleaseCoreBranch() != null) {
+                command.add("--emergency-release-core-branch=" + releaseInformation.getEmergencyReleaseCoreBranch());
+            }
         }
         if (releaseInformation.isMajor()) {
             command.add("--major");
