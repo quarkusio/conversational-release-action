@@ -42,7 +42,7 @@ public class IssuesTest {
                 """;
 
         assertThat(issues.extractReleaseInformationFromForm(description))
-                .isEqualTo(new ReleaseInformation(null, "3.6", Branches.MAIN, null, false, false, false, false));
+                .isEqualTo(new ReleaseInformation(null, "3.6", Branches.MAIN, null, false, null, false, false, false));
 
         description = """
                 ### Branch
@@ -63,7 +63,7 @@ public class IssuesTest {
                 """;
 
         assertThat(issues.extractReleaseInformationFromForm(description))
-                .isEqualTo(new ReleaseInformation(null, "main", "3.14", "CR1", false, true, false, false));
+                .isEqualTo(new ReleaseInformation(null, "main", "3.14", "CR1", false, null, true, false, false));
 
         description = """
                 ### Branch
@@ -82,13 +82,46 @@ public class IssuesTest {
 
                 - [x] This release is an emergency release.
 
+                ### Emergency release Core branch
+
+                3.20.1-emergency-1
+
                 ### Major version
 
                 - [ ] This release is a major version.
                 """;
 
         assertThat(issues.extractReleaseInformationFromForm(description))
-                .isEqualTo(new ReleaseInformation(null, "3.20", "main", null, true, false, false, false));
+                .isEqualTo(new ReleaseInformation(null, "3.20", "main", null, true, "3.20.1-emergency-1", false, false, false));
+
+        description = """
+                ### Branch
+
+                3.20
+
+                ### Origin branch
+
+                _No response_
+
+                ### Qualifier
+
+                _No response_
+
+                ### Emergency release
+
+                - [x] This release is an emergency release.
+
+                ### Emergency release Core branch
+
+                _No response_
+
+                ### Major version
+
+                - [ ] This release is a major version.
+                """;
+
+        assertThat(issues.extractReleaseInformationFromForm(description))
+                .isEqualTo(new ReleaseInformation(null, "3.20", "main", null, true, null, false, false, false));
 
         assertThrows(IllegalStateException.class, () -> issues.extractReleaseInformationFromForm("foobar"));
 
@@ -169,6 +202,36 @@ public class IssuesTest {
         assertThatThrownBy(() -> issues.extractReleaseInformationFromForm(invalidEmergencyVersionQualifier))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("An emergency release may not have a qualifier");
+
+        String invalidEmergencyReleaseCoreBranch = """
+                ### Branch
+
+                3.20
+
+                ### Origin branch
+
+                _No response_
+
+                ### Qualifier
+
+                _No response_
+
+                ### Emergency release
+
+                - [ ] This release is an emergency release.
+
+                ### Emergency release Core branch
+
+                3.20.1-emergency-1
+
+                ### Major version
+
+                - [ ] This release is a major version.
+                """;
+
+        assertThatThrownBy(() -> issues.extractReleaseInformationFromForm(invalidEmergencyReleaseCoreBranch))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("An emergency release Core branch may only be defined for emergency releases");
     }
 
     @Test
@@ -189,13 +252,13 @@ public class IssuesTest {
                 currentStep: "CORE_RELEASE_APPROVE"
                 currentStepStatus: "STARTED"
                 workflowRunId: 123
-                -->"""))).isEqualTo(new ReleaseInformation(null, "4.0", null, "CR1", false, true, false, false));
+                -->"""))).isEqualTo(new ReleaseInformation(null, "4.0", null, "CR1", false, null, true, false, false));
     }
 
     @Test
     void testAppendReleaseInformation() {
         assertThat(issues.appendReleaseInformation(new UpdatedIssueBody(""),
-                new ReleaseInformation(null, "3.6", Branches.MAIN, null, false, false, false, false))).isEqualTo("""
+                new ReleaseInformation(null, "3.6", Branches.MAIN, null, false, null, false, false, false))).isEqualTo("""
 
 
                         <!-- quarkus-release/release-information:
@@ -205,6 +268,7 @@ public class IssuesTest {
                         originBranch: "main"
                         qualifier: null
                         emergency: false
+                        emergencyReleaseCoreBranch: null
                         major: false
                         firstFinal: false
                         maintenance: false
@@ -219,23 +283,77 @@ public class IssuesTest {
                 originBranch: "main"
                 qualifier: null
                 emergency: false
+                emergencyReleaseCoreBranch: null
                 major: false
                 firstFinal: false
                 maintenance: false
-                -->"""), new ReleaseInformation("3.7.1", "3.7", Branches.MAIN, "CR1", false, true, false, false))).isEqualTo("""
+                -->"""), new ReleaseInformation("3.7.1", "3.7", Branches.MAIN, "CR1", false, null, true, false, false)))
+                .isEqualTo("""
+                        This is a comment.
+
+                        <!-- quarkus-release/release-information:
+                        ---
+                        version: "3.7.1"
+                        branch: "3.7"
+                        originBranch: "main"
+                        qualifier: "CR1"
+                        emergency: false
+                        emergencyReleaseCoreBranch: null
+                        major: true
+                        firstFinal: false
+                        maintenance: false
+                        -->""");
+    }
+
+    @Test
+    void testAppendReleaseInformationEmergencyRelease() {
+        assertThat(issues.appendReleaseInformation(new UpdatedIssueBody(""),
+                new ReleaseInformation(null, "3.20", Branches.MAIN, null, true, "3.20.1-emergency-1", false, false, false)))
+                .isEqualTo("""
+
+
+                        <!-- quarkus-release/release-information:
+                        ---
+                        version: null
+                        branch: "3.20"
+                        originBranch: "main"
+                        qualifier: null
+                        emergency: true
+                        emergencyReleaseCoreBranch: "3.20.1-emergency-1"
+                        major: false
+                        firstFinal: false
+                        maintenance: false
+                        -->""");
+
+        assertThat(issues.appendReleaseInformation(new UpdatedIssueBody("""
                 This is a comment.
 
                 <!-- quarkus-release/release-information:
                 ---
-                version: "3.7.1"
-                branch: "3.7"
+                branch: "3.20"
                 originBranch: "main"
-                qualifier: "CR1"
-                emergency: false
-                major: true
+                qualifier: null
+                emergency: true
+                emergencyReleaseCoreBranch: "3.20.1-emergency-1"
+                major: false
                 firstFinal: false
                 maintenance: false
-                -->""");
+                -->"""), new ReleaseInformation("3.21.1", "3.21", Branches.MAIN, "CR1", false, null, true, false, false)))
+                .isEqualTo("""
+                        This is a comment.
+
+                        <!-- quarkus-release/release-information:
+                        ---
+                        version: "3.21.1"
+                        branch: "3.21"
+                        originBranch: "main"
+                        qualifier: "CR1"
+                        emergency: false
+                        emergencyReleaseCoreBranch: null
+                        major: true
+                        firstFinal: false
+                        maintenance: false
+                        -->""");
     }
 
     @Test
@@ -260,7 +378,7 @@ public class IssuesTest {
                 currentStep: "CORE_RELEASE_APPROVE"
                 currentStepStatus: "STARTED"
                 workflowRunId: 123
-                -->"""))).isEqualTo(new ReleaseInformation(null, "4.0", Branches.MAIN, "CR1", false, true, true, true));
+                -->"""))).isEqualTo(new ReleaseInformation(null, "4.0", Branches.MAIN, "CR1", false, null, true, true, true));
 
         assertThat(issues.extractReleaseInformation(new UpdatedIssueBody("""
                 This is a comment.
@@ -282,7 +400,7 @@ public class IssuesTest {
                 currentStep: "CORE_RELEASE_APPROVE"
                 currentStepStatus: "STARTED"
                 workflowRunId: 123
-                -->"""))).isEqualTo(new ReleaseInformation("4.0.0.CR1", "4.0", "3.99", "CR1", false, true, false, false));
+                -->"""))).isEqualTo(new ReleaseInformation("4.0.0.CR1", "4.0", "3.99", "CR1", false, null, true, false, false));
     }
 
     @Test
