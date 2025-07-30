@@ -50,6 +50,32 @@ public class Branches {
                 .toList();
     }
 
+    public static String getNextMinor(String branch) {
+        String[] segments = branch.split("\\.");
+
+        if (segments.length < 2) {
+            throw new IllegalArgumentException("Invalid branch format: " + branch);
+        }
+
+        return segments[0] + "." + (Integer.parseInt(segments[1]) + 1);
+    }
+
+    public static String getPreviousMinor(String branch) {
+        String[] segments = branch.split("\\.");
+
+        if (segments.length < 2) {
+            throw new IllegalArgumentException("Invalid branch format: " + branch);
+        }
+
+        int minorSegment = Integer.parseInt(segments[1]);
+
+        if (minorSegment == 0) {
+            throw new IllegalArgumentException("Unable to generate previous minor for .0 releases: " + branch);
+        }
+
+        return segments[0] + "." + (minorSegment - 1);
+    }
+
     public static String getFullBranch(String branch) {
         if (isLts(branch)) {
             return branch + " LTS";

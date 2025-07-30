@@ -60,10 +60,25 @@ public class CoreReleaseApprove implements StepHandler {
             comment.append("- This is a `preview` release (e.g. `Alpha`, `Beta`, `CR`).\n");
         }
 
+        if (Branches.isLts(releaseInformation.getBranch()) && releaseInformation.isFirstFinal()) {
+            String previousMinor = Branches.getPreviousMinor(releaseInformation.getBranch());
+            String snapshotVersion = releaseInformation.getBranch() + ".999-SNAPSHOT";
+
+            comment.append("\n");
+            comment.append(
+                    Admonitions.warning("This release will be built from `" + releaseInformation.getBranch() + "`.\n\n" +
+                            "You need to push the required changes to this branch e.g. if `" + releaseInformation.getBranch()
+                            + "` is the direct continuation of `" + previousMinor
+                            + "` (which is usually the case for an LTS), you need to sync `"
+                            + releaseInformation.getBranch() + "` with the new changes made to `" + previousMinor + "`.\n\n"
+                            + "Make sure the version in the branch is `" + snapshotVersion + "` (use `./update-version.sh "
+                            + snapshotVersion + "` at the root of the Core repository if needed).") + "\n");
+        }
+
         if (!releaseInformation.isOriginBranchMain()) {
             comment.append("\n");
             comment.append(
-                    Admonitions.warning("This release will be branched from " + releaseInformation.getOriginBranch() + ".\n" +
+                    Admonitions.warning("This release will be branched from `" + releaseInformation.getOriginBranch() + "`.\n" +
                             "You may release from an existing branch only when preparing a new LTS release.") + "\n");
         }
 

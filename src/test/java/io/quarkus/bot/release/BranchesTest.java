@@ -1,6 +1,7 @@
 package io.quarkus.bot.release;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
 
@@ -66,5 +67,23 @@ public class BranchesTest {
         assertThat(Branches.getLtsVersionsReleasedBefore("3.8")).containsExactly("3.2");
         assertThat(Branches.getLtsVersionsReleasedBefore("3.9")).containsExactly("3.2", "3.8");
         assertThat(Branches.getLtsVersionsReleasedBefore("3.16")).containsExactly("3.2", "3.8", "3.15");
+    }
+
+    @Test
+    void testGetNextMinor() {
+        assertThat(Branches.getNextMinor("1.0")).isEqualTo("1.1");
+        assertThat(Branches.getNextMinor("2.15")).isEqualTo("2.16");
+        assertThat(Branches.getNextMinor("10.99")).isEqualTo("10.100");
+    }
+
+    @Test
+    void testGetPreviousMinor() {
+        assertThat(Branches.getPreviousMinor("1.1")).isEqualTo("1.0");
+        assertThat(Branches.getPreviousMinor("2.15")).isEqualTo("2.14");
+        assertThat(Branches.getPreviousMinor("10.99")).isEqualTo("10.98");
+
+        assertThatThrownBy(() -> Branches.getPreviousMinor("1.0"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Unable to generate previous minor for .0 releases: 1.0");
     }
 }
