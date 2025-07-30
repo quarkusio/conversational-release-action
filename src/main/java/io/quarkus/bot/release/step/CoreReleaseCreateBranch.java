@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 import org.apache.maven.artifact.versioning.ComparableVersion;
@@ -28,6 +29,7 @@ import io.quarkus.bot.release.util.Branches;
 import io.quarkus.bot.release.util.Command;
 import io.quarkus.bot.release.util.Labels;
 import io.quarkus.bot.release.util.Outputs;
+import io.quarkus.bot.release.util.Processes;
 import io.quarkus.bot.release.util.Progress;
 import io.quarkus.bot.release.util.Repositories;
 import io.quarkus.bot.release.util.UpdatedIssueBody;
@@ -40,6 +42,9 @@ public class CoreReleaseCreateBranch implements StepHandler {
     private static final Logger LOG = Logger.getLogger(CoreReleaseCreateBranch.class);
 
     private static final String MAIN_MILESTONE_SUFFIX = " - main";
+
+    @Inject
+    Processes processes;
 
     @Override
     public boolean shouldSkip(ReleaseInformation releaseInformation, ReleaseStatus releaseStatus) {
@@ -141,14 +146,21 @@ public class CoreReleaseCreateBranch implements StepHandler {
             }
         }
 
+        try {
+            processes.execute(List.of("./release-core-update-branch-version.sh"));
+        } catch (Exception e) {
+            throw new IllegalStateException(
+                    "Unable to update version in branch " + releaseInformation.getBranch() + ": " + e.getMessage(), e);
+        }
+
         Optional<GHMilestone> versionedMilestone = getMilestone(repository, releaseInformation.getVersion());
-        String nextMinor = getNextMinor(releaseInformation.getBranch());
+        String nextMinor = Branches.getNextMinor(releaseInformation.getBranch());
         boolean isNextMinorLts = false;
         String nextMinorInMain = nextMinor;
 
         if (Branches.isLts(nextMinor)) {
             isNextMinorLts = true;
-            nextMinorInMain = getNextMinor(nextMinor);
+            nextMinorInMain = Branches.getNextMinor(nextMinor);
         }
 
         if (versionedMilestone.isEmpty()) {
@@ -245,16 +257,6 @@ public class CoreReleaseCreateBranch implements StepHandler {
                 .collect(Collectors.toCollection(TreeSet::new));
 
         return Versions.getPreviousMinorBranch(tags, Versions.getBranch(currentBranch));
-    }
-
-    private static String getNextMinor(String currentBranch) {
-        String[] segments = currentBranch.toString().split("\\.");
-
-        if (segments.length < 2) {
-            throw new IllegalStateException("CR1 releases should be made from a versioned branch and not from main");
-        }
-
-        return segments[0] + "." + (Integer.parseInt(segments[1]) + 1);
     }
 
     private static Optional<GHMilestone> getMilestone(GHRepository repository, String name) {
