@@ -56,7 +56,7 @@ public class CoreReleaseApprove implements StepHandler {
         if (releaseInformation.isEmergency()) {
             comment.append("- This is an `emergency` release");
             if (releaseInformation.getEmergencyReleaseCoreBranch() != null) {
-                comment.append(" built from branch ").append(releaseInformation.getEmergencyReleaseCoreBranch());
+                comment.append(" built from branch `").append(releaseInformation.getEmergencyReleaseCoreBranch()).append("`");
             }
             comment.append(".\n");
         }
