@@ -100,15 +100,15 @@ public class PlatformReleasePrepare implements StepHandler {
                     "* Send an email to the Platform coordination mailing list: [quarkus-platform-coordination@googlegroups.com](mailto:quarkus-platform-coordination@googlegroups.com) :\n\n");
             comment.append("Subject:\n");
             comment.append("```\n");
-            comment.append("Quarkus " + releaseInformation.getVersion() + " core artifacts are available\n");
+            comment.append("Quarkus " + releaseInformation.getFullVersion() + " core artifacts are available\n");
             comment.append("```\n");
             comment.append("Body:\n");
             comment.append("```\n");
             comment.append("Hi,\n"
                     + "\n"
-                    + "The Quarkus " + releaseInformation.getVersion() + " core artifacts are available on Maven Central.\n"
+                    + "The Quarkus " + releaseInformation.getFullVersion() + " core artifacts are available on Maven Central.\n"
                     + "\n"
-                    + "The pull request updating the Platform to Quarkus " + releaseInformation.getVersion()
+                    + "The pull request updating the Platform to Quarkus " + releaseInformation.getFullVersion()
                     + " has been merged in the " + platformPreparationBranch + " branch.\n"
                     + "We pinged in the pull request the teams maintaining components not passing the tests.\n"
                     + "\n"
