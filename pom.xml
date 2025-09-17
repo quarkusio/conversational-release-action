@@ -17,7 +17,7 @@
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
         <quarkus.platform.version>3.26.4</quarkus.platform.version>
         <surefire-plugin.version>3.5.4</surefire-plugin.version>
-        <version.formatter.plugin>2.27.0</version.formatter.plugin>
+        <version.formatter.plugin>2.29.0</version.formatter.plugin>
         <version.impsort.plugin>1.12.0</version.impsort.plugin>
         <skipITs>true</skipITs>
     </properties>
