@@ -65,6 +65,7 @@ public class PlatformReleasePrepare implements StepHandler {
         comment.append("```\n");
         comment.append("* Follow (roughly) these steps (`upstream` is the upstream repository, `origin` is your fork):\n\n");
         comment.append("```\n");
+        comment.append("git remote update upstream\n");
         if (releaseInformation.isOriginBranchMain()) {
             comment.append("git checkout " + platformPreparationBranch + "\n");
             comment.append("git pull upstream " + platformPreparationBranch + "\n");
@@ -168,6 +169,7 @@ public class PlatformReleasePrepare implements StepHandler {
                     "* Make sure you have merged [all the pull requests](https://github.com/quarkusio/quarkus-platform/pulls) that should be included in this version of the Platform\n");
             comment.append("* Once all the pull requests are merged, create the branch:\n\n");
             comment.append("```\n");
+            comment.append("git remote update upstream\n");
             comment.append("git checkout main\n");
             comment.append("git pull upstream main\n");
             comment.append("git checkout -b " + platformReleaseBranch + "\n");
