@@ -81,8 +81,13 @@ public class AnnounceRelease implements StepHandler {
                 }
             }
             if (Branches.isLts(releaseInformation.getBranch())) {
+                comment.append("* This is a LTS version:\n");
                 comment.append(
-                        "* This is a LTS version so make sure the version is referenced in the `documentation:` section of [`_data/versions.yaml`](https://github.com/quarkusio/quarkusio.github.io/blob/develop/_data/versions.yaml)\n");
+                        "  * Make sure the version is referenced in the `documentation:` section of [`_data/versions.yaml`](https://github.com/quarkusio/quarkusio.github.io/blob/develop/_data/versions.yaml)\n");
+                comment.append("  * Include ").append(releaseInformation.getFullVersion()).append(
+                        " in the main repo's [`SECURITY.md`](https://github.com/quarkusio/quarkus/blob/main/SECURITY.md#supported-versions)\n");
+                comment.append("  * Include ").append(releaseInformation.getFullVersion()).append(
+                        " in the website's [`security.adoc`](https://github.com/quarkusio/quarkusio.github.io/blob/main/security.adoc#supported-versions)\n");
             }
             comment.append("* Write a blog post in `_posts/").append(DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.now()))
                     .append("-").append(blogPostSlug).append(".adoc")
