@@ -88,6 +88,15 @@ public class AnnounceRelease implements StepHandler {
                         " in the main repo's [`SECURITY.md`](https://github.com/quarkusio/quarkus/blob/main/SECURITY.md#supported-versions)\n");
                 comment.append("  * Include ").append(releaseInformation.getFullVersion()).append(
                         " in the website's [`security.adoc`](https://github.com/quarkusio/quarkusio.github.io/blob/main/security.adoc#supported-versions)\n");
+                comment.append(
+                        "  * Create an issue in the main repo that will be used for reporting platform CI issues, similar to " +
+                                "[this issue for 3.20](https://github.com/quarkusio/quarkus/issues/47241)\n");
+                comment.append("  * Add the `").append(releaseInformation.getBranch())
+                        .append("` branch to the `lts` version matrix in " +
+                                "[`quarkus-snapshots.yml`](https://github.com/quarkusio/quarkus-platform/blob/main/.github/workflows/quarkus-snapshots.yml)\n");
+                comment.append(
+                        "  * Configure the CI to report problems into the issue created above by adding it as an item in " +
+                                "[`info.yaml`](https://github.com/quarkusio/quarkus-ecosystem-ci/blob/main/platform/info.yaml)\n");
             }
             comment.append("* Write a blog post in `_posts/").append(DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.now()))
                     .append("-").append(blogPostSlug).append(".adoc")
