@@ -1,8 +1,10 @@
 package io.quarkus.bot.release.step;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -186,12 +188,29 @@ public class AnnounceRelease implements StepHandler {
         String version = releaseInformation.getVersion();
         String fullVersion = releaseInformation.getFullVersion();
         String minorVersion = Versions.getMinorVersion(releaseInformation.getVersion());
-
         GHRepository quarkusRepository = Repositories.getQuarkusRepository(quarkusBotGitHub);
-        GHMilestone milestone = quarkusRepository.listMilestones(GHIssueState.CLOSED).toList().stream()
-                .filter(m -> version.equals(m.getTitle()))
-                .findFirst().orElseThrow(() -> new IllegalStateException("Unable to find a closed milestone for " + version));
-        List<GHIssue> issues = quarkusRepository.getIssues(GHIssueState.CLOSED, milestone);
+
+        final List<GHIssue> issues;
+        if (releaseInformation.isFirstFinal()) {
+            issues = new ArrayList<>();
+
+            // we need to merge issues from all preview releases
+            quarkusRepository.listMilestones(GHIssueState.CLOSED).toList().stream()
+                    .filter(m -> m.getTitle().startsWith(minorVersion + "."))
+                    .forEach(m -> {
+                        try {
+                            issues.addAll(quarkusRepository.getIssues(GHIssueState.CLOSED, m));
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
+        } else {
+            GHMilestone milestone = quarkusRepository.listMilestones(GHIssueState.CLOSED).toList().stream()
+                    .filter(m -> version.equals(m.getTitle()))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("Unable to find a closed milestone for " + version));
+            issues = quarkusRepository.getIssues(GHIssueState.CLOSED, milestone);
+        }
 
         List<GHIssue> majorChanges = issues.stream()
                 .filter(i -> i.getLabels().stream().anyMatch(l -> Labels.RELEASE_NOTEWORTHY_FEATURE_LABEL.equals(l.getName())))
