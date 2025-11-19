@@ -82,7 +82,7 @@ public class AnnounceRelease implements StepHandler {
                     comment.append("  * Update requirements if needed\n");
                 }
             }
-            if (Branches.isLts(releaseInformation.getBranch())) {
+            if (Branches.isLts(releaseInformation.getBranch()) && releaseInformation.isFirstFinal()) {
                 comment.append("* This is a LTS version:\n");
                 comment.append(
                         "  * Make sure the version is referenced in the `documentation:` section of [`_data/versions.yaml`](https://github.com/quarkusio/quarkusio.github.io/blob/develop/_data/versions.yaml)\n");
