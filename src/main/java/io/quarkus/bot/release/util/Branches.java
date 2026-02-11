@@ -9,7 +9,7 @@ import io.quarkus.bot.release.ReleaseInformation;
 public class Branches {
 
     public static final String MAIN = "main";
-    private static final List<String> LTS_BRANCHES = List.of("3.27", "3.20", "3.15", "3.8", "3.2");
+    private static final List<String> LTS_BRANCHES = List.of("3.33", "3.27", "3.20", "3.15", "3.8", "3.2");
     public static final String BRANCH_3_8 = "3.8";
 
     public static String getPlatformPreparationBranch(ReleaseInformation releaseInformation) {
