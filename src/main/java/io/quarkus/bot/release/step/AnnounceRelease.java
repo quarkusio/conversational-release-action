@@ -99,6 +99,10 @@ public class AnnounceRelease implements StepHandler {
                 comment.append(
                         "  * Configure the CI to report problems into the issue created above by adding it as an item in " +
                                 "[`info.yaml`](https://github.com/quarkusio/quarkus-ecosystem-ci/blob/main/platform/info.yaml)\n");
+                comment.append(
+                        "  * Add the `").append(releaseInformation.getBranch())
+                        .append("` branch into the `guardedBranches` list in " +
+                                "[`quarkus-github-bot.yml`](https://github.com/quarkusio/quarkus/blob/main/.github/quarkus-github-bot.yml)\n");
             }
             comment.append("* Write a blog post in `_posts/").append(DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.now()))
                     .append("-").append(blogPostSlug).append(".adoc")
