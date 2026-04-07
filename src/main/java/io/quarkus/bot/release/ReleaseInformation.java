@@ -15,6 +15,7 @@ public class ReleaseInformation {
     private final String qualifier;
     private final boolean emergency;
     private final String emergencyReleaseCoreBranch;
+    private final String emergencyReleasePlatformBranch;
     private final boolean major;
 
     private String version;
@@ -23,8 +24,9 @@ public class ReleaseInformation {
 
     @JsonCreator
     public ReleaseInformation(String version, String branch, String originBranch, String qualifier, boolean emergency,
-            String emergencyReleaseCoreBranch, boolean major, boolean firstFinal, boolean maintenance) {
-        checkConsistency(branch, qualifier, emergency, emergencyReleaseCoreBranch, major);
+            String emergencyReleaseCoreBranch, String emergencyReleasePlatformBranch, boolean major, boolean firstFinal,
+            boolean maintenance) {
+        checkConsistency(branch, qualifier, emergency, emergencyReleaseCoreBranch, emergencyReleasePlatformBranch, major);
 
         this.version = version;
         this.branch = branch;
@@ -32,6 +34,7 @@ public class ReleaseInformation {
         this.qualifier = qualifier;
         this.emergency = emergency;
         this.emergencyReleaseCoreBranch = emergencyReleaseCoreBranch;
+        this.emergencyReleasePlatformBranch = emergencyReleasePlatformBranch;
         this.major = major;
         this.firstFinal = firstFinal;
         this.maintenance = maintenance;
@@ -179,6 +182,14 @@ public class ReleaseInformation {
     }
 
     /**
+     * @return in the case of an emergency release, we might want to point to a branch that has been prepared specifically for
+     *         this emergency release in the Platform repository.
+     */
+    public String getEmergencyReleasePlatformBranch() {
+        return emergencyReleasePlatformBranch;
+    }
+
+    /**
      * @return whether the origin branch for creating the branch is the main branch (see {@link #getOriginBranch()} for more
      *         details)
      */
@@ -202,7 +213,7 @@ public class ReleaseInformation {
     }
 
     private static void checkConsistency(String branch, String qualifier, boolean emergency,
-            String emergencyReleaseCoreBranch, boolean major) {
+            String emergencyReleaseCoreBranch, String emergencyReleasePlatformBranch, boolean major) {
         if (emergency) {
             if (!Branches.isLtsBranchWithRegularReleaseCadence(branch)) {
                 throw new IllegalStateException(
@@ -214,8 +225,14 @@ public class ReleaseInformation {
             if (qualifier != null) {
                 throw new IllegalStateException("An emergency release may not have a qualifier");
             }
-        } else if (emergencyReleaseCoreBranch != null) {
-            throw new IllegalStateException("An emergency release Core branch may only be defined for emergency releases");
+        } else {
+            if (emergencyReleaseCoreBranch != null) {
+                throw new IllegalStateException("An emergency release Core branch may only be defined for emergency releases");
+            }
+            if (emergencyReleasePlatformBranch != null) {
+                throw new IllegalStateException(
+                        "An emergency release Platform branch may only be defined for emergency releases");
+            }
         }
     }
 
@@ -238,6 +255,7 @@ public class ReleaseInformation {
                 && Objects.equals(originBranch, other.originBranch)
                 && emergency == other.emergency
                 && Objects.equals(emergencyReleaseCoreBranch, other.emergencyReleaseCoreBranch)
+                && Objects.equals(emergencyReleasePlatformBranch, other.emergencyReleasePlatformBranch)
                 && major == other.major
                 && Objects.equals(qualifier, other.qualifier)
                 && firstFinal == other.firstFinal
@@ -248,7 +266,8 @@ public class ReleaseInformation {
     public String toString() {
         return "ReleaseInformation [version=" + version + ", branch=" + branch + ", originBranch=" + originBranch
                 + ", qualifier=" + qualifier + ", emergency=" + emergency
-                + ", emergencyReleaseCoreBranch=" + emergencyReleaseCoreBranch + ", major=" + major
+                + ", emergencyReleaseCoreBranch=" + emergencyReleaseCoreBranch
+                + ", emergencyReleasePlatformBranch=" + emergencyReleasePlatformBranch + ", major=" + major
                 + ", firstFinal=" + firstFinal + ", maintenance=" + maintenance
                 + "]";
     }

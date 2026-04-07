@@ -13,6 +13,9 @@ public class Branches {
     public static final String BRANCH_3_8 = "3.8";
 
     public static String getPlatformPreparationBranch(ReleaseInformation releaseInformation) {
+        if (releaseInformation.isEmergency() && releaseInformation.getEmergencyReleasePlatformBranch() != null) {
+            return releaseInformation.getEmergencyReleasePlatformBranch();
+        }
         if (releaseInformation.isFinal()
                 && (!releaseInformation.isFirstFinal() || Branches.isLts(releaseInformation.getBranch()))) {
             return releaseInformation.getBranch();
@@ -25,6 +28,9 @@ public class Branches {
     }
 
     public static String getPlatformReleaseBranch(ReleaseInformation releaseInformation) {
+        if (releaseInformation.isEmergency() && releaseInformation.getEmergencyReleasePlatformBranch() != null) {
+            return releaseInformation.getEmergencyReleasePlatformBranch();
+        }
         if (releaseInformation.isFinal()) {
             return releaseInformation.getBranch();
         }
