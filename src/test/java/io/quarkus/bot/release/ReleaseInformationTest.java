@@ -30,8 +30,7 @@ public class ReleaseInformationTest {
         boolean expectedResult = argumentsAccessor.getBoolean(4);
 
         ReleaseInformation releaseInformation = new ReleaseInformation(version, branch, Branches.MAIN, qualifier, false, null,
-                false,
-                firstFinal, false);
+                null, false, firstFinal, false);
         assertThat(releaseInformation.isLtsMaintenanceReleaseWithRegularReleaseCadence())
                 .as("Version %s", releaseInformation.getVersion()).isEqualTo(expectedResult);
     }

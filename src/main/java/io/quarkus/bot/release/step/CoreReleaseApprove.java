@@ -54,11 +54,22 @@ public class CoreReleaseApprove implements StepHandler {
             comment.append("- This is a `maintenance` release.\n");
         }
         if (releaseInformation.isEmergency()) {
-            comment.append("- This is an `emergency` release");
-            if (releaseInformation.getEmergencyReleaseCoreBranch() != null) {
-                comment.append(" built from branch `").append(releaseInformation.getEmergencyReleaseCoreBranch()).append("`");
+            comment.append("- This is an `emergency` release:\n");
+
+            String coreBranch = releaseInformation.getEmergencyReleaseCoreBranch();
+            if (coreBranch != null) {
+                comment.append("  - Core branch: `").append(coreBranch).append("`\n");
+            } else {
+                comment.append("  - Core branch: `").append(releaseInformation.getBranch()).append("` (default)\n");
             }
-            comment.append(".\n");
+
+            String platformBranch = releaseInformation.getEmergencyReleasePlatformBranch();
+            if (platformBranch != null) {
+                comment.append("  - Platform branch: `").append(platformBranch).append("`\n");
+            } else {
+                comment.append("  - Platform branch: `").append(Branches.getPlatformReleaseBranch(releaseInformation))
+                        .append("` (default)\n");
+            }
         }
         if (!releaseInformation.isFinal()) {
             comment.append("- This is a `preview` release (e.g. `Alpha`, `Beta`, `CR`).\n");

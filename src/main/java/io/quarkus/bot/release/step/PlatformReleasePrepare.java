@@ -48,6 +48,13 @@ public class PlatformReleasePrepare implements StepHandler {
                     + "\n\n");
         }
 
+        if (releaseInformation.isEmergency() && releaseInformation.getEmergencyReleasePlatformBranch() != null) {
+            comment.append(Admonitions.warning(
+                    "The Platform will be built from the emergency branch `"
+                            + releaseInformation.getEmergencyReleasePlatformBranch() + "`.")
+                    + "\n\n");
+        }
+
         if (!releaseInformation.isFinal() && releaseInformation.isOriginBranchMain()) {
             comment.append(Admonitions.tip(
                     "In the case of `preview releases` (e.g. `Alpha1`, `CR1`...), the release will be built from the `main` branch")
