@@ -9,6 +9,7 @@ public final class Repositories {
 
     private static final String QUARKUSIO_QUARKUS = "quarkusio/quarkus";
     private static final String QUARKUSIO_QUARKUS_PLATFORM = "quarkusio/quarkus-platform";
+    private static final String GITHUB_URL = "https://github.com/";
 
     private Repositories() {
     }
@@ -19,6 +20,14 @@ public final class Repositories {
 
     public static GHRepository getQuarkusPlatformRepository(GitHub quarkusBotGitHub) {
         return getRepository(quarkusBotGitHub, QUARKUSIO_QUARKUS_PLATFORM);
+    }
+
+    public static String getCoreBranchLink(String branch) {
+        return "[`" + branch + "`](" + GITHUB_URL + QUARKUSIO_QUARKUS + "/tree/" + branch + ")";
+    }
+
+    public static String getPlatformBranchLink(String branch) {
+        return "[`" + branch + "`](" + GITHUB_URL + QUARKUSIO_QUARKUS_PLATFORM + "/tree/" + branch + ")";
     }
 
     private static GHRepository getRepository(GitHub quarkusBotGitHub, String repository) {

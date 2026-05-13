@@ -20,6 +20,7 @@ import io.quarkus.bot.release.util.Command;
 import io.quarkus.bot.release.util.Jdks;
 import io.quarkus.bot.release.util.Outputs;
 import io.quarkus.bot.release.util.Progress;
+import io.quarkus.bot.release.util.Repositories;
 import io.quarkus.bot.release.util.UpdatedIssueBody;
 import io.quarkus.bot.release.util.Versions;
 
@@ -36,7 +37,7 @@ public class CoreReleaseApprove implements StepHandler {
         StringBuilder comment = new StringBuilder();
         comment.append(":raised_hands: We are going to release the following release:\n\n");
         comment.append("- Quarkus `").append(releaseInformation.getVersion()).append("`\n");
-        comment.append("- On branch `").append(releaseInformation.getBranch()).append("`");
+        comment.append("- On branch ").append(Repositories.getCoreBranchLink(releaseInformation.getBranch()));
         if (releaseInformation.isFirstCR()) {
             comment.append(" (it will get created a bit further in the process)");
         }
@@ -58,17 +59,19 @@ public class CoreReleaseApprove implements StepHandler {
 
             String coreBranch = releaseInformation.getEmergencyReleaseCoreBranch();
             if (coreBranch != null) {
-                comment.append("  - Core branch: `").append(coreBranch).append("`\n");
+                comment.append("  - Core branch: ").append(Repositories.getCoreBranchLink(coreBranch)).append("\n");
             } else {
-                comment.append("  - Core branch: `").append(releaseInformation.getBranch()).append("` (default)\n");
+                comment.append("  - Core branch: ").append(Repositories.getCoreBranchLink(releaseInformation.getBranch()))
+                        .append(" (default)\n");
             }
 
             String platformBranch = releaseInformation.getEmergencyReleasePlatformBranch();
             if (platformBranch != null) {
-                comment.append("  - Platform branch: `").append(platformBranch).append("`\n");
+                comment.append("  - Platform branch: ").append(Repositories.getPlatformBranchLink(platformBranch)).append("\n");
             } else {
-                comment.append("  - Platform branch: `").append(Branches.getPlatformReleaseBranch(releaseInformation))
-                        .append("` (default)\n");
+                comment.append("  - Platform branch: ")
+                        .append(Repositories.getPlatformBranchLink(Branches.getPlatformReleaseBranch(releaseInformation)))
+                        .append(" (default)\n");
             }
         }
         if (!releaseInformation.isFinal()) {
@@ -80,12 +83,14 @@ public class CoreReleaseApprove implements StepHandler {
             String snapshotVersion = releaseInformation.getBranch() + ".999-SNAPSHOT";
 
             comment.append("\n");
+            String branchLink = Repositories.getCoreBranchLink(releaseInformation.getBranch());
+            String previousMinorLink = Repositories.getCoreBranchLink(previousMinor);
             comment.append(
-                    Admonitions.warning("This release will be built from `" + releaseInformation.getBranch() + "`.\n\n" +
-                            "You need to push the required changes to this branch e.g. if `" + releaseInformation.getBranch()
-                            + "` is the direct continuation of `" + previousMinor
-                            + "` (which is usually the case for an LTS), you need to sync `"
-                            + releaseInformation.getBranch() + "` with the new changes made to `" + previousMinor + "`.\n\n"
+                    Admonitions.warning("This release will be built from " + branchLink + ".\n\n" +
+                            "You need to push the required changes to this branch e.g. if " + branchLink
+                            + " is the direct continuation of " + previousMinorLink
+                            + " (which is usually the case for an LTS), you need to sync "
+                            + branchLink + " with the new changes made to " + previousMinorLink + ".\n\n"
                             + "Make sure the version in the branch is `" + snapshotVersion + "` (use `./update-version.sh "
                             + snapshotVersion + "` at the root of the Core repository if needed).") + "\n");
         }
@@ -93,7 +98,8 @@ public class CoreReleaseApprove implements StepHandler {
         if (!releaseInformation.isOriginBranchMain()) {
             comment.append("\n");
             comment.append(
-                    Admonitions.warning("This release will be branched from `" + releaseInformation.getOriginBranch() + "`.\n" +
+                    Admonitions.warning("This release will be branched from "
+                            + Repositories.getCoreBranchLink(releaseInformation.getOriginBranch()) + ".\n" +
                             "You may release from an existing branch only when preparing a new LTS release.") + "\n");
         }
 
