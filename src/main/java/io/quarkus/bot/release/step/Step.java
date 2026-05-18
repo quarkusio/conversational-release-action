@@ -33,6 +33,7 @@ public enum Step {
             UpdateDocumentationAdditionalSyncLts.class, true, true),
     UPDATE_WIKI_MIGRATION_GUIDES_FINAL("Update wiki migration guides for Final", UpdateWikiMigrationGuidesFinal.class, true,
             true),
+    UPDATE_GUARDED_BRANCHES("Update guarded branches", UpdateGuardedBranches.class, true, true),
     ANNOUNCE_RELEASE("Announce release", AnnounceRelease.class, true, false);
 
     private final String description;
