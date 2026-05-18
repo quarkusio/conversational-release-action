@@ -8,6 +8,7 @@ public enum Step {
     PREREQUISITES("Prerequisites", Prerequisites.class, false, false),
     CORE_RELEASE_APPROVE("Approve the Core release", CoreReleaseApprove.class, true, false),
     CORE_RELEASE_CREATE_BRANCH("Create branch", CoreReleaseCreateBranch.class, true, false),
+    UPDATE_WIKI_MIGRATION_GUIDES_CR1("Update wiki migration guides for CR1", UpdateWikiMigrationGuidesCr1.class, true, false),
     CORE_RELEASE_PREPARE("Prepare the Core release", CoreReleasePrepare.class, true, false),
     CORE_RELEASE_DEPLOY_LOCALLY("Deploy the Core release locally", CoreReleaseDeployLocally.class, true, false),
     CORE_RELEASE_VALIDATE("Validate the Core release artifacts", CoreReleaseValidate.class, true, false),
@@ -30,6 +31,8 @@ public enum Step {
     UPDATE_DOCUMENTATION("Update documentation", UpdateDocumentation.class, true, true),
     UPDATE_DOCUMENTATION_ADDITIONAL_SYNC_LTS("Update documentation - Additional sync for LTS",
             UpdateDocumentationAdditionalSyncLts.class, true, true),
+    UPDATE_WIKI_MIGRATION_GUIDES_FINAL("Update wiki migration guides for Final", UpdateWikiMigrationGuidesFinal.class, true,
+            true),
     ANNOUNCE_RELEASE("Announce release", AnnounceRelease.class, true, false);
 
     private final String description;
