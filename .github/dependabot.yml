@@ -13,3 +13,5 @@ updates:
     directory: "/"
     schedule:
       interval: daily
+    cooldown:
+      default: 7
