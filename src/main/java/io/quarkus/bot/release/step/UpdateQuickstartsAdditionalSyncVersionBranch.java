@@ -25,10 +25,11 @@ public class UpdateQuickstartsAdditionalSyncVersionBranch implements StepHandler
     Processes processes;
 
     @Override
-    public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
+    public StepResult run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody)
             throws IOException, InterruptedException {
-        return processes.execute(List.of("./update-quickstarts-version-branch.sh", releaseInformation.getBranch()));
+        return StepResult
+                .of(processes.execute(List.of("./update-quickstarts-version-branch.sh", releaseInformation.getBranch())));
     }
 
     @Override

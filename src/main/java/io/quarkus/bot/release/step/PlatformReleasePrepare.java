@@ -35,8 +35,6 @@ public class PlatformReleasePrepare implements StepHandler {
     private static final String PLATFORM_PR_NUMBER = "platformPrNumber";
     private static final String AUTO = "auto";
 
-    private String createdPrNumber;
-
     @Inject
     Processes processes;
 
@@ -112,7 +110,7 @@ public class PlatformReleasePrepare implements StepHandler {
     }
 
     @Override
-    public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
+    public StepResult run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody)
             throws IOException, InterruptedException {
 
@@ -127,7 +125,7 @@ public class PlatformReleasePrepare implements StepHandler {
 
         int exitCode = processes.execute(scriptCommand);
         if (exitCode != 0) {
-            return exitCode;
+            return StepResult.of(exitCode);
         }
 
         GHPullRequest pr = Repositories.getQuarkusPlatformRepository(quarkusBotGitHub)
@@ -137,22 +135,12 @@ public class PlatformReleasePrepare implements StepHandler {
                         platformPreparationBranch,
                         "Upgrade to Quarkus " + releaseInformation.getVersion());
 
-        createdPrNumber = String.valueOf(pr.getNumber());
-
         issue.comment(":white_check_mark: Pull request [#" + pr.getNumber()
                 + "](https://github.com/quarkusio/quarkus-platform/pull/" + pr.getNumber()
                 + ") has been created to upgrade the Platform to Quarkus " + releaseInformation.getVersion() + ".\n\n"
                 + Progress.youAreHere(releaseInformation, releaseStatus));
 
-        return 0;
-    }
-
-    @Override
-    public Map<String, String> getUpdatedProperties(ReleaseInformation releaseInformation, ReleaseStatus releaseStatus) {
-        if (createdPrNumber != null) {
-            return Map.of(PLATFORM_MODE, AUTO, PLATFORM_PR_NUMBER, createdPrNumber);
-        }
-        return Map.of();
+        return StepResult.success(Map.of(PLATFORM_MODE, AUTO, PLATFORM_PR_NUMBER, String.valueOf(pr.getNumber())));
     }
 
     @Override

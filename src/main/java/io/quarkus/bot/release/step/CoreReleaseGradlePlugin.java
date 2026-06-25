@@ -25,10 +25,10 @@ public class CoreReleaseGradlePlugin implements StepHandler {
     Processes processes;
 
     @Override
-    public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
+    public StepResult run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody)
             throws IOException, InterruptedException {
-        return processes.execute(List.of("./release-core-gradle-plugin.sh"));
+        return StepResult.of(processes.execute(List.of("./release-core-gradle-plugin.sh")));
     }
 
     @Override

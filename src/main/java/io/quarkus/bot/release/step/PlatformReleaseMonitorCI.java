@@ -98,7 +98,7 @@ public class PlatformReleaseMonitorCI implements StepHandler {
     }
 
     @Override
-    public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
+    public StepResult run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody)
             throws IOException, InterruptedException {
         String prNumber = releaseStatus.getProperty(PLATFORM_PR_NUMBER);
@@ -118,7 +118,7 @@ public class PlatformReleaseMonitorCI implements StepHandler {
             Thread.sleep(15 * 60 * 1000L);
         }
 
-        return 0;
+        return StepResult.success();
     }
 
     @Override

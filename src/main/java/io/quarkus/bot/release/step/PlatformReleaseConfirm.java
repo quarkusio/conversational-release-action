@@ -99,7 +99,7 @@ public class PlatformReleaseConfirm implements StepHandler {
     }
 
     @Override
-    public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
+    public StepResult run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody)
             throws IOException, InterruptedException {
 
@@ -116,6 +116,6 @@ public class PlatformReleaseConfirm implements StepHandler {
         issue.comment(":white_check_mark: The Platform branch `" + platformReleaseBranch
                 + "` is ready to be released, continuing...\n\n" + Progress.youAreHere(releaseInformation, releaseStatus));
 
-        return 0;
+        return StepResult.success();
     }
 }

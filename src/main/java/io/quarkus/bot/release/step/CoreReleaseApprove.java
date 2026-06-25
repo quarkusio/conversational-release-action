@@ -147,7 +147,7 @@ public class CoreReleaseApprove implements StepHandler {
     }
 
     @Override
-    public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
+    public StepResult run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody)
             throws IOException, InterruptedException {
         StringBuilder comment = new StringBuilder(":white_check_mark: Core release is approved, proceeding...\n\n");
@@ -166,7 +166,7 @@ public class CoreReleaseApprove implements StepHandler {
 
         issue.comment(comment.toString());
 
-        return 0;
+        return StepResult.success();
     }
 
     @Override

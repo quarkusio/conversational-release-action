@@ -36,7 +36,7 @@ public class Prerequisites implements StepHandler {
     Processes processes;
 
     @Override
-    public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
+    public StepResult run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody)
             throws IOException, InterruptedException {
         List<String> command = new ArrayList<String>();
@@ -61,7 +61,7 @@ public class Prerequisites implements StepHandler {
 
         int exitCode = processes.execute(command);
         if (exitCode != 0) {
-            return exitCode;
+            return StepResult.of(exitCode);
         }
 
         String version = Files.readString(Path.of("work", "newVersion")).trim();
@@ -86,6 +86,6 @@ public class Prerequisites implements StepHandler {
             throw new StepExecutionException("Origin branch may only be set when releasing the CR1 of a LTS release.", true);
         }
 
-        return exitCode;
+        return StepResult.of(exitCode);
     }
 }

@@ -27,14 +27,14 @@ public class PlatformReleasePublish implements StepHandler {
     Processes processes;
 
     @Override
-    public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
+    public StepResult run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody)
             throws IOException, InterruptedException {
         String platformReleaseBranch = Branches.getPlatformReleaseBranch(releaseInformation);
 
-        return processes.execute(List.of(
+        return StepResult.of(processes.execute(List.of(
                 "./release-platform-publish.sh",
-                platformReleaseBranch));
+                platformReleaseBranch)));
     }
 
     @Override

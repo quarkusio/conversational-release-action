@@ -1,7 +1,6 @@
 package io.quarkus.bot.release.step;
 
 import java.io.IOException;
-import java.util.Map;
 
 import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHIssueComment;
@@ -15,16 +14,9 @@ import io.quarkus.bot.release.util.UpdatedIssueBody;
 
 public interface StepHandler {
 
-    int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
+    StepResult run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody)
             throws IOException, InterruptedException;
-
-    /**
-     * Return properties to be stored in the release status after a successful run.
-     */
-    default Map<String, String> getUpdatedProperties(ReleaseInformation releaseInformation, ReleaseStatus releaseStatus) {
-        return Map.of();
-    }
 
     /**
      * This method is executed if run() has been successfully executed and is executed after the step status has been marked to

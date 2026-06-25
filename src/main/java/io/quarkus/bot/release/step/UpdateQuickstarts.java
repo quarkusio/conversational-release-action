@@ -26,7 +26,7 @@ public class UpdateQuickstarts implements StepHandler {
     Processes processes;
 
     @Override
-    public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
+    public StepResult run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody)
             throws IOException, InterruptedException {
         if (releaseInformation.isCR()) {
@@ -36,18 +36,20 @@ public class UpdateQuickstarts implements StepHandler {
                 String originBranch = releaseInformation.isOriginBranchMain() ? "development"
                         : releaseInformation.getOriginBranch();
 
-                return processes.execute(List.of("./update-quickstarts.sh", releaseInformation.getBranch(), originBranch));
+                return StepResult.of(
+                        processes.execute(List.of("./update-quickstarts.sh", releaseInformation.getBranch(), originBranch)));
             } else {
-                return processes.execute(
-                        List.of("./update-quickstarts.sh", releaseInformation.getBranch(), releaseInformation.getBranch()));
+                return StepResult.of(processes.execute(
+                        List.of("./update-quickstarts.sh", releaseInformation.getBranch(), releaseInformation.getBranch())));
             }
         } else if (releaseInformation.isFinal()) {
             if (releaseInformation.isFirstFinal()) {
-                return processes.execute(List.of("./update-quickstarts.sh", Branches.MAIN, releaseInformation.getBranch()));
+                return StepResult.of(
+                        processes.execute(List.of("./update-quickstarts.sh", Branches.MAIN, releaseInformation.getBranch())));
             } else {
                 String branch = releaseInformation.isMaintenance() ? releaseInformation.getBranch() : Branches.MAIN;
 
-                return processes.execute(List.of("./update-quickstarts.sh", branch, branch));
+                return StepResult.of(processes.execute(List.of("./update-quickstarts.sh", branch, branch)));
             }
         }
 
