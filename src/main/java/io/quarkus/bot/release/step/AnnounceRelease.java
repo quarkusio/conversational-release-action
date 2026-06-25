@@ -114,11 +114,15 @@ public class AnnounceRelease implements StepHandler {
             comment.append("* Send the announcement to various social networks using https://buffer.com/\n");
 
             try {
+                String announcement = generateAnnouncement(quarkusBotGitHub, releaseInformation, blogPostSlug);
                 comment.append("\n\nYou can find below a template that can help you with writing the announcement email.\n\n");
-                comment.append(generateAnnouncement(quarkusBotGitHub, releaseInformation, blogPostSlug));
+                comment.append(announcement);
             } catch (Exception e) {
-                commands.warning("An error occurred while generating the email announcement template. Ignoring.");
-                LOG.warn("An error occurred while generating the email announcement template. Ignoring.", e);
+                comment.append("\n\n> [!WARNING]\n> An error occurred while generating the email announcement template: `"
+                        + e.getMessage() + "`\n");
+                commands.warning("An error occurred while generating the email announcement template: " + e.getMessage()
+                        + " - check the log file for the full stacktrace");
+                LOG.warn("An error occurred while generating the email announcement template.", e);
             }
 
             if (releaseInformation.isFirstFinal()) {
@@ -195,7 +199,7 @@ public class AnnounceRelease implements StepHandler {
             issues = new ArrayList<>();
 
             // we need to merge issues from all preview releases
-            quarkusRepository.listMilestones(GHIssueState.CLOSED).toList().stream()
+            quarkusRepository.listMilestones(GHIssueState.CLOSED).withPageSize(100).toList().stream()
                     .filter(m -> m.getTitle().startsWith(minorVersion + "."))
                     .forEach(m -> {
                         try {
@@ -205,7 +209,7 @@ public class AnnounceRelease implements StepHandler {
                         }
                     });
         } else {
-            GHMilestone milestone = quarkusRepository.listMilestones(GHIssueState.CLOSED).toList().stream()
+            GHMilestone milestone = quarkusRepository.listMilestones(GHIssueState.CLOSED).withPageSize(100).toList().stream()
                     .filter(m -> version.equals(m.getTitle()))
                     .findFirst()
                     .orElseThrow(() -> new IllegalStateException("Unable to find a closed milestone for " + version));
