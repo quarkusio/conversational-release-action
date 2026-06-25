@@ -70,6 +70,10 @@ public class PlatformReleasePrepare implements StepHandler {
         comment.append("```\n");
         comment.append("cd <your quarkus-platform clone>\n");
         comment.append("```\n");
+        comment.append("* First, make sure that the current project version is `999-SNAPSHOT` - the commit titled" +
+                "\"prepare for next development iteration\" which is created automatically after each release has to be present "
+                +
+                "after the previous release from this branch.");
         comment.append("* Follow (roughly) these steps (`upstream` is the upstream repository, `origin` is your fork):\n\n");
         comment.append("```\n");
         comment.append("git remote update upstream\n");
