@@ -1,6 +1,7 @@
 package io.quarkus.bot.release;
 
 import java.io.IOException;
+import java.util.Map;
 
 import jakarta.inject.Inject;
 
@@ -278,6 +279,12 @@ public class ReleaseAction {
                 int exitCode = currentStepHandler.run(context, commands, quarkusBotGitHub, releaseInformation,
                         currentReleaseStatus, issue, updatedIssueBody);
                 handleExitCode(exitCode, currentStep);
+
+                Map<String, String> updatedProperties = currentStepHandler.getUpdatedProperties(releaseInformation,
+                        currentReleaseStatus);
+                for (var entry : updatedProperties.entrySet()) {
+                    currentReleaseStatus = currentReleaseStatus.withProperty(entry.getKey(), entry.getValue());
+                }
 
                 currentReleaseStatus = currentReleaseStatus.progress(StepStatus.COMPLETED);
                 updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);

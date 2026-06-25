@@ -520,6 +520,7 @@ public class IssuesTest {
                         currentStep: "CORE_RELEASE_APPROVE"
                         currentStepStatus: "STARTED"
                         workflowRunId: 123
+                        properties: \\{\\}
                         date: ".*"
                         -->""");
 
@@ -556,6 +557,7 @@ public class IssuesTest {
                         currentStep: "CORE_RELEASE_PREPARE"
                         currentStepStatus: "COMPLETED"
                         workflowRunId: 145
+                        properties: \\{\\}
                         date: ".*"
                         -->""");
     }
