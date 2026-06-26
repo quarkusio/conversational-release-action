@@ -30,9 +30,9 @@ public class UpdateWikiMigrationGuidesFinal implements StepHandler {
     }
 
     @Override
-    public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
+    public StepResult run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody)
             throws IOException, InterruptedException {
-        return processes.execute(List.of("./update-wiki-migration-guides-final.sh"));
+        return StepResult.of(processes.execute(List.of("./update-wiki-migration-guides-final.sh")));
     }
 }

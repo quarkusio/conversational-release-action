@@ -14,7 +14,7 @@ import io.quarkus.bot.release.util.UpdatedIssueBody;
 
 public interface StepHandler {
 
-    int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
+    StepResult run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody)
             throws IOException, InterruptedException;
 

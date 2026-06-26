@@ -40,7 +40,7 @@ public class AnnounceRelease implements StepHandler {
     private static final Logger LOG = Logger.getLogger(AnnounceRelease.class);
 
     @Override
-    public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
+    public StepResult run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody)
             throws IOException, InterruptedException {
         StringBuilder comment = new StringBuilder();
@@ -176,7 +176,7 @@ public class AnnounceRelease implements StepHandler {
         issue.comment(comment.toString());
         issue.close();
 
-        return 0;
+        return StepResult.success();
     }
 
     private static String getPreviousMinorBranch(GHRepository repository, String currentBranch) throws IOException {

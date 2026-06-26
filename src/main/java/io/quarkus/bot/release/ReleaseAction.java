@@ -23,6 +23,7 @@ import io.quarkus.bot.release.error.StatusUpdateException;
 import io.quarkus.bot.release.error.StepExecutionException;
 import io.quarkus.bot.release.step.Step;
 import io.quarkus.bot.release.step.StepHandler;
+import io.quarkus.bot.release.step.StepResult;
 import io.quarkus.bot.release.step.StepStatus;
 import io.quarkus.bot.release.util.Admonitions;
 import io.quarkus.bot.release.util.Command;
@@ -275,9 +276,13 @@ public class ReleaseAction {
 
                 commands.notice("Running step " + currentStep.getDescription());
 
-                int exitCode = currentStepHandler.run(context, commands, quarkusBotGitHub, releaseInformation,
+                StepResult stepResult = currentStepHandler.run(context, commands, quarkusBotGitHub, releaseInformation,
                         currentReleaseStatus, issue, updatedIssueBody);
-                handleExitCode(exitCode, currentStep);
+                handleExitCode(stepResult.exitCode(), currentStep);
+
+                for (var entry : stepResult.properties().entrySet()) {
+                    currentReleaseStatus = currentReleaseStatus.withProperty(entry.getKey(), entry.getValue());
+                }
 
                 currentReleaseStatus = currentReleaseStatus.progress(StepStatus.COMPLETED);
                 updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);

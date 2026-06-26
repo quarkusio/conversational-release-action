@@ -126,7 +126,7 @@ public class CoreReleaseCreateBranch implements StepHandler {
     }
 
     @Override
-    public int run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
+    public StepResult run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody)
             throws InterruptedException, IOException {
         GHRepository repository = Repositories.getQuarkusRepository(quarkusBotGitHub);
@@ -248,7 +248,7 @@ public class CoreReleaseCreateBranch implements StepHandler {
 
         issue.comment(comment);
 
-        return 0;
+        return StepResult.success();
     }
 
     private static String getPreviousMinorBranch(GHRepository repository, String currentBranch) throws IOException {
