@@ -6,6 +6,7 @@ import java.util.Map;
 
 import jakarta.inject.Singleton;
 
+import org.jboss.logging.Logger;
 import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHIssueComment;
 import org.kohsuke.github.GHPullRequest;
@@ -27,6 +28,8 @@ import io.quarkus.bot.release.util.UpdatedIssueBody;
 @Singleton
 @Unremovable
 public class PlatformReleaseMonitorCI implements StepHandler {
+
+    private static final Logger LOG = Logger.getLogger(PlatformReleaseMonitorCI.class);
 
     private static final String PLATFORM_MODE = "platformMode";
     private static final String PLATFORM_PR_NUMBER = "platformPrNumber";
@@ -75,8 +78,10 @@ public class PlatformReleaseMonitorCI implements StepHandler {
             comment.append("If things go south, you can check the pull request status manually and add a `"
                     + Command.CONTINUE.getFullCommand() + "` comment to continue.\n\n");
         } catch (Exception e) {
+            LOG.error("Unable to start the CI monitoring workflow", e);
             comment.append(Admonitions.warning(
-                    "We were unable to start the CI monitoring workflow. Please monitor CI manually.") + "\n\n");
+                    "We were unable to start the CI monitoring workflow: " + e.getMessage() + ". Please monitor CI manually.")
+                    + "\n\n");
             comment.append("* Check [the pull request](https://github.com/quarkusio/quarkus-platform/pull/"
                     + prNumber + ") for CI status\n");
             comment.append("* Once CI passes and the pull request is merged, add a `"

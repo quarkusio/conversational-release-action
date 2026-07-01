@@ -73,7 +73,7 @@ public class PlatformReleasePrepare implements StepHandler {
                     + "\n\n");
         }
 
-        comment.append(":raised_hands: You have two options:\n\n");
+        comment.append("You have two options:\n\n");
         comment.append("- Let the release process handle things automatically: it will create a pull request on the Platform "
                 + "targeting the `" + platformPreparationBranch + "` branch, monitor CI, and merge it\n");
         comment.append("- Perform all the operations manually\n\n");
