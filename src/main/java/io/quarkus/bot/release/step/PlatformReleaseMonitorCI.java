@@ -117,10 +117,7 @@ public class PlatformReleaseMonitorCI implements StepHandler {
             }
 
             issue.comment(":white_check_mark: Platform pull request #" + prNumber + " has been merged.\n\n"
-                    + "Waiting 15 minutes before continuing to let artifacts propagate...\n\n"
                     + Progress.youAreHere(releaseInformation, releaseStatus));
-
-            Thread.sleep(15 * 60 * 1000L);
         }
 
         return StepResult.success();
