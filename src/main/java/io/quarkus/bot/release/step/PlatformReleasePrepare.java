@@ -114,6 +114,11 @@ public class PlatformReleasePrepare implements StepHandler {
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody)
             throws IOException, InterruptedException {
 
+        issue.comment(":hourglass: Waiting 15 minutes before preparing the Platform to let Core artifacts propagate...\n\n"
+                + Progress.youAreHere(releaseInformation, releaseStatus));
+
+        Thread.sleep(15 * 60 * 1000L);
+
         String platformPreparationBranch = Branches.getPlatformPreparationBranch(releaseInformation);
 
         List<String> scriptCommand = new ArrayList<>();
