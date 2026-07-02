@@ -73,9 +73,7 @@ public class PlatformReleasePrepare implements StepHandler {
                     + "\n\n");
         }
 
-        if (!releaseInformation.isDot0()
-                && !(releaseInformation.isLtsMaintenanceReleaseWithRegularReleaseCadence()
-                        && !releaseInformation.isEmergency())) {
+        if (!releaseInformation.requiresPlatformMemberWaitingPeriod()) {
             comment.append(Admonitions.important(
                     "Make sure you have merged [all the pull requests](https://github.com/quarkusio/quarkus-platform/pulls) targeting the `"
                             + platformPreparationBranch

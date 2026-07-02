@@ -35,13 +35,7 @@ public class PlatformReleaseConfirm implements StepHandler {
         if (!AUTO.equals(releaseStatus.getProperty(PLATFORM_MODE))) {
             return true;
         }
-        if (releaseInformation.isDot0()) {
-            return false;
-        }
-        if (releaseInformation.isLtsMaintenanceReleaseWithRegularReleaseCadence() && !releaseInformation.isEmergency()) {
-            return false;
-        }
-        return true;
+        return !releaseInformation.requiresPlatformMemberWaitingPeriod();
     }
 
     @Override

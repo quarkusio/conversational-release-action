@@ -199,6 +199,14 @@ public class ReleaseInformation {
     }
 
     /**
+     * @return whether this release requires a waiting period for Platform members to contribute updates or fixes
+     */
+    @JsonIgnore
+    public boolean requiresPlatformMemberWaitingPeriod() {
+        return isDot0() || (isLtsMaintenanceReleaseWithRegularReleaseCadence() && !isEmergency());
+    }
+
+    /**
      * @return whether this version is an LTS maintenance release with the regular release cadence (so a release from a LTS
      *         branch, not a first final, and post 3.15 included)
      */
