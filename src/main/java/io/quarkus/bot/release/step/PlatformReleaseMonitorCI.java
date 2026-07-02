@@ -70,7 +70,7 @@ public class PlatformReleaseMonitorCI implements StepHandler {
             issue.getRepository().getWorkflow("monitor-platform-ci.yml").dispatch(Branches.MAIN, inputs);
 
             comment.append("**We started a separate workflow to monitor the CI status of "
-                    + "[pull request #" + prNumber + "](https://github.com/quarkusio/quarkus-platform/pull/" + prNumber
+                    + "pull request [#" + prNumber + "](https://github.com/quarkusio/quarkus-platform/pull/" + prNumber
                     + "). "
                     + "It will automatically continue the release process once CI passes.**\n\n");
 
@@ -116,7 +116,8 @@ public class PlatformReleaseMonitorCI implements StepHandler {
                 pr.merge("Upgrade to Quarkus " + releaseInformation.getVersion(), null, GHPullRequest.MergeMethod.MERGE);
             }
 
-            issue.comment(":white_check_mark: Platform pull request #" + prNumber + " has been merged.\n\n"
+            issue.comment(":white_check_mark: Platform pull request [#" + prNumber
+                    + "](https://github.com/quarkusio/quarkus-platform/pull/" + prNumber + ") has been merged.\n\n"
                     + Progress.youAreHere(releaseInformation, releaseStatus));
         }
 
