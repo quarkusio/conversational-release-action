@@ -32,7 +32,16 @@ public class PlatformReleaseConfirm implements StepHandler {
 
     @Override
     public boolean shouldSkip(ReleaseInformation releaseInformation, ReleaseStatus releaseStatus) {
-        return !AUTO.equals(releaseStatus.getProperty(PLATFORM_MODE));
+        if (!AUTO.equals(releaseStatus.getProperty(PLATFORM_MODE))) {
+            return true;
+        }
+        if (releaseInformation.isDot0()) {
+            return false;
+        }
+        if (releaseInformation.isLtsMaintenanceReleaseWithRegularReleaseCadence() && !releaseInformation.isEmergency()) {
+            return false;
+        }
+        return true;
     }
 
     @Override

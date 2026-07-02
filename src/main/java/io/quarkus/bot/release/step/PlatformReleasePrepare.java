@@ -73,6 +73,16 @@ public class PlatformReleasePrepare implements StepHandler {
                     + "\n\n");
         }
 
+        if (!releaseInformation.isDot0()
+                && !(releaseInformation.isLtsMaintenanceReleaseWithRegularReleaseCadence()
+                        && !releaseInformation.isEmergency())) {
+            comment.append(Admonitions.important(
+                    "Make sure you have merged [all the pull requests](https://github.com/quarkusio/quarkus-platform/pulls) targeting the `"
+                            + platformPreparationBranch
+                            + "` branch that should be included in this version of the Platform before continuing.")
+                    + "\n\n");
+        }
+
         comment.append("You have two options:\n\n");
         comment.append("- Let the release process handle things automatically: it will create a pull request on the Platform "
                 + "targeting the `" + platformPreparationBranch + "` branch, monitor CI, and merge it\n");
