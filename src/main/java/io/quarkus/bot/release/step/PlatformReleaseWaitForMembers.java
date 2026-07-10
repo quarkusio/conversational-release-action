@@ -62,7 +62,7 @@ public class PlatformReleaseWaitForMembers implements StepHandler {
                     + "\n"
                     + "If you want to update your components, please create your pull requests targeting the "
                     + platformPreparationBranch + " branch and make sure they are merged before next Tuesday.\n");
-            if (!releaseInformation.isOriginBranchMain()) {
+            if (!releaseInformation.isOriginBranchDefault()) {
                 comment.append(
                         "\nMake sure you mention in the description that your pull request should be be backported to the "
                                 + releaseInformation.getBranch() + " branch as " + releaseInformation.getBranch()

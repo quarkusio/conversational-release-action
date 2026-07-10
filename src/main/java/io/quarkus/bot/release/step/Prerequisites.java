@@ -76,13 +76,16 @@ public class Prerequisites implements StepHandler {
 
         issues.appendReleaseInformation(updatedIssueBody, releaseInformation);
 
-        // for the first CR of an LTS branch, we need the origin branch to be not be main
+        // for the first CR of an LTS branch, we need the origin branch to not be the default
         if (releaseInformation.isFirstCR() && Branches.isLts(releaseInformation.getBranch())) {
-            if (releaseInformation.isOriginBranchMain()) {
-                throw new StepExecutionException("Origin branch is set to `main` for the CR1 of a LTS release.", true,
+            if (releaseInformation.isOriginBranchDefault()) {
+                throw new StepExecutionException(
+                        "Origin branch is set to `" + Branches.getDefaultOriginBranch(releaseInformation.getBranch())
+                                + "` for the CR1 of a LTS release.",
+                        true,
                         "For the first CR of a LTS branch, we need the origin branch to be the branch of the previous minor as the LTS should be a direct continuation of the previous minor.");
             }
-        } else if (!releaseInformation.isOriginBranchMain()) {
+        } else if (!releaseInformation.isOriginBranchDefault()) {
             throw new StepExecutionException("Origin branch may only be set when releasing the CR1 of a LTS release.", true);
         }
 
