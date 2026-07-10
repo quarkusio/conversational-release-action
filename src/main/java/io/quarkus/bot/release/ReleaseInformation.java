@@ -73,9 +73,9 @@ public class ReleaseInformation {
     }
 
     /**
-     * @return the branch from which we branch the CR1 release - it is main except when preparing the CR1 of an LTS release, in
-     *         which case it is the previous version branch as we want to branch CR1 from the previous version branch. For any
-     *         other release than the CR1, this is not consumed.
+     * @return the branch from which we branch the CR1 release - it is main (or 3.x for 3.x releases) except when preparing the
+     *         CR1 of an LTS release, in which case it is the previous version branch as we want to branch CR1 from the previous
+     *         version branch. For any other release than the CR1, this is not consumed.
      */
     public String getOriginBranch() {
         return originBranch;
@@ -190,12 +190,12 @@ public class ReleaseInformation {
     }
 
     /**
-     * @return whether the origin branch for creating the branch is the main branch (see {@link #getOriginBranch()} for more
-     *         details)
+     * @return whether the origin branch for creating the branch is the default origin branch (see {@link #getOriginBranch()}
+     *         for more details) - it is main for most branches, except for 3.x branches where it is the 3.x branch
      */
     @JsonIgnore
-    public boolean isOriginBranchMain() {
-        return Branches.MAIN.equals(originBranch);
+    public boolean isOriginBranchDefault() {
+        return Branches.getDefaultOriginBranch(branch).equals(originBranch);
     }
 
     /**

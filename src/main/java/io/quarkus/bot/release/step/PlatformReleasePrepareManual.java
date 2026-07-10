@@ -59,7 +59,7 @@ public class PlatformReleasePrepareManual implements StepHandler {
         comment.append("* Follow (roughly) these steps (`upstream` is the upstream repository, `origin` is your fork):\n\n");
         comment.append("```\n");
         comment.append("git remote update upstream\n");
-        if (releaseInformation.isOriginBranchMain()) {
+        if (releaseInformation.isOriginBranchDefault()) {
             comment.append("git checkout " + platformPreparationBranch + "\n");
             comment.append("git pull upstream " + platformPreparationBranch + "\n");
         } else {
@@ -108,7 +108,7 @@ public class PlatformReleasePrepareManual implements StepHandler {
                     + "\n"
                     + "If you want to update your components, please create your pull requests targeting the "
                     + platformPreparationBranch + " branch and make sure they are merged before next Tuesday.\n");
-            if (!releaseInformation.isOriginBranchMain()) {
+            if (!releaseInformation.isOriginBranchDefault()) {
                 comment.append(
                         "\nMake sure you mention in the description that your pull request should be be backported to the "
                                 + releaseInformation.getBranch() + " branch as " + releaseInformation.getBranch()

@@ -9,6 +9,7 @@ import io.quarkus.bot.release.ReleaseInformation;
 public class Branches {
 
     public static final String MAIN = "main";
+    public static final String BRANCH_3_X = "3.x";
     private static final List<String> LTS_BRANCHES = List.of("3.33", "3.27", "3.20", "3.15", "3.8", "3.2");
     public static final String BRANCH_3_8 = "3.8";
 
@@ -20,7 +21,7 @@ public class Branches {
                 && (!releaseInformation.isFirstFinal() || Branches.isLts(releaseInformation.getBranch()))) {
             return releaseInformation.getBranch();
         }
-        if (!releaseInformation.isOriginBranchMain()) {
+        if (!releaseInformation.isOriginBranchDefault()) {
             return releaseInformation.getBranch();
         }
 
@@ -34,10 +35,17 @@ public class Branches {
         if (releaseInformation.isFinal()) {
             return releaseInformation.getBranch();
         }
-        if (!releaseInformation.isOriginBranchMain()) {
+        if (!releaseInformation.isOriginBranchDefault()) {
             return releaseInformation.getBranch();
         }
 
+        return MAIN;
+    }
+
+    public static String getDefaultOriginBranch(String branch) {
+        if (branch != null && branch.startsWith("3.")) {
+            return BRANCH_3_X;
+        }
         return MAIN;
     }
 

@@ -42,7 +42,29 @@ public class IssuesTest {
                 """;
 
         assertThat(issues.extractReleaseInformationFromForm(description))
-                .isEqualTo(new ReleaseInformation(null, "3.6", Branches.MAIN, null, false, null, null, false, false, false));
+                .isEqualTo(
+                        new ReleaseInformation(null, "3.6", Branches.BRANCH_3_X, null, false, null, null, false, false, false));
+
+        description = """
+                ### Branch
+
+                4.0
+
+                ### Origin branch
+
+                _No response_
+
+                ### Qualifier
+
+                CR1
+
+                ### Major version
+
+                - [x] This release is a major version.
+                """;
+
+        assertThat(issues.extractReleaseInformationFromForm(description))
+                .isEqualTo(new ReleaseInformation(null, "4.0", Branches.MAIN, "CR1", false, null, null, true, false, false));
 
         description = """
                 ### Branch
@@ -92,8 +114,8 @@ public class IssuesTest {
                 """;
 
         assertThat(issues.extractReleaseInformationFromForm(description))
-                .isEqualTo(new ReleaseInformation(null, "3.20", "main", null, true, "3.20.1-emergency-1", null, false, false,
-                        false));
+                .isEqualTo(new ReleaseInformation(null, "3.20", Branches.BRANCH_3_X, null, true, "3.20.1-emergency-1", null,
+                        false, false, false));
 
         description = """
                 ### Branch
@@ -122,7 +144,8 @@ public class IssuesTest {
                 """;
 
         assertThat(issues.extractReleaseInformationFromForm(description))
-                .isEqualTo(new ReleaseInformation(null, "3.20", "main", null, true, null, null, false, false, false));
+                .isEqualTo(new ReleaseInformation(null, "3.20", Branches.BRANCH_3_X, null, true, null, null, false, false,
+                        false));
 
         description = """
                 ### Branch
@@ -155,7 +178,7 @@ public class IssuesTest {
                 """;
 
         assertThat(issues.extractReleaseInformationFromForm(description))
-                .isEqualTo(new ReleaseInformation(null, "3.20", "main", null, true, "3.20.1-emergency-1",
+                .isEqualTo(new ReleaseInformation(null, "3.20", Branches.BRANCH_3_X, null, true, "3.20.1-emergency-1",
                         "3.20.1-platform-emergency-1", false, false, false));
 
         description = """
@@ -189,7 +212,8 @@ public class IssuesTest {
                 """;
 
         assertThat(issues.extractReleaseInformationFromForm(description))
-                .isEqualTo(new ReleaseInformation(null, "3.20", "main", null, true, null, null, false, false, false));
+                .isEqualTo(new ReleaseInformation(null, "3.20", Branches.BRANCH_3_X, null, true, null, null, false, false,
+                        false));
 
         assertThrows(IllegalStateException.class, () -> issues.extractReleaseInformationFromForm("foobar"));
 

@@ -114,7 +114,7 @@ public final class Issues {
                 continue;
             }
             if (inOriginBranch) {
-                originBranch = NO_RESPONSE.equals(line) ? Branches.MAIN : line;
+                originBranch = NO_RESPONSE.equals(line) ? Branches.getDefaultOriginBranch(branch) : line;
                 inOriginBranch = false;
                 continue;
             }

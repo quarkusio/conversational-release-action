@@ -67,7 +67,7 @@ public class PlatformReleasePrepare implements StepHandler {
                     + "\n\n");
         }
 
-        if (!releaseInformation.isFinal() && releaseInformation.isOriginBranchMain()) {
+        if (!releaseInformation.isFinal() && releaseInformation.isOriginBranchDefault()) {
             comment.append(Admonitions.tip(
                     "In the case of `preview releases` (e.g. `Alpha1`, `CR1`...), the release will be built from the `main` branch")
                     + "\n\n");
@@ -132,7 +132,7 @@ public class PlatformReleasePrepare implements StepHandler {
         List<String> scriptCommand = new ArrayList<>();
         scriptCommand.add("./release-platform-prepare.sh");
         scriptCommand.add(platformPreparationBranch);
-        if (!releaseInformation.isOriginBranchMain()) {
+        if (!releaseInformation.isOriginBranchDefault()) {
             scriptCommand.add(releaseInformation.getOriginBranch());
         }
 

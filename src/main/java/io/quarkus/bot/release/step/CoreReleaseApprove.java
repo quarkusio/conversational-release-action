@@ -95,7 +95,7 @@ public class CoreReleaseApprove implements StepHandler {
                             + snapshotVersion + "` at the root of the Core repository if needed).") + "\n");
         }
 
-        if (!releaseInformation.isOriginBranchMain()) {
+        if (!releaseInformation.isOriginBranchDefault()) {
             comment.append("\n");
             comment.append(
                     Admonitions.warning("This release will be branched from "

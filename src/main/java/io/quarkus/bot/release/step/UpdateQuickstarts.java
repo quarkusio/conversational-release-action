@@ -32,9 +32,15 @@ public class UpdateQuickstarts implements StepHandler {
         if (releaseInformation.isCR()) {
             if (releaseInformation.isFirstCR()) {
                 // first CR is specific, we want to create the branch and get the new developments from the development branch
-                // except if we are branching from an existing branch for a LTS release
-                String originBranch = releaseInformation.isOriginBranchMain() ? "development"
-                        : releaseInformation.getOriginBranch();
+                // (or 3.x for 3.x releases), except if we are branching from an existing branch for a LTS release
+                String originBranch;
+                if (!releaseInformation.isOriginBranchDefault()) {
+                    originBranch = releaseInformation.getOriginBranch();
+                } else if (releaseInformation.getBranch().startsWith("3.")) {
+                    originBranch = Branches.BRANCH_3_X;
+                } else {
+                    originBranch = "development";
+                }
 
                 return StepResult.of(
                         processes.execute(List.of("./update-quickstarts.sh", releaseInformation.getBranch(), originBranch)));

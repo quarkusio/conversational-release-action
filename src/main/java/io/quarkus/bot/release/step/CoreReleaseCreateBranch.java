@@ -228,7 +228,7 @@ public class CoreReleaseCreateBranch implements StepHandler {
 
         String comment = ":white_check_mark: Branch " + releaseInformation.getBranch()
                 + " has been created and the milestone and backport labels adjusted.\n\n";
-        if (releaseInformation.isOriginBranchMain()) {
+        if (releaseInformation.isOriginBranchDefault()) {
             comment += "We created a new `" + nextMinorInMain + " - main`"
                     + " milestone for future developments.\n\n";
         }
