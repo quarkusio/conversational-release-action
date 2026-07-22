@@ -58,11 +58,16 @@ public class PlatformReleaseMonitorCI implements StepHandler {
                     Command.CONTINUE.getFullCommand()
                             + "\n\nWe have detected that the Platform CI has passed. Merging the pull request and continuing.");
             inputs.put("message-if-failure",
-                    "The Platform CI has failed.\n\n"
+                    ":rotating_light: The Platform CI has failed.\n\n"
                             + "Please check [the pull request](https://github.com/quarkusio/quarkus-platform/pull/"
                             + prNumber + ") for details.\n\n"
-                            + "Once the issue is fixed and CI passes, add a `"
-                            + Command.CONTINUE.getFullCommand() + "` comment to continue.");
+                            + "From here, you need to handle things manually:\n\n"
+                            + "1. Analyze the CI failures and either fix them or decide to proceed anyway\n"
+                            + "2. Merge [the pull request](https://github.com/quarkusio/quarkus-platform/pull/"
+                            + prNumber + ") manually\n\n"
+                            + Admonitions.important("**Once the pull request is merged, add a `"
+                                    + Command.CONTINUE.getFullCommand()
+                                    + "` comment to this issue to continue the release process.**"));
             inputs.put("initial-delay", "120");
             inputs.put("poll-delay", "15");
             inputs.put("poll-iterations", "8");
