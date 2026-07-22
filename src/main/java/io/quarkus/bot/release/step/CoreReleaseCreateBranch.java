@@ -41,7 +41,9 @@ public class CoreReleaseCreateBranch implements StepHandler {
 
     private static final Logger LOG = Logger.getLogger(CoreReleaseCreateBranch.class);
 
-    private static final String MAIN_MILESTONE_SUFFIX = " - main";
+    private static String getMilestoneSuffix(String branch) {
+        return " - " + Branches.getDefaultOriginBranch(branch);
+    }
 
     @Inject
     Processes processes;
@@ -73,11 +75,13 @@ public class CoreReleaseCreateBranch implements StepHandler {
         comment.append("If you choose to do things manually, make sure you perform all the following tasks:\n\n");
         comment.append(
                 "- Create the `" + releaseInformation.getBranch() + "` branch and push it to the upstream repository\n");
+        String milestoneSuffix = getMilestoneSuffix(releaseInformation.getBranch());
         comment.append("- Rename the `" + releaseInformation.getBranch()
-                + " - main` milestone [here](https://github.com/quarkusio/quarkus/milestones) to "
+                + milestoneSuffix + "` milestone [here](https://github.com/quarkusio/quarkus/milestones) to "
                 + releaseInformation.getVersion() + "\n");
         comment.append(
-                "- Create a new milestone `X.Y - main` milestone [here](https://github.com/quarkusio/quarkus/milestones/new) with `X.Y` being the next major/minor version name. Make sure you follow the naming convention, it is important.\n");
+                "- Create a new milestone `X.Y" + milestoneSuffix
+                        + "` milestone [here](https://github.com/quarkusio/quarkus/milestones/new) with `X.Y` being the next major/minor version name. Make sure you follow the naming convention, it is important.\n");
         comment.append("- Rename the `" + Labels.BACKPORT_LABEL + "` label to `"
                 + Labels.backportForVersion(releaseInformation.getBranch()) + "`\n");
         comment.append("- Create a new `" + Labels.BACKPORT_LABEL + "` label\n");
@@ -166,12 +170,13 @@ public class CoreReleaseCreateBranch implements StepHandler {
         if (versionedMilestone.isEmpty()) {
             // the version milestone does not exist, we try to rename the "X.Y - main" milestone to the version
 
-            Optional<GHMilestone> milestone = getMilestone(repository, releaseInformation.getBranch() + MAIN_MILESTONE_SUFFIX);
+            String milestoneSuffix = getMilestoneSuffix(releaseInformation.getBranch());
+            Optional<GHMilestone> milestone = getMilestone(repository, releaseInformation.getBranch() + milestoneSuffix);
             if (milestone.isPresent()) {
                 try {
                     milestone.get().setTitle(releaseInformation.getVersion());
 
-                    repository.createMilestone(nextMinorInMain + MAIN_MILESTONE_SUFFIX, "");
+                    repository.createMilestone(nextMinorInMain + milestoneSuffix, "");
                 } catch (Exception e) {
                     throw new IllegalStateException(
                             "Unable to update the milestone or create the new milestone: " + e.getMessage(), e);
@@ -179,7 +184,7 @@ public class CoreReleaseCreateBranch implements StepHandler {
             } else {
                 throw new IllegalStateException(
                         "Milestone " + releaseInformation.getVersion() + " does not exist and we were unable to find milestone "
-                                + releaseInformation.getBranch() + MAIN_MILESTONE_SUFFIX + " to rename it");
+                                + releaseInformation.getBranch() + milestoneSuffix + " to rename it");
             }
         }
 
@@ -229,7 +234,7 @@ public class CoreReleaseCreateBranch implements StepHandler {
         String comment = ":white_check_mark: Branch " + releaseInformation.getBranch()
                 + " has been created and the milestone and backport labels adjusted.\n\n";
         if (releaseInformation.isOriginBranchDefault()) {
-            comment += "We created a new `" + nextMinorInMain + " - main`"
+            comment += "We created a new `" + nextMinorInMain + getMilestoneSuffix(releaseInformation.getBranch()) + "`"
                     + " milestone for future developments.\n\n";
         }
         comment += "Make sure to [adjust the name of the milestone](https://github.com/quarkusio/quarkus/milestones) if needed as the name has simply been inferred from the current release.\n\n";
@@ -280,7 +285,8 @@ public class CoreReleaseCreateBranch implements StepHandler {
                 + "```\n"
                 + "Hi,\n"
                 + "\n"
-                + "We just branched " + releaseInformation.getFullBranch() + ". The main branch is now "
+                + "We just branched " + releaseInformation.getFullBranch() + ". The "
+                + Branches.getDefaultOriginBranch(releaseInformation.getBranch()) + " branch is now "
                 + (nextMinorInMain != null ? nextMinorInMain : "**X.Y**");
 
         if (isNextMinorLts && nextMinor != null) {
