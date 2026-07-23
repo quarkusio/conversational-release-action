@@ -80,8 +80,10 @@ public class PlatformReleaseMonitorCI implements StepHandler {
                     + "It will automatically continue the release process once CI passes.**\n\n");
 
             comment.append("---\n\n");
-            comment.append("If things go south, you can check the pull request status manually and add a `"
+            comment.append("<details><summary>If things go south</summary>\n\n");
+            comment.append("You can check the pull request status manually and add a `"
                     + Command.CONTINUE.getFullCommand() + "` comment to continue.\n\n");
+            comment.append("</details>\n\n");
         } catch (Exception e) {
             LOG.error("Unable to start the CI monitoring workflow", e);
             comment.append(Admonitions.warning(
