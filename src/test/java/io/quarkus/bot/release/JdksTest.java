@@ -20,7 +20,10 @@ public class JdksTest {
         assertThat(jdks.getJdkVersion("3.2")).isEqualTo("11");
         assertThat(jdks.getJdkVersion("3.6")).isEqualTo("11");
         assertThat(jdks.getJdkVersion("3.7")).isEqualTo("17");
-        assertThat(jdks.getJdkVersion("4.0")).isEqualTo("17");
-        assertThat(jdks.getJdkVersion("main")).isEqualTo("17");
+        assertThat(jdks.getJdkVersion("3.8")).isEqualTo("17");
+        assertThat(jdks.getJdkVersion("3.17")).isEqualTo("17");
+        assertThat(jdks.getJdkVersion("4.0")).isEqualTo("21");
+        assertThat(jdks.getJdkVersion("4.1")).isEqualTo("21");
+        assertThat(jdks.getJdkVersion("main")).isEqualTo("21");
     }
 }

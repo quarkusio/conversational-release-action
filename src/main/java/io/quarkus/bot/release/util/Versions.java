@@ -10,6 +10,7 @@ public final class Versions {
     public static final ComparableVersion VERSION_3_2 = new ComparableVersion("3.2");
     public static final ComparableVersion VERSION_3_6 = new ComparableVersion("3.6");
     public static final ComparableVersion VERSION_3_7 = new ComparableVersion("3.7");
+    public static final ComparableVersion VERSION_4_0 = new ComparableVersion("4.0");
 
     private Versions() {
     }
