@@ -21,7 +21,7 @@ public enum Step {
     PLATFORM_RELEASE_PREPARE_MANUAL("Prepare the Quarkus Platform (manual)", PlatformReleasePrepareManual.class, true, false),
     PLATFORM_RELEASE_MONITOR_CI("Monitor Platform CI", PlatformReleaseMonitorCI.class, true, false),
     PLATFORM_RELEASE_WAIT_FOR_MEMBERS("Wait for Platform members", PlatformReleaseWaitForMembers.class, true, false),
-    PLATFORM_RELEASE_CONFIRM("Confirm Platform readiness", PlatformReleaseConfirm.class, true, false),
+    PLATFORM_RELEASE_PREPARE_BRANCH("Prepare Platform release branch", PlatformReleasePrepareBranch.class, true, false),
     PLATFORM_RELEASE_PUBLISH("Publish the Quarkus Platform", PlatformReleasePublish.class, true, false),
     PLATFORM_RELEASE_WAIT_FOR_SYNC("Sync Platform release to Maven Central", PlatformReleaseWaitForSync.class, true, false),
     UPDATE_EXTENSION_CATALOG("Update extension catalog", UpdateExtensionCatalog.class, true, false),
