@@ -30,7 +30,7 @@ public class PlatformReleasePrepareBranch implements StepHandler {
         if (!AUTO.equals(releaseStatus.getProperty(PLATFORM_MODE))) {
             return true;
         }
-        return !releaseInformation.requiresPlatformMemberWaitingPeriod();
+        return !releaseInformation.isFirstFinal();
     }
 
     @Override
