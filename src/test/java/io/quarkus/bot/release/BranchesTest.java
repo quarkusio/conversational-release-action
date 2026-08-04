@@ -94,20 +94,25 @@ public class BranchesTest {
 
     @Test
     void testLts() {
-        assertThat(Branches.isLts("3.2")).isTrue();
+        assertThat(Branches.isLts("3.2")).isFalse();
         assertThat(Branches.isLts("3.4")).isFalse();
-        assertThat(Branches.isLts("3.8")).isTrue();
+        assertThat(Branches.isLts("3.8")).isFalse();
         assertThat(Branches.isLts("3.9")).isFalse();
-        assertThat(Branches.isLts("3.15")).isTrue();
+        assertThat(Branches.isLts("3.15")).isFalse();
         assertThat(Branches.isLts("3.20")).isTrue();
+        assertThat(Branches.isLts("3.27")).isTrue();
+        assertThat(Branches.isLts("3.33")).isTrue();
+        assertThat(Branches.isLts("3.38")).isFalse();
+        assertThat(Branches.isLts("3.40")).isTrue();
     }
 
     @Test
     void testGetLtsVersionsReleasedBefore() {
-        assertThat(Branches.getLtsVersionsReleasedBefore("3.3")).containsExactly("3.2");
-        assertThat(Branches.getLtsVersionsReleasedBefore("3.8")).containsExactly("3.2");
-        assertThat(Branches.getLtsVersionsReleasedBefore("3.9")).containsExactly("3.2", "3.8");
-        assertThat(Branches.getLtsVersionsReleasedBefore("3.16")).containsExactly("3.2", "3.8", "3.15");
+        assertThat(Branches.getLtsVersionsReleasedBefore("3.20")).isEmpty();
+        assertThat(Branches.getLtsVersionsReleasedBefore("3.21")).containsExactly("3.20");
+        assertThat(Branches.getLtsVersionsReleasedBefore("3.28")).containsExactly("3.20", "3.27");
+        assertThat(Branches.getLtsVersionsReleasedBefore("3.34")).containsExactly("3.20", "3.27", "3.33");
+        assertThat(Branches.getLtsVersionsReleasedBefore("3.41")).containsExactly("3.20", "3.27", "3.33", "3.40");
     }
 
     @Test
