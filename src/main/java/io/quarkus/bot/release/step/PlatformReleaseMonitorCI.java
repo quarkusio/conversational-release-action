@@ -125,6 +125,7 @@ public class PlatformReleaseMonitorCI implements StepHandler {
 
             issue.comment(":white_check_mark: Platform pull request [#" + prNumber
                     + "](https://github.com/quarkusio/quarkus-platform/pull/" + prNumber + ") has been merged.\n\n"
+                    + "We will now proceed with the rest of the release process." + ".\n\n"
                     + Progress.youAreHere(releaseInformation, releaseStatus));
         }
 
