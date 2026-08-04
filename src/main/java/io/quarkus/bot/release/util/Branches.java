@@ -10,8 +10,7 @@ public class Branches {
 
     public static final String MAIN = "main";
     public static final String BRANCH_3_X = "3.x";
-    private static final List<String> LTS_BRANCHES = List.of("3.33", "3.27", "3.20", "3.15", "3.8", "3.2");
-    public static final String BRANCH_3_8 = "3.8";
+    private static final List<String> LTS_BRANCHES = List.of("3.40", "3.33", "3.27", "3.20");
 
     public static String getPlatformPreparationBranch(ReleaseInformation releaseInformation) {
         if (releaseInformation.isEmergency() && releaseInformation.getEmergencyReleasePlatformBranch() != null) {
@@ -99,7 +98,7 @@ public class Branches {
     }
 
     public static boolean isLtsBranchWithRegularReleaseCadence(String branch) {
-        return Branches.isLts(branch) && new ComparableVersion(branch).compareTo(new ComparableVersion(BRANCH_3_8)) >= 0;
+        return Branches.isLts(branch);
     }
 
     private Branches() {

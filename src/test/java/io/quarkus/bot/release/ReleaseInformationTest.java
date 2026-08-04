@@ -12,16 +12,17 @@ public class ReleaseInformationTest {
 
     @ParameterizedTest
     // version,branch,qualifier,firstFinal,expectedResult
-    @CsvSource({ "3.2.1,3.2,,false,false",
-            "3.6.0.CR1,3.6,CR1,false,false",
-            "3.8.2,3.8,,false,true",
-            "3.15.0.CR1,3.15,CR1,false,false",
-            "3.15.0,3.15,,true,false",
-            "3.15.1,3.15,,true,false",
-            "3.15.2,3.15,,false,true",
+    @CsvSource({ "3.6.0.CR1,3.6,CR1,false,false",
             "3.16.2,3.16,,false,false",
+            "3.20.0.CR1,3.20,CR1,false,false",
             "3.20.0,3.20,,true,false",
-            "3.20.1,3.20,,false,true" })
+            "3.20.1,3.20,,false,true",
+            "3.27.0,3.27,,true,false",
+            "3.27.2,3.27,,false,true",
+            "3.33.0,3.33,,true,false",
+            "3.33.1,3.33,,false,true",
+            "3.40.0,3.40,,true,false",
+            "3.40.1,3.40,,false,true" })
     public void testIsLtsMaintenanceReleaseWithRegularReleaseCadence(ArgumentsAccessor argumentsAccessor) {
         String version = argumentsAccessor.getString(0);
         String branch = argumentsAccessor.getString(1);
