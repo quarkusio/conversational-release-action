@@ -151,6 +151,7 @@ public class PlatformReleasePrepare implements StepHandler {
         issue.comment(":white_check_mark: Pull request [#" + pr.getNumber()
                 + "](https://github.com/quarkusio/quarkus-platform/pull/" + pr.getNumber()
                 + ") has been created to upgrade the Platform to Quarkus " + releaseInformation.getVersion() + ".\n\n"
+                + "We will now proceed with the rest of the release process." + ".\n\n"
                 + Progress.youAreHere(releaseInformation, releaseStatus));
 
         return StepResult.success(Map.of(PLATFORM_MODE, AUTO, PLATFORM_PR_NUMBER, String.valueOf(pr.getNumber())));
