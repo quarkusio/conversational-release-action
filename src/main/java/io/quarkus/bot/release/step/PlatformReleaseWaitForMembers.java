@@ -46,7 +46,7 @@ public class PlatformReleaseWaitForMembers implements StepHandler {
 
         if (releaseInformation.isDot0()) {
             comment.append(
-                    "* Send an email to the Platform coordination mailing list: [quarkus-platform-coordination@googlegroups.com](mailto:quarkus-platform-coordination@googlegroups.com) :\n\n");
+                    ":raised_hands: Send an email to the Platform coordination mailing list: [quarkus-platform-coordination@googlegroups.com](mailto:quarkus-platform-coordination@googlegroups.com) :\n\n");
             comment.append("Subject:\n");
             comment.append("```\n");
             comment.append("Quarkus " + releaseInformation.getFullVersion() + " core artifacts are available\n");
@@ -78,8 +78,9 @@ public class PlatformReleaseWaitForMembers implements StepHandler {
             comment.append(
                     "* If CI failed for some Platform members, please contact them so that they are aware of the issues\n\n");
         } else {
+            // for maintenance versions of LTS releases
             comment.append(
-                    "* Send an email to the Platform coordination mailing list: [quarkus-platform-coordination@googlegroups.com](mailto:quarkus-platform-coordination@googlegroups.com) :\n\n");
+                    ":raised_hands: Send an email to the Platform coordination mailing list: [quarkus-platform-coordination@googlegroups.com](mailto:quarkus-platform-coordination@googlegroups.com) :\n\n");
             comment.append("Subject:\n");
             comment.append("```\n");
             comment.append("Quarkus " + releaseInformation.getFullVersion() + " core artifacts are available\n");
