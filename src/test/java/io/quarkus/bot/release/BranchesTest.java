@@ -52,8 +52,8 @@ public class BranchesTest {
         ReleaseInformation releaseInformation = new ReleaseInformation("3.40.0.CR1", "3.40", "3.39", "CR1", false,
                 null, null, false, false, false);
 
-        assertThat(Branches.getPlatformPreparationBranch(releaseInformation)).isEqualTo(Branches.MAIN);
-        assertThat(Branches.getPlatformReleaseBranch(releaseInformation)).isEqualTo(Branches.MAIN);
+        assertThat(Branches.getPlatformPreparationBranch(releaseInformation)).isEqualTo("3.40");
+        assertThat(Branches.getPlatformReleaseBranch(releaseInformation)).isEqualTo("3.40");
     }
 
     @Test

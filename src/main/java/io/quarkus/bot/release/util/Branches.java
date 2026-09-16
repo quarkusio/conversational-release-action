@@ -20,7 +20,7 @@ public class Branches {
                 && (!releaseInformation.isFirstFinal() || Branches.isLts(releaseInformation.getBranch()))) {
             return releaseInformation.getBranch();
         }
-        if (releaseInformation.isFinal() && !releaseInformation.isOriginBranchDefault()) {
+        if (!releaseInformation.isOriginBranchDefault()) {
             return releaseInformation.getBranch();
         }
 
@@ -32,6 +32,9 @@ public class Branches {
             return releaseInformation.getEmergencyReleasePlatformBranch();
         }
         if (releaseInformation.isFinal()) {
+            return releaseInformation.getBranch();
+        }
+        if (!releaseInformation.isOriginBranchDefault()) {
             return releaseInformation.getBranch();
         }
 
