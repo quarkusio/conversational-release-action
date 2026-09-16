@@ -48,6 +48,15 @@ public class BranchesTest {
     }
 
     @Test
+    void testPreviewLtsRelease() {
+        ReleaseInformation releaseInformation = new ReleaseInformation("3.40.0.CR1", "3.40", "3.39", "CR1", false,
+                null, null, false, false, false);
+
+        assertThat(Branches.getPlatformPreparationBranch(releaseInformation)).isEqualTo(Branches.MAIN);
+        assertThat(Branches.getPlatformReleaseBranch(releaseInformation)).isEqualTo(Branches.MAIN);
+    }
+
+    @Test
     void testFirstFinalLtsRelease() {
         ReleaseInformation releaseInformation = new ReleaseInformation("3.20.0", "3.20", Branches.BRANCH_3_X, null, false, null,
                 null, false, true, false);
