@@ -72,8 +72,15 @@ public class PlatformReleasePrepare implements StepHandler {
                     "In the case of `preview releases` (e.g. `Alpha1`, `CR1`...), the release will be built from the `main` branch")
                     + "\n\n");
         }
+        if (!releaseInformation.isFinal() && !releaseInformation.isOriginBranchDefault()) {
+            comment.append(Admonitions.tip(
+                    "The Platform `" + platformPreparationBranch + "` branch will be created from the `"
+                            + releaseInformation.getOriginBranch() + "` branch")
+                    + "\n\n");
+        }
 
-        if (!releaseInformation.requiresPlatformMemberWaitingPeriod()) {
+        if (!releaseInformation.requiresPlatformMemberWaitingPeriod()
+                && releaseInformation.isOriginBranchDefault()) {
             comment.append(Admonitions.important(
                     "Make sure you have merged [all the pull requests](https://github.com/quarkusio/quarkus-platform/pulls) targeting the `"
                             + platformPreparationBranch
