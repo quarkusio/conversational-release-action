@@ -22,7 +22,6 @@ public final class Issues {
     private static final String EMERGENCY_RELEASE = "### Emergency release";
     private static final String EMERGENCY_RELEASE_CORE_BRANCH = "### Emergency release Core branch";
     private static final String EMERGENCY_RELEASE_PLATFORM_BRANCH = "### Emergency release Platform branch";
-    private static final String MAJOR_VERSION = "### Major version";
     private static final String ORIGIN_BRANCH = "### Origin branch";
     private static final String NO_RESPONSE = "_No response_";
 
@@ -42,7 +41,6 @@ public final class Issues {
     public ReleaseInformation extractReleaseInformationFromForm(String description) {
         String branch = null;
         String qualifier = null;
-        boolean major = false;
         boolean emergency = false;
         String emergencyReleaseCoreBranch = null;
         String emergencyReleasePlatformBranch = null;
@@ -53,7 +51,6 @@ public final class Issues {
         boolean inEmergencyRelease = false;
         boolean inEmergencyReleaseCoreBranch = false;
         boolean inEmergencyReleasePlatformBranch = false;
-        boolean inMajor = false;
         boolean inOriginBranch = false;
 
         for (String line : description.lines().map(String::trim).toList()) {
@@ -78,10 +75,6 @@ public final class Issues {
             }
             if (EMERGENCY_RELEASE_PLATFORM_BRANCH.equals(line)) {
                 inEmergencyReleasePlatformBranch = true;
-                continue;
-            }
-            if (MAJOR_VERSION.equals(line)) {
-                inMajor = true;
                 continue;
             }
             if (ORIGIN_BRANCH.equals(line)) {
@@ -118,11 +111,6 @@ public final class Issues {
                 inOriginBranch = false;
                 continue;
             }
-            if (inMajor) {
-                major = line.toLowerCase(Locale.ROOT).contains("[x]");
-                inMajor = false;
-                break;
-            }
         }
 
         if (branch == null) {
@@ -130,7 +118,7 @@ public final class Issues {
         }
 
         return new ReleaseInformation(null, branch, originBranch, qualifier, emergency, emergencyReleaseCoreBranch,
-                emergencyReleasePlatformBranch, major, false, false);
+                emergencyReleasePlatformBranch, false, false);
     }
 
     public ReleaseInformation extractReleaseInformation(UpdatedIssueBody updatedIssueBody) {

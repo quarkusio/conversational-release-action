@@ -18,7 +18,6 @@ public class ReleaseInformation {
     private final boolean emergency;
     private final String emergencyReleaseCoreBranch;
     private final String emergencyReleasePlatformBranch;
-    private final boolean major;
 
     private String version;
     private boolean firstFinal;
@@ -26,9 +25,9 @@ public class ReleaseInformation {
 
     @JsonCreator
     public ReleaseInformation(String version, String branch, String originBranch, String qualifier, boolean emergency,
-            String emergencyReleaseCoreBranch, String emergencyReleasePlatformBranch, boolean major, boolean firstFinal,
+            String emergencyReleaseCoreBranch, String emergencyReleasePlatformBranch, boolean firstFinal,
             boolean maintenance) {
-        checkConsistency(branch, qualifier, emergency, emergencyReleaseCoreBranch, emergencyReleasePlatformBranch, major);
+        checkConsistency(branch, qualifier, emergency, emergencyReleaseCoreBranch, emergencyReleasePlatformBranch);
 
         this.version = version;
         this.branch = branch;
@@ -37,7 +36,6 @@ public class ReleaseInformation {
         this.emergency = emergency;
         this.emergencyReleaseCoreBranch = emergencyReleaseCoreBranch;
         this.emergencyReleasePlatformBranch = emergencyReleasePlatformBranch;
-        this.major = major;
         this.firstFinal = firstFinal;
         this.maintenance = maintenance;
     }
@@ -172,13 +170,6 @@ public class ReleaseInformation {
     }
 
     /**
-     * @return whether this is a major new release (e.g. 4.0.0.CR1)
-     */
-    public boolean isMajor() {
-        return major;
-    }
-
-    /**
      * @return whether this is an emergency release (e.g. 3.17.7.1). Emergency releases are only used for LTS branches with
      *         regular release cadence.
      */
@@ -234,14 +225,11 @@ public class ReleaseInformation {
     }
 
     private static void checkConsistency(String branch, String qualifier, boolean emergency,
-            String emergencyReleaseCoreBranch, String emergencyReleasePlatformBranch, boolean major) {
+            String emergencyReleaseCoreBranch, String emergencyReleasePlatformBranch) {
         if (emergency) {
             if (!Branches.isLtsBranchWithRegularReleaseCadence(branch)) {
                 throw new IllegalStateException(
                         "Emergency releases are only supported for LTS branches with regular release cadence.");
-            }
-            if (major) {
-                throw new IllegalStateException("A release may not be both an emergency and a major release");
             }
             if (qualifier != null) {
                 throw new IllegalStateException("An emergency release may not have a qualifier");
@@ -259,7 +247,7 @@ public class ReleaseInformation {
 
     @Override
     public int hashCode() {
-        return Objects.hash(branch, qualifier, emergency, major);
+        return Objects.hash(branch, qualifier, emergency);
     }
 
     @Override
@@ -277,7 +265,6 @@ public class ReleaseInformation {
                 && emergency == other.emergency
                 && Objects.equals(emergencyReleaseCoreBranch, other.emergencyReleaseCoreBranch)
                 && Objects.equals(emergencyReleasePlatformBranch, other.emergencyReleasePlatformBranch)
-                && major == other.major
                 && Objects.equals(qualifier, other.qualifier)
                 && firstFinal == other.firstFinal
                 && maintenance == other.maintenance;
@@ -288,7 +275,7 @@ public class ReleaseInformation {
         return "ReleaseInformation [version=" + version + ", branch=" + branch + ", originBranch=" + originBranch
                 + ", qualifier=" + qualifier + ", emergency=" + emergency
                 + ", emergencyReleaseCoreBranch=" + emergencyReleaseCoreBranch
-                + ", emergencyReleasePlatformBranch=" + emergencyReleasePlatformBranch + ", major=" + major
+                + ", emergencyReleasePlatformBranch=" + emergencyReleasePlatformBranch
                 + ", firstFinal=" + firstFinal + ", maintenance=" + maintenance
                 + "]";
     }

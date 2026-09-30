@@ -5,7 +5,6 @@ public final class Outputs {
     public static final String BRANCH = "branch";
     public static final String VERSION = "version";
     public static final String QUALIFIER = "qualifier";
-    public static final String MAJOR = "major";
     public static final String JDK = "jdk";
     public static final String ORIGIN_BRANCH = "origin-branch";
 

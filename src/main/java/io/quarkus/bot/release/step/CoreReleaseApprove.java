@@ -37,7 +37,8 @@ public class CoreReleaseApprove implements StepHandler {
         StringBuilder comment = new StringBuilder();
         comment.append(":raised_hands: We are going to release the following release:\n\n");
         comment.append("- Quarkus `").append(releaseInformation.getVersion()).append("`\n");
-        comment.append("- On branch ").append(Repositories.getCoreBranchLink(releaseInformation.getBranch()));
+        comment.append("- On branch ")
+                .append(Repositories.getCoreBranchLink(Branches.getCoreReleaseBranch(releaseInformation)));
         if (releaseInformation.isFirstCR()) {
             comment.append(" (it will get created a bit further in the process)");
         }
@@ -104,15 +105,16 @@ public class CoreReleaseApprove implements StepHandler {
         }
 
         String mergeInfo;
-        if (releaseInformation.isFirstCR()) {
+        String coreReleaseBranch = Branches.getCoreReleaseBranch(releaseInformation);
+        if (releaseInformation.isFirstCR() || releaseInformation.isPreCR1()) {
             mergeInfo = "**Make sure you have merged all the required [pull requests](https://github.com/quarkusio/quarkus/pulls) in the ["
-                    + releaseInformation.getOriginBranch() + "](https://github.com/quarkusio/quarkus/commits/"
-                    + releaseInformation.getOriginBranch() + "/) branch.**";
+                    + coreReleaseBranch + "](https://github.com/quarkusio/quarkus/commits/"
+                    + coreReleaseBranch + "/) branch.**";
         } else {
             mergeInfo = "**Make sure you have merged all the [backport pull requests](https://github.com/quarkusio/quarkus/pulls?q=is%3Apr+base%3A"
-                    + releaseInformation.getBranch() + "+is%3Aopen) in the ["
-                    + releaseInformation.getBranch() + "](https://github.com/quarkusio/quarkus/commits/"
-                    + releaseInformation.getBranch() + "/) branch.**";
+                    + coreReleaseBranch + "+is%3Aopen) in the ["
+                    + coreReleaseBranch + "](https://github.com/quarkusio/quarkus/commits/"
+                    + coreReleaseBranch + "/) branch.**";
         }
 
         comment.append("\n");

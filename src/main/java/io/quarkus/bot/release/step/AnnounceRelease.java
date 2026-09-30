@@ -164,10 +164,11 @@ public class AnnounceRelease implements StepHandler {
                     + "Please try to upgrade your applications and report back:\n"
                     + "- if everything is going well, just post a reply to this thread\n"
                     + "- if you encounter issues, please open a GitHub issue in our tracker with a simple reproducer\n"
-                    + "\n"
-                    + "We will build the final core artifacts next Wednesday.\n"
-                    + "\n"
-                    + "Thanks!\n\n"
+                    + "\n");
+            if (releaseInformation.isCR()) {
+                comment.append("We will build the final core artifacts next Wednesday.\n\n");
+            }
+            comment.append("Thanks!\n\n"
                     + "--\n"
                     + "The Quarkus dev team\n");
             comment.append("```\n");

@@ -22,7 +22,7 @@ public class ReleaseInformationTest {
             "Final,false" }, nullValues = "null")
     public void testIsPreCR1(String qualifier, boolean expectedResult) {
         ReleaseInformation releaseInformation = new ReleaseInformation(null, "4.0", Branches.MAIN, qualifier, false, null,
-                null, true, false, false);
+                null, false, false);
         assertThat(releaseInformation.isPreCR1()).as("Qualifier %s", qualifier).isEqualTo(expectedResult);
     }
 
@@ -35,7 +35,7 @@ public class ReleaseInformationTest {
             "CR2,false" }, nullValues = "null")
     public void testIsFirstCR(String qualifier, boolean expectedResult) {
         ReleaseInformation releaseInformation = new ReleaseInformation(null, "4.0", Branches.MAIN, qualifier, false, null,
-                null, true, false, false);
+                null, false, false);
         assertThat(releaseInformation.isFirstCR()).as("Qualifier %s", qualifier).isEqualTo(expectedResult);
     }
 
@@ -60,7 +60,7 @@ public class ReleaseInformationTest {
         boolean expectedResult = argumentsAccessor.getBoolean(4);
 
         ReleaseInformation releaseInformation = new ReleaseInformation(version, branch, Branches.MAIN, qualifier, false, null,
-                null, false, firstFinal, false);
+                null, firstFinal, false);
         assertThat(releaseInformation.isLtsMaintenanceReleaseWithRegularReleaseCadence())
                 .as("Version %s", releaseInformation.getVersion()).isEqualTo(expectedResult);
     }

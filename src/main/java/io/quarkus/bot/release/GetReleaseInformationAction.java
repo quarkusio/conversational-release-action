@@ -44,7 +44,6 @@ public class GetReleaseInformationAction {
         if (releaseInformation.getQualifier() != null) {
             commands.setOutput(Outputs.QUALIFIER, releaseInformation.getQualifier());
         }
-        commands.setOutput(Outputs.MAJOR, Boolean.toString(releaseInformation.isMajor()));
         if (releaseInformation.getVersion() != null) {
             commands.setOutput(Outputs.VERSION, releaseInformation.getVersion());
         }

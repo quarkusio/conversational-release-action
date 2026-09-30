@@ -12,6 +12,16 @@ public class Branches {
     public static final String BRANCH_3_X = "3.x";
     private static final List<String> LTS_BRANCHES = List.of("3.40", "3.33", "3.27", "3.20");
 
+    public static String getCoreReleaseBranch(ReleaseInformation releaseInformation) {
+        if (releaseInformation.isPreCR1()) {
+            return releaseInformation.getOriginBranch();
+        }
+        if (releaseInformation.isEmergency() && releaseInformation.getEmergencyReleaseCoreBranch() != null) {
+            return releaseInformation.getEmergencyReleaseCoreBranch();
+        }
+        return releaseInformation.getBranch();
+    }
+
     public static String getPlatformPreparationBranch(ReleaseInformation releaseInformation) {
         if (releaseInformation.isEmergency() && releaseInformation.getEmergencyReleasePlatformBranch() != null) {
             return releaseInformation.getEmergencyReleasePlatformBranch();

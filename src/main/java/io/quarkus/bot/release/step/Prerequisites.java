@@ -57,7 +57,6 @@ public class Prerequisites implements StepHandler {
 
         String branch = releaseInformation.getBranch();
         String qualifier = releaseInformation.getQualifier() != null ? releaseInformation.getQualifier() : "";
-        boolean major = releaseInformation.isMajor();
         boolean emergency = releaseInformation.isEmergency();
         String emergencyReleaseCoreBranch = releaseInformation.getEmergencyReleaseCoreBranch() != null
                 ? releaseInformation.getEmergencyReleaseCoreBranch()
@@ -65,7 +64,7 @@ public class Prerequisites implements StepHandler {
         String originBranch = releaseInformation.getOriginBranch();
         boolean lts = Branches.isLts(branch);
 
-        boolean micro = !Branches.isMain(branch) && !major;
+        boolean micro = !Branches.isMain(branch);
         boolean firstCR = releaseInformation.isFirstCR();
         boolean preCR1 = releaseInformation.isPreCR1();
 
@@ -136,7 +135,7 @@ public class Prerequisites implements StepHandler {
                 LOG.warnf("No release associated with tag %s", tag);
             }
 
-            newVersion = computeNewVersion(tag.toString(), micro, major, emergency, qualifier);
+            newVersion = computeNewVersion(tag.toString(), micro, emergency, qualifier);
         } else {
             if (!qualifier.isBlank()) {
                 newVersion = branch + ".0." + qualifier;
@@ -176,8 +175,9 @@ public class Prerequisites implements StepHandler {
         LOG.infof("Writing %s into the 'work/newVersion' file", newVersion);
         Files.writeString(Path.of("work", "newVersion"), newVersion, StandardCharsets.UTF_8);
 
-        LOG.infof("Writing %s into the 'work/branch' file", branch);
-        Files.writeString(Path.of("work", "branch"), branch, StandardCharsets.UTF_8);
+        String coreReleaseBranch = Branches.getCoreReleaseBranch(releaseInformation);
+        LOG.infof("Writing %s into the 'work/branch' file", coreReleaseBranch);
+        Files.writeString(Path.of("work", "branch"), coreReleaseBranch, StandardCharsets.UTF_8);
 
         Files.writeString(Path.of("work", "originBranch"), originBranch, StandardCharsets.UTF_8);
 
@@ -235,7 +235,7 @@ public class Prerequisites implements StepHandler {
         return StepResult.success();
     }
 
-    private static String computeNewVersion(String previousVersion, boolean micro, boolean major, boolean emergency,
+    static String computeNewVersion(String previousVersion, boolean micro, boolean emergency,
             String qualifier) {
         String[] segments = previousVersion.split("\\.");
         if (segments.length < 3) {
@@ -266,15 +266,8 @@ public class Prerequisites implements StepHandler {
                     newVersion = segments[0] + "." + segments[1] + "." + segments[2];
                 }
             }
-        } else if (major) {
-            newVersion = (Integer.parseInt(segments[0]) + 1) + ".0.0";
         } else {
-            if (segments.length >= 4 && !DIGITS_PATTERN.matcher(segments[3]).matches()
-                    && !"Final".equals(segments[3])) {
-                newVersion = segments[0] + "." + segments[1] + "." + segments[2];
-            } else {
-                newVersion = segments[0] + "." + (Integer.parseInt(segments[1]) + 1) + ".0";
-            }
+            newVersion = segments[0] + "." + (Integer.parseInt(segments[1]) + 1) + ".0";
         }
         if (!qualifier.isBlank()) {
             newVersion = newVersion + "." + qualifier;
