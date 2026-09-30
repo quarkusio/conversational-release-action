@@ -8,6 +8,8 @@ public enum Step {
     PREREQUISITES("Prerequisites", Prerequisites.class, false, false),
     CORE_RELEASE_APPROVE("Approve the Core release", CoreReleaseApprove.class, true, false),
     CORE_RELEASE_CREATE_BRANCH("Create branch", CoreReleaseCreateBranch.class, true, false),
+    CORE_RELEASE_RENAME_MILESTONE_FOR_PREVIEW("Rename milestone for preview release",
+            CoreReleaseRenameMilestoneForPreview.class, true, false),
     UPDATE_WIKI_MIGRATION_GUIDES_CR1("Update wiki migration guides for CR1", UpdateWikiMigrationGuidesCr1.class, true, false),
     CORE_RELEASE_PREPARE("Prepare the Core release", CoreReleasePrepare.class, true, false),
     CORE_RELEASE_DEPLOY_LOCALLY("Deploy the Core release locally", CoreReleaseDeployLocally.class, true, false),
