@@ -14,7 +14,7 @@ public class BranchesTest {
     @Test
     void testPreviewRelease() {
         ReleaseInformation releaseInformation = new ReleaseInformation("3.6.0.CR1", "3.6", Branches.BRANCH_3_X, "CR1", false,
-                null, null, false, false, false);
+                null, null, false, false);
 
         assertThat(Branches.getPlatformPreparationBranch(releaseInformation)).isEqualTo(Branches.MAIN);
         assertThat(Branches.getPlatformReleaseBranch(releaseInformation)).isEqualTo(Branches.MAIN);
@@ -23,7 +23,16 @@ public class BranchesTest {
     @Test
     void testPreviewReleaseMain() {
         ReleaseInformation releaseInformation = new ReleaseInformation("4.0.0.CR1", "4.0", Branches.MAIN, "CR1", false,
-                null, null, true, false, false);
+                null, null, false, false);
+
+        assertThat(Branches.getPlatformPreparationBranch(releaseInformation)).isEqualTo(Branches.MAIN);
+        assertThat(Branches.getPlatformReleaseBranch(releaseInformation)).isEqualTo(Branches.MAIN);
+    }
+
+    @Test
+    void testPreviewReleasePreCR1() {
+        ReleaseInformation releaseInformation = new ReleaseInformation("4.0.0.Beta1", "4.0", Branches.MAIN, "Beta1", false,
+                null, null, false, false);
 
         assertThat(Branches.getPlatformPreparationBranch(releaseInformation)).isEqualTo(Branches.MAIN);
         assertThat(Branches.getPlatformReleaseBranch(releaseInformation)).isEqualTo(Branches.MAIN);
@@ -32,7 +41,7 @@ public class BranchesTest {
     @Test
     void testFirstFinalRelease() {
         ReleaseInformation releaseInformation = new ReleaseInformation("3.6.0", "3.6", Branches.BRANCH_3_X, null, false, null,
-                null, false, true, false);
+                null, true, false);
 
         assertThat(Branches.getPlatformPreparationBranch(releaseInformation)).isEqualTo(Branches.MAIN);
         assertThat(Branches.getPlatformReleaseBranch(releaseInformation)).isEqualTo("3.6");
@@ -41,7 +50,7 @@ public class BranchesTest {
     @Test
     void testFirstFinalReleaseMain() {
         ReleaseInformation releaseInformation = new ReleaseInformation("4.0.0", "4.0", Branches.MAIN, null, false, null,
-                null, true, true, false);
+                null, true, false);
 
         assertThat(Branches.getPlatformPreparationBranch(releaseInformation)).isEqualTo(Branches.MAIN);
         assertThat(Branches.getPlatformReleaseBranch(releaseInformation)).isEqualTo("4.0");
@@ -50,7 +59,7 @@ public class BranchesTest {
     @Test
     void testPreviewLtsRelease() {
         ReleaseInformation releaseInformation = new ReleaseInformation("3.40.0.CR1", "3.40", "3.39", "CR1", false,
-                null, null, false, false, false);
+                null, null, false, false);
 
         assertThat(Branches.getPlatformPreparationBranch(releaseInformation)).isEqualTo("3.40");
         assertThat(Branches.getPlatformReleaseBranch(releaseInformation)).isEqualTo("3.40");
@@ -59,7 +68,7 @@ public class BranchesTest {
     @Test
     void testFirstFinalLtsRelease() {
         ReleaseInformation releaseInformation = new ReleaseInformation("3.20.0", "3.20", Branches.BRANCH_3_X, null, false, null,
-                null, false, true, false);
+                null, true, false);
 
         assertThat(Branches.getPlatformPreparationBranch(releaseInformation)).isEqualTo("3.20");
         assertThat(Branches.getPlatformReleaseBranch(releaseInformation)).isEqualTo("3.20");
@@ -68,7 +77,7 @@ public class BranchesTest {
     @Test
     void testBugfixFinalRelease() {
         ReleaseInformation releaseInformation = new ReleaseInformation("3.6.1", "3.6", Branches.BRANCH_3_X, null, false, null,
-                null, false, false, false);
+                null, false, false);
 
         assertThat(Branches.getPlatformPreparationBranch(releaseInformation)).isEqualTo("3.6");
         assertThat(Branches.getPlatformReleaseBranch(releaseInformation)).isEqualTo("3.6");
@@ -77,7 +86,7 @@ public class BranchesTest {
     @Test
     void testEmergencyReleaseWithPlatformBranch() {
         ReleaseInformation releaseInformation = new ReleaseInformation("3.20.1", "3.20", Branches.BRANCH_3_X, null, true, null,
-                "3.20.1-platform-emergency-1", false, false, false);
+                "3.20.1-platform-emergency-1", false, false);
 
         assertThat(Branches.getPlatformPreparationBranch(releaseInformation)).isEqualTo("3.20.1-platform-emergency-1");
         assertThat(Branches.getPlatformReleaseBranch(releaseInformation)).isEqualTo("3.20.1-platform-emergency-1");
@@ -86,7 +95,7 @@ public class BranchesTest {
     @Test
     void testEmergencyReleaseWithoutPlatformBranch() {
         ReleaseInformation releaseInformation = new ReleaseInformation("3.20.1", "3.20", Branches.BRANCH_3_X, null, true, null,
-                null, false, false, false);
+                null, false, false);
 
         assertThat(Branches.getPlatformPreparationBranch(releaseInformation)).isEqualTo("3.20");
         assertThat(Branches.getPlatformReleaseBranch(releaseInformation)).isEqualTo("3.20");
@@ -99,6 +108,38 @@ public class BranchesTest {
         assertThat(Branches.getDefaultOriginBranch("3.38")).isEqualTo(Branches.BRANCH_3_X);
         assertThat(Branches.getDefaultOriginBranch("4.0")).isEqualTo(Branches.MAIN);
         assertThat(Branches.getDefaultOriginBranch("main")).isEqualTo(Branches.MAIN);
+    }
+
+    @Test
+    void testGetCoreReleaseBranch() {
+        // Pre-CR1: release from origin branch (main)
+        assertThat(Branches.getCoreReleaseBranch(
+                new ReleaseInformation("4.0.0.Beta1", "4.0", Branches.MAIN, "Beta1", false, null, null, false, false)))
+                .isEqualTo(Branches.MAIN);
+        assertThat(Branches.getCoreReleaseBranch(
+                new ReleaseInformation("4.0.0.Alpha1", "4.0", Branches.MAIN, "Alpha1", false, null, null, false, false)))
+                .isEqualTo(Branches.MAIN);
+
+        // CR1: release from version branch
+        assertThat(Branches.getCoreReleaseBranch(
+                new ReleaseInformation("4.0.0.CR1", "4.0", Branches.MAIN, "CR1", false, null, null, false, false)))
+                .isEqualTo("4.0");
+
+        // Final: release from version branch
+        assertThat(Branches.getCoreReleaseBranch(
+                new ReleaseInformation("4.0.0", "4.0", Branches.MAIN, null, false, null, null, true, false)))
+                .isEqualTo("4.0");
+
+        // Emergency with custom core branch
+        assertThat(Branches.getCoreReleaseBranch(
+                new ReleaseInformation("3.20.1.1", "3.20", Branches.BRANCH_3_X, null, true, "3.20.1-emergency-1", null, false,
+                        false)))
+                .isEqualTo("3.20.1-emergency-1");
+
+        // Emergency without custom core branch
+        assertThat(Branches.getCoreReleaseBranch(
+                new ReleaseInformation("3.20.2", "3.20", Branches.BRANCH_3_X, null, true, null, null, false, false)))
+                .isEqualTo("3.20");
     }
 
     @Test
@@ -129,6 +170,14 @@ public class BranchesTest {
         assertThat(Branches.getNextMinor("1.0")).isEqualTo("1.1");
         assertThat(Branches.getNextMinor("2.15")).isEqualTo("2.16");
         assertThat(Branches.getNextMinor("10.99")).isEqualTo("10.100");
+    }
+
+    @Test
+    void testIsMain() {
+        assertThat(Branches.isMain("main")).isTrue();
+        assertThat(Branches.isMain("3.6")).isFalse();
+        assertThat(Branches.isMain("4.0")).isFalse();
+        assertThat(Branches.isMain("")).isFalse();
     }
 
     @Test
