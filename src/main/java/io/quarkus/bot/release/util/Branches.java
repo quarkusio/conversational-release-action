@@ -48,6 +48,10 @@ public class Branches {
         return MAIN;
     }
 
+    public static boolean isMain(String branch) {
+        return MAIN.equals(branch);
+    }
+
     public static boolean isLts(String branch) {
         return LTS_BRANCHES.contains(branch);
     }

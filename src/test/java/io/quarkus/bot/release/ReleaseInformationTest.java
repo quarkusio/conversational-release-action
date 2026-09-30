@@ -11,6 +11,35 @@ import io.quarkus.bot.release.util.Branches;
 public class ReleaseInformationTest {
 
     @ParameterizedTest
+    // qualifier,expectedResult
+    @CsvSource(value = { ",false",
+            "Alpha1,true",
+            "Alpha2,true",
+            "Beta1,true",
+            "Beta2,true",
+            "CR1,false",
+            "CR2,false",
+            "Final,false" }, nullValues = "null")
+    public void testIsPreCR1(String qualifier, boolean expectedResult) {
+        ReleaseInformation releaseInformation = new ReleaseInformation(null, "4.0", Branches.MAIN, qualifier, false, null,
+                null, true, false, false);
+        assertThat(releaseInformation.isPreCR1()).as("Qualifier %s", qualifier).isEqualTo(expectedResult);
+    }
+
+    @ParameterizedTest
+    // qualifier,expectedResult
+    @CsvSource(value = { ",false",
+            "Alpha1,false",
+            "Beta1,false",
+            "CR1,true",
+            "CR2,false" }, nullValues = "null")
+    public void testIsFirstCR(String qualifier, boolean expectedResult) {
+        ReleaseInformation releaseInformation = new ReleaseInformation(null, "4.0", Branches.MAIN, qualifier, false, null,
+                null, true, false, false);
+        assertThat(releaseInformation.isFirstCR()).as("Qualifier %s", qualifier).isEqualTo(expectedResult);
+    }
+
+    @ParameterizedTest
     // version,branch,qualifier,firstFinal,expectedResult
     @CsvSource({ "3.6.0.CR1,3.6,CR1,false,false",
             "3.16.2,3.16,,false,false",

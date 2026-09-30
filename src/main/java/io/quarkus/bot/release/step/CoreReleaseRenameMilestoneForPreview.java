@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import jakarta.inject.Singleton;
 
-import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.jboss.logging.Logger;
 import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHIssueState;
@@ -31,15 +30,7 @@ public class CoreReleaseRenameMilestoneForPreview implements StepHandler {
 
     @Override
     public boolean shouldSkip(ReleaseInformation releaseInformation, ReleaseStatus releaseStatus) {
-        return !isPreCR1(releaseInformation);
-    }
-
-    private static boolean isPreCR1(ReleaseInformation releaseInformation) {
-        String qualifier = releaseInformation.getQualifier();
-        if (qualifier == null || qualifier.isBlank()) {
-            return false;
-        }
-        return new ComparableVersion(qualifier).compareTo(new ComparableVersion("CR1")) < 0;
+        return !releaseInformation.isPreCR1();
     }
 
     @Override

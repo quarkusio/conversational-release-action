@@ -132,6 +132,14 @@ public class BranchesTest {
     }
 
     @Test
+    void testIsMain() {
+        assertThat(Branches.isMain("main")).isTrue();
+        assertThat(Branches.isMain("3.6")).isFalse();
+        assertThat(Branches.isMain("4.0")).isFalse();
+        assertThat(Branches.isMain("")).isFalse();
+    }
+
+    @Test
     void testGetPreviousMinor() {
         assertThat(Branches.getPreviousMinor("1.1")).isEqualTo("1.0");
         assertThat(Branches.getPreviousMinor("2.15")).isEqualTo("2.14");

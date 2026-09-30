@@ -2,6 +2,8 @@ package io.quarkus.bot.release;
 
 import java.util.Objects;
 
+import org.apache.maven.artifact.versioning.ComparableVersion;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -156,6 +158,17 @@ public class ReleaseInformation {
     @JsonIgnore
     public boolean isFirstCR() {
         return "CR1".equalsIgnoreCase(qualifier);
+    }
+
+    /**
+     * @return whether this version is a pre-CR1 preview (e.g. Alpha1, Beta1)
+     */
+    @JsonIgnore
+    public boolean isPreCR1() {
+        if (qualifier == null || qualifier.isBlank()) {
+            return false;
+        }
+        return new ComparableVersion(qualifier).compareTo(new ComparableVersion("CR1")) < 0;
     }
 
     /**
