@@ -105,8 +105,19 @@ public class AnnounceRelease implements StepHandler {
                     .append("` for [the website](https://github.com/quarkusio/quarkusio.github.io)\n");
             comment.append(
                     "  * Use a previous announcement as a template (be aware, announcements are very different for the first final of a major/minor and the follow-up micros)\n");
+            // include CXF release notes for .0 releases always, and for micro updates when it's an LTS branch
             if (releaseInformation.isFirstFinal()) {
-                comment.append("  * If a Mandrel/GraalVM upgrade is necessary, make sure it is prominent in the announcement");
+                comment.append(
+                        "  * Include a link to the release notes of the CXF extension that is part of this release. Check the [`release notes index`](https://docs.quarkiverse.io/quarkus-cxf/dev/release-notes/index.html)\n");
+            } else if (Branches.isLts(releaseInformation.getBranch())) {
+                comment.append(
+                        "  * Include a link to the release notes of the CXF extension if it was updated (if it was updated by more than one version number, include a separate link for each update)."
+                                +
+                                "  Check the [`release notes index`](https://docs.quarkiverse.io/quarkus-cxf/dev/release-notes/index.html)\n");
+            }
+            if (releaseInformation.isFirstFinal()) {
+                comment.append(
+                        "  * If a Mandrel/GraalVM upgrade is necessary, make sure it is prominent in the announcement\n");
             }
             comment.append(
                     "* Push it and wait for it to be live on [quarkus.io](https://quarkus.io/blog/) - you can follow the progress of the deployment on [GitHub Actions](https://github.com/quarkusio/quarkusio.github.io/actions)\n");
