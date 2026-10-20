@@ -30,6 +30,7 @@ public enum Step {
     POST_PLATFORM_RELEASE("Execute post-Platform-release operations", PostPlatformRelease.class, true, false),
     UPDATE_JBANG_CATALOG("Update JBang catalog", UpdateJBangCatalog.class, true, true),
     PUBLISH_CLI("Publish CLI", PublishCLI.class, true, true),
+    PUBLISH_RELEASE("Publish GitHub release", PublishRelease.class, true, false),
     UPDATE_QUICKSTARTS("Update quickstarts", UpdateQuickstarts.class, true, false),
     UPDATE_QUICKSTARTS_ADDITIONAL_SYNC_LTS("Update quickstarts - Additional sync to version branch",
             UpdateQuickstartsAdditionalSyncVersionBranch.class,
