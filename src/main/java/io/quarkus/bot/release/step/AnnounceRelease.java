@@ -74,7 +74,7 @@ public class AnnounceRelease implements StepHandler {
             comment.append("Then it is time to announce the release:\n\n");
             if (!releaseInformation.isMaintenance()) {
                 comment.append(
-                        "* Update the versions of the website in [`_data/versions.yaml`](https://github.com/quarkusio/quarkusio.github.io/blob/develop/_data/versions.yaml):\n");
+                        "* Update the versions of the website in [`_data/versions.yaml`](https://github.com/quarkusio/quarkusio.github.io/blob/main/_data/versions.yaml):\n");
                 comment.append("  * Update `version:` to `").append(releaseInformation.getVersion()).append("`\n");
                 comment.append("  * Update `announce:` to `/blog/").append(blogPostSlug).append(
                         "/` - be careful, we use the minor version in the URL for the first final and the full version for follow-up micro releases\n");
@@ -85,11 +85,11 @@ public class AnnounceRelease implements StepHandler {
             if (Branches.isLts(releaseInformation.getBranch()) && releaseInformation.isFirstFinal()) {
                 comment.append("* This is a LTS version:\n");
                 comment.append(
-                        "  * Make sure the version is referenced in the `documentation:` section of [`_data/versions.yaml`](https://github.com/quarkusio/quarkusio.github.io/blob/develop/_data/versions.yaml)\n");
+                        "  * Make sure the version is referenced in the `documentation:` section of [`_data/versions.yaml`](https://github.com/quarkusio/quarkusio.github.io/blob/main/_data/versions.yaml)\n");
                 comment.append("  * Include ").append(releaseInformation.getFullVersion()).append(
                         " in the main repo's [`SECURITY.md`](https://github.com/quarkusio/quarkus/blob/main/SECURITY.md#supported-versions)\n");
                 comment.append("  * Include ").append(releaseInformation.getFullVersion()).append(
-                        " in the website's [`security.adoc`](https://github.com/quarkusio/quarkusio.github.io/blob/main/security.adoc#supported-versions)\n");
+                        " in the website's [`security.adoc`](https://github.com/quarkusio/quarkusio.github.io/blob/main/content/security.adoc#supported-versions)\n");
                 comment.append(
                         "  * Create an issue in the main repo that will be used for reporting platform CI issues, similar to " +
                                 "[this issue for 3.20](https://github.com/quarkusio/quarkus/issues/47241)\n");
@@ -100,7 +100,9 @@ public class AnnounceRelease implements StepHandler {
                         "  * Configure the CI to report problems into the issue created above by adding it as an item in " +
                                 "[`info.yaml`](https://github.com/quarkusio/quarkus-ecosystem-ci/blob/main/platform/info.yaml)\n");
             }
-            comment.append("* Write a blog post in `_posts/").append(DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.now()))
+            LocalDate today = LocalDate.now();
+            comment.append("* Write a blog post in `content/posts/").append(today.getYear()).append("/")
+                    .append(DateTimeFormatter.ISO_LOCAL_DATE.format(today))
                     .append("-").append(blogPostSlug).append(".adoc")
                     .append("` for [the website](https://github.com/quarkusio/quarkusio.github.io)\n");
             comment.append(
