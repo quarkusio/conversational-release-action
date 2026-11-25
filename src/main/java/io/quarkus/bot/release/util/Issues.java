@@ -28,11 +28,15 @@ public final class Issues {
     private static final String RELEASE_INFORMATION_MARKER = "<!-- quarkus-release/release-information:";
     private static final String RELEASE_STATUS_MARKER = "<!-- quarkus-release/release-status:";
     private static final String END_OF_MARKER = "-->";
+    private static final String PROGRESS_START_MARKER = "<!-- quarkus-release/progress:start -->";
+    private static final String PROGRESS_END_MARKER = "<!-- quarkus-release/progress:end -->";
 
     private static final Pattern RELEASE_INFORMATION_PATTERN = Pattern
             .compile(RELEASE_INFORMATION_MARKER + "(.*?)" + END_OF_MARKER, Pattern.DOTALL);
     private static final Pattern RELEASE_STATUS_PATTERN = Pattern.compile(RELEASE_STATUS_MARKER + "(.*?)" + END_OF_MARKER,
             Pattern.DOTALL);
+    private static final Pattern PROGRESS_PATTERN = Pattern.compile(
+            Pattern.quote(PROGRESS_START_MARKER) + ".*?" + Pattern.quote(PROGRESS_END_MARKER), Pattern.DOTALL);
 
     @Inject
     @Yaml
@@ -182,5 +186,24 @@ public final class Issues {
         } catch (Exception e) {
             throw new IllegalStateException("Unable to update the release status descriptor", e);
         }
+    }
+
+    public String appendProgress(UpdatedIssueBody updatedIssueBody, ReleaseInformation releaseInformation,
+            ReleaseStatus releaseStatus) {
+        if (!releaseInformation.isComplete()) {
+            return updatedIssueBody.getBody();
+        }
+
+        String progress = PROGRESS_START_MARKER + "\n"
+                + "### Release progress\n\n"
+                + Progress.checklist(releaseInformation, releaseStatus) + "\n\n"
+                + "<sub>:robot: Updated automatically by the release bot, manual edits will be overwritten.</sub>\n"
+                + PROGRESS_END_MARKER;
+
+        if (!updatedIssueBody.contains(PROGRESS_START_MARKER)) {
+            return updatedIssueBody.append(progress);
+        }
+
+        return updatedIssueBody.replace(PROGRESS_PATTERN, Matcher.quoteReplacement(progress));
     }
 }

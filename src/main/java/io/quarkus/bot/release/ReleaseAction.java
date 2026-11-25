@@ -132,7 +132,7 @@ public class ReleaseAction {
 
         try {
             releaseStatus = releaseStatus.progress(context.getGitHubRunId());
-            updateReleaseStatus(issue, updatedIssueBody, releaseStatus);
+            updateReleaseStatus(issue, updatedIssueBody, releaseInformation, releaseStatus);
             handleSteps(context, commands, getQuarkusBotGitHub(), issue, updatedIssueBody, issueComment, releaseInformation,
                     releaseStatus);
         } finally {
@@ -172,7 +172,7 @@ public class ReleaseAction {
                 if (Command.RETRY.matches(issueComment.getBody())) {
                     react(commands, issueComment, ReactionContent.PLUS_ONE);
                     currentReleaseStatus = currentReleaseStatus.progress(StepStatus.INIT);
-                    updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
+                    updateReleaseStatus(issue, updatedIssueBody, releaseInformation, currentReleaseStatus);
                 } else {
                     react(commands, issueComment, ReactionContent.CONFUSED);
                     return;
@@ -183,7 +183,7 @@ public class ReleaseAction {
                     if (Command.RETRY.matches(issueComment.getBody())) {
                         react(commands, issueComment, ReactionContent.PLUS_ONE);
                         currentReleaseStatus = currentReleaseStatus.progress(StepStatus.STARTED);
-                        updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
+                        updateReleaseStatus(issue, updatedIssueBody, releaseInformation, currentReleaseStatus);
                     } else {
                         react(commands, issueComment, ReactionContent.CONFUSED);
                         return;
@@ -202,12 +202,12 @@ public class ReleaseAction {
                         currentReleaseStatus, issue, issueComment)) {
                     react(commands, issueComment, ReactionContent.PLUS_ONE);
                     currentReleaseStatus = currentReleaseStatus.progress(StepStatus.STARTED);
-                    updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
+                    updateReleaseStatus(issue, updatedIssueBody, releaseInformation, currentReleaseStatus);
                 } else if (stepHandler.shouldSkipAfterPause(context, commands, quarkusBotGitHub, releaseInformation,
                         currentReleaseStatus, issue, issueComment)) {
                     react(commands, issueComment, ReactionContent.PLUS_ONE);
                     currentReleaseStatus = currentReleaseStatus.progress(StepStatus.SKIPPED);
-                    updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
+                    updateReleaseStatus(issue, updatedIssueBody, releaseInformation, currentReleaseStatus);
                 } else {
                     react(commands, issueComment, ReactionContent.CONFUSED);
                     return;
@@ -222,7 +222,7 @@ public class ReleaseAction {
                 return;
             } else {
                 currentReleaseStatus = currentReleaseStatus.progress(currentReleaseStatus.getCurrentStep().next());
-                updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
+                updateReleaseStatus(issue, updatedIssueBody, releaseInformation, currentReleaseStatus);
             }
         }
 
@@ -246,31 +246,31 @@ public class ReleaseAction {
             try {
                 if (currentReleaseStatus.getCurrentStep() != currentStep) {
                     currentReleaseStatus = currentReleaseStatus.progress(currentStep);
-                    updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
+                    updateReleaseStatus(issue, updatedIssueBody, releaseInformation, currentReleaseStatus);
                 } else {
                     if (currentReleaseStatus.getCurrentStepStatus() == StepStatus.INIT_FAILED) {
                         currentReleaseStatus = currentReleaseStatus.progress(StepStatus.INIT);
-                        updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
+                        updateReleaseStatus(issue, updatedIssueBody, releaseInformation, currentReleaseStatus);
                     } else if (currentReleaseStatus.getCurrentStepStatus() == StepStatus.FAILED) {
                         currentReleaseStatus = currentReleaseStatus.progress(StepStatus.STARTED);
-                        updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
+                        updateReleaseStatus(issue, updatedIssueBody, releaseInformation, currentReleaseStatus);
                     }
                 }
 
                 if (currentReleaseStatus.getCurrentStepStatus() == StepStatus.INIT) {
                     if (currentStepHandler.shouldSkip(releaseInformation, currentReleaseStatus)) {
                         currentReleaseStatus = currentReleaseStatus.progress(StepStatus.SKIPPED);
-                        updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
+                        updateReleaseStatus(issue, updatedIssueBody, releaseInformation, currentReleaseStatus);
                         continue;
                         // we push an updated PAUSED status here as we want that to appear in youAreHere()
                     } else if (currentStepHandler.shouldPause(context, commands, quarkusBotGitHub, releaseInformation,
                             currentReleaseStatus.progress(StepStatus.PAUSED), issue, issueComment)) {
                         currentReleaseStatus = currentReleaseStatus.progress(StepStatus.PAUSED);
-                        updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
+                        updateReleaseStatus(issue, updatedIssueBody, releaseInformation, currentReleaseStatus);
                         return;
                     } else {
                         currentReleaseStatus = currentReleaseStatus.progress(StepStatus.STARTED);
-                        updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
+                        updateReleaseStatus(issue, updatedIssueBody, releaseInformation, currentReleaseStatus);
                     }
                 }
 
@@ -285,7 +285,7 @@ public class ReleaseAction {
                 }
 
                 currentReleaseStatus = currentReleaseStatus.progress(StepStatus.COMPLETED);
-                updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
+                updateReleaseStatus(issue, updatedIssueBody, releaseInformation, currentReleaseStatus);
 
                 try {
                     currentStepHandler.afterSuccess(context, commands, quarkusBotGitHub, releaseInformation,
@@ -323,7 +323,7 @@ public class ReleaseAction {
     private void markAsReleased(GHIssue issue, UpdatedIssueBody updatedIssueBody, ReleaseInformation releaseInformation,
             ReleaseStatus currentReleaseStatus) {
         currentReleaseStatus = currentReleaseStatus.progress(Status.COMPLETED);
-        updateReleaseStatus(issue, updatedIssueBody, currentReleaseStatus);
+        updateReleaseStatus(issue, updatedIssueBody, releaseInformation, currentReleaseStatus);
     }
 
     private static void handleExitCode(int exitCode, Step step) {
@@ -332,13 +332,32 @@ public class ReleaseAction {
         }
     }
 
-    private void updateReleaseStatus(GHIssue issue, UpdatedIssueBody updatedIssueBody, ReleaseStatus updatedReleaseStatus) {
+    private void updateReleaseStatus(GHIssue issue, UpdatedIssueBody updatedIssueBody, ReleaseInformation releaseInformation,
+            ReleaseStatus updatedReleaseStatus) {
         try {
-            issue.setBody(issues.appendReleaseStatus(updatedIssueBody, updatedReleaseStatus));
+            issue.setBody(buildUpdatedBody(updatedIssueBody, releaseInformation, updatedReleaseStatus));
         } catch (Exception e) {
             throw new StatusUpdateException(
                     "Unable to update the release status to " + updatedReleaseStatus + ": " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * Updates the release status descriptor and, on a best effort basis, the visible progress section.
+     * <p>
+     * A failure to render the progress section should never prevent the status from being updated.
+     */
+    private String buildUpdatedBody(UpdatedIssueBody updatedIssueBody, ReleaseInformation releaseInformation,
+            ReleaseStatus releaseStatus) {
+        String body = issues.appendReleaseStatus(updatedIssueBody, releaseStatus);
+
+        try {
+            body = issues.appendProgress(updatedIssueBody, releaseInformation, releaseStatus);
+        } catch (Exception e) {
+            LOG.warn("Unable to update the progress section of the issue description", e);
+        }
+
+        return body;
     }
 
     private static void react(Commands commands, final Reactable reactable, ReactionContent reactionContent) {
@@ -399,7 +418,7 @@ public class ReleaseAction {
         }
 
         try {
-            retry(3, () -> issue.setBody(issues.appendReleaseStatus(updatedIssueBody, updatedReleaseStatus)));
+            retry(3, () -> issue.setBody(buildUpdatedBody(updatedIssueBody, releaseInformation, updatedReleaseStatus)));
 
             StringBuilder interactionComment = new StringBuilder();
             interactionComment.append(Admonitions.caution(error)).append("\n\n");
@@ -437,7 +456,7 @@ public class ReleaseAction {
         final ReleaseStatus updatedReleaseStatus = releaseStatus.progress(Status.FAILED, StepStatus.FAILED);
 
         try {
-            retry(3, () -> issue.setBody(issues.appendReleaseStatus(updatedIssueBody, updatedReleaseStatus)));
+            retry(3, () -> issue.setBody(buildUpdatedBody(updatedIssueBody, releaseInformation, updatedReleaseStatus)));
             retry(3, () -> {
                 StringBuilder issueComment = new StringBuilder();
                 issueComment.append(Admonitions.caution(error)).append("\n\n");
