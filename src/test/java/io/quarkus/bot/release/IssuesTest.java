@@ -525,4 +525,31 @@ public class IssuesTest {
                 -->"""))).isEqualTo(new ReleaseStatus(Status.STARTED, Step.CORE_RELEASE_APPROVE, StepStatus.STARTED, 123L));
     }
 
+    @Test
+    void testAppendProgress() {
+        ReleaseInformation incomplete = new ReleaseInformation(null, "3.6", Branches.MAIN, null, false, null, null, false,
+                false);
+        assertThat(issues.appendProgress(new UpdatedIssueBody("Body"), incomplete,
+                new ReleaseStatus(Status.STARTED, Step.PREREQUISITES, StepStatus.STARTED, 123L))).isEqualTo("Body");
+
+        ReleaseInformation releaseInformation = new ReleaseInformation("3.6.0.CR1", "3.6", Branches.MAIN, "CR1", false, null,
+                null, false, false);
+
+        UpdatedIssueBody updatedIssueBody = new UpdatedIssueBody("Body");
+        String body = issues.appendProgress(updatedIssueBody, releaseInformation,
+                new ReleaseStatus(Status.STARTED, Step.CORE_RELEASE_PREPARE, StepStatus.STARTED, 123L));
+        assertThat(body)
+                .startsWith("Body\n\n<!-- quarkus-release/progress:start -->\n### Release progress\n\n- [X] ")
+                .contains("] " + Step.CORE_RELEASE_PREPARE.getDescription() + " :gear: ☚ You are here")
+                .contains("<sub>")
+                .endsWith("</sub>\n<!-- quarkus-release/progress:end -->")
+                .doesNotContain("<details>");
+
+        // the section is replaced in place, not appended again
+        body = issues.appendProgress(updatedIssueBody, releaseInformation,
+                new ReleaseStatus(Status.STARTED, Step.CORE_RELEASE_PREPARE, StepStatus.FAILED, 124L));
+        assertThat(body.split("quarkus-release/progress:start", -1)).hasSize(2);
+        assertThat(body).contains("] " + Step.CORE_RELEASE_PREPARE.getDescription() + " :rotating_light: ☚ You are here")
+                .doesNotContain(":gear:");
+    }
 }
