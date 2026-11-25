@@ -68,9 +68,9 @@ public class PlatformReleaseMonitorCI implements StepHandler {
                             + Admonitions.important("**Once the pull request is merged, add a `"
                                     + Command.CONTINUE.getFullCommand()
                                     + "` comment to this issue to continue the release process.**"));
-            inputs.put("initial-delay", "120");
+            inputs.put("initial-delay", "60");
             inputs.put("poll-delay", "15");
-            inputs.put("poll-iterations", "8");
+            inputs.put("poll-iterations", "12");
 
             issue.getRepository().getWorkflow("monitor-platform-ci.yml").dispatch(Branches.MAIN, inputs);
 
