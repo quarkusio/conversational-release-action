@@ -28,7 +28,7 @@ public class PublishCLI implements StepHandler {
     public StepResult run(Context context, Commands commands, GitHub quarkusBotGitHub, ReleaseInformation releaseInformation,
             ReleaseStatus releaseStatus, GHIssue issue, UpdatedIssueBody updatedIssueBody)
             throws IOException, InterruptedException {
-        return StepResult.of(processes.execute(List.of("./publish-cli.sh")));
+        return StepResult.of(processes.execute(List.of("./publish-cli.sh", "release")));
     }
 
 }

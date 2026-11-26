@@ -6,6 +6,7 @@ import jakarta.inject.Singleton;
 
 import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHRelease;
+import org.kohsuke.github.GHReleaseBuilder.MakeLatest;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
 
@@ -29,32 +30,51 @@ public class PublishRelease implements StepHandler {
         GHRepository repository = Repositories.getQuarkusRepository(quarkusBotGitHub);
         String version = releaseInformation.getVersion();
 
-        publishRelease(commands, repository, version);
-
         if (releaseInformation.isFirstFinal() && !releaseInformation.isDot0()) {
             String dot0Version = Versions.getMinorVersion(version) + ".0";
-            GHRelease dot0Release = repository.getReleaseByTagName(dot0Version);
+            GHRelease dot0Release = findRelease(repository, dot0Version);
             if (dot0Release != null && dot0Release.isDraft()) {
-                publishRelease(commands, repository, dot0Version);
+                publishRelease(commands, dot0Release, MakeLatest.FALSE);
             }
         }
 
-        return StepResult.success();
-    }
-
-    private static void publishRelease(Commands commands, GHRepository repository, String version) throws IOException {
-        GHRelease release = repository.getReleaseByTagName(version);
-
+        GHRelease release = findRelease(repository, version);
         if (release == null) {
             throw new IllegalStateException(
                     "Release " + version + " not found, it should have been created by the post-Platform-release step");
         }
 
+        // GitHub doesn't keep the makeLatest value defined when creating a draft release
+        // and makes the release the latest one by default when publishing it so we have to be explicit
+        MakeLatest makeLatest = !releaseInformation.isFinal() || releaseInformation.isMaintenance() ? MakeLatest.FALSE
+                : MakeLatest.TRUE;
+        publishRelease(commands, release, makeLatest);
+
+        return StepResult.success();
+    }
+
+    private static void publishRelease(Commands commands, GHRelease release, MakeLatest makeLatest) throws IOException {
         if (!release.isDraft()) {
-            commands.warning("Release " + version + " is already published, skipping");
+            commands.warning("Release " + release.getTagName() + " is already published, skipping");
             return;
         }
 
-        release.update().draft(false).update();
+        release.update().draft(false).makeLatest(makeLatest).update();
+    }
+
+    /**
+     * {@link GHRepository#getReleaseByTagName(String)} only returns published releases so we also look for drafts
+     * in the most recent releases: a draft is created during the release process so it is always one of the latest.
+     */
+    private static GHRelease findRelease(GHRepository repository, String version) throws IOException {
+        GHRelease release = repository.getReleaseByTagName(version);
+        if (release != null) {
+            return release;
+        }
+
+        return repository.listReleases().withPageSize(20).iterator().nextPage().stream()
+                .filter(r -> version.equals(r.getTagName()))
+                .findFirst()
+                .orElse(null);
     }
 }

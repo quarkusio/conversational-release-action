@@ -27,10 +27,14 @@ public enum Step {
     PLATFORM_RELEASE_PUBLISH("Publish the Quarkus Platform", PlatformReleasePublish.class, true, false),
     PLATFORM_RELEASE_WAIT_FOR_SYNC("Sync Platform release to Maven Central", PlatformReleaseWaitForSync.class, true, false),
     UPDATE_EXTENSION_CATALOG("Update extension catalog", UpdateExtensionCatalog.class, true, false),
+    // GitHub releases are immutable once published so the CLI archives are attached to a draft release created by JReleaser,
+    // before the post-Platform-release operations update the release notes and the release is published
+    PUBLISH_CLI("Create draft GitHub release with the CLI", PublishCLI.class, true, true),
     POST_PLATFORM_RELEASE("Execute post-Platform-release operations", PostPlatformRelease.class, true, false),
     UPDATE_JBANG_CATALOG("Update JBang catalog", UpdateJBangCatalog.class, true, true),
-    PUBLISH_CLI("Publish CLI", PublishCLI.class, true, true),
     PUBLISH_RELEASE("Publish GitHub release", PublishRelease.class, true, false),
+    // the CLI packages point to the archives attached to the GitHub release so they can only be published once the release is
+    PUBLISH_CLI_PACKAGES("Publish CLI packages", PublishCLIPackages.class, true, true),
     UPDATE_QUICKSTARTS("Update quickstarts", UpdateQuickstarts.class, true, false),
     UPDATE_QUICKSTARTS_ADDITIONAL_SYNC_LTS("Update quickstarts - Additional sync to version branch",
             UpdateQuickstartsAdditionalSyncVersionBranch.class,
