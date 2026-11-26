@@ -8,9 +8,12 @@ import java.util.Map;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
+import org.jboss.logging.Logger;
 import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHIssueComment;
+import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHPullRequest;
+import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
 
 import io.quarkiverse.githubaction.Commands;
@@ -30,6 +33,8 @@ import io.quarkus.bot.release.util.UpdatedIssueBody;
 @Singleton
 @Unremovable
 public class PlatformReleasePrepare implements StepHandler {
+
+    private static final Logger LOG = Logger.getLogger(PlatformReleasePrepare.class);
 
     private static final String PLATFORM_MODE = "platformMode";
     private static final String PLATFORM_PR_NUMBER = "platformPrNumber";
@@ -148,20 +153,48 @@ public class PlatformReleasePrepare implements StepHandler {
             return StepResult.of(exitCode);
         }
 
-        GHPullRequest pr = Repositories.getQuarkusPlatformRepository(quarkusBotGitHub)
-                .createPullRequest(
-                        "Upgrade to Quarkus " + releaseInformation.getVersion(),
-                        "quarkus-" + releaseInformation.getVersion(),
-                        platformPreparationBranch,
-                        "Upgrade to Quarkus " + releaseInformation.getVersion());
+        GHPullRequest pr = getOrCreatePullRequest(Repositories.getQuarkusPlatformRepository(quarkusBotGitHub),
+                releaseInformation, platformPreparationBranch);
 
-        issue.comment(":white_check_mark: Pull request [#" + pr.getNumber()
-                + "](https://github.com/quarkusio/quarkus-platform/pull/" + pr.getNumber()
-                + ") has been created to upgrade the Platform to Quarkus " + releaseInformation.getVersion() + ".\n\n"
-                + "We will now proceed with the rest of the release process." + ".\n\n"
-                + Progress.youAreHere(releaseInformation, releaseStatus));
+        try {
+            issue.comment(":white_check_mark: Pull request [#" + pr.getNumber()
+                    + "](https://github.com/quarkusio/quarkus-platform/pull/" + pr.getNumber()
+                    + ") has been created to upgrade the Platform to Quarkus " + releaseInformation.getVersion() + ".\n\n"
+                    + "We will now proceed with the rest of the release process.\n\n"
+                    + Progress.youAreHere(releaseInformation, releaseStatus));
+        } catch (IOException e) {
+            // the pull request has been created, we don't want to fail the step only because we couldn't comment
+            LOG.warn("Unable to post the comment about Platform pull request #" + pr.getNumber() + ", ignoring", e);
+        }
 
         return StepResult.success(Map.of(PLATFORM_MODE, AUTO, PLATFORM_PR_NUMBER, String.valueOf(pr.getNumber())));
+    }
+
+    /**
+     * If a previous attempt of this step created the pull request before failing (e.g. during a GitHub outage),
+     * we reuse it instead of failing to create a new one.
+     */
+    private static GHPullRequest getOrCreatePullRequest(GHRepository platformRepository,
+            ReleaseInformation releaseInformation, String platformPreparationBranch) throws IOException {
+        String head = "quarkus-" + releaseInformation.getVersion();
+
+        List<GHPullRequest> existingPullRequests = platformRepository.queryPullRequests()
+                .head(platformRepository.getOwnerName() + ":" + head)
+                .base(platformPreparationBranch)
+                .state(GHIssueState.OPEN)
+                .list()
+                .toList();
+        if (!existingPullRequests.isEmpty()) {
+            GHPullRequest existingPullRequest = existingPullRequests.get(0);
+            LOG.info("Reusing existing Platform pull request #" + existingPullRequest.getNumber());
+            return existingPullRequest;
+        }
+
+        return platformRepository.createPullRequest(
+                "Upgrade to Quarkus " + releaseInformation.getVersion(),
+                head,
+                platformPreparationBranch,
+                "Upgrade to Quarkus " + releaseInformation.getVersion());
     }
 
     @Override
