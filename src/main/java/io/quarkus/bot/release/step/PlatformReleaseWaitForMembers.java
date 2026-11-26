@@ -95,7 +95,7 @@ public class PlatformReleaseWaitForMembers implements StepHandler {
                     + " has been merged in the " + platformPreparationBranch + " branch.\n"
                     + "We pinged in the pull request the teams maintaining components not passing the tests.\n"
                     + "\n"
-                    + "If you need to update your components to fix compatibility issues with this new micro (and only for this reason!), please create your pull requests targeting the "
+                    + "If you need to update your components to fix compatibility or security issues with this new micro (and only for this reason!), please create your pull requests targeting the "
                     + platformPreparationBranch + " branch and make sure they are merged before next Monday.\n");
             comment.append("\n"
                     + "Thanks.\n"
